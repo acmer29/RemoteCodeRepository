@@ -1,9 +1,0 @@
-﻿  DateTime.cpp
-d:\spring2018\cse687\nosqldb\datetime\datetime.cpp(70): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-d:\spring2018\cse687\nosqldb\datetime\datetime.cpp(102): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-d:\spring2018\cse687\nosqldb\datetime\datetime.cpp(103): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-d:\spring2018\cse687\nosqldb\datetime\datetime.cpp(104): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-d:\spring2018\cse687\nosqldb\datetime\datetime.cpp(105): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-d:\spring2018\cse687\nosqldb\datetime\datetime.cpp(106): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-d:\spring2018\cse687\nosqldb\datetime\datetime.cpp(107): warning C4267: '=': conversion from 'size_t' to 'int', possible loss of data
-  DateTime.vcxproj -> D:\Spring2018\CSE687\NoSqlDb\x64\Debug\DateTime.lib
