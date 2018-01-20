@@ -109,6 +109,23 @@ namespace Utilities
     return temp;
   }
 
+  // Check if the string is wrapped correctly.
+  template <typename T>
+  inline bool isUnwrappable(const std::basic_string<T>& toTest, const char wrapper) 
+  {
+	  if (toTest.length() == 0) return false;
+	  typename std::basic_string<T>::const_iterator front, last;
+	  front = toTest.begin(), last = toTest.end() - 1;
+	  return ((*front == *last) && (*front == wrapper));
+  }
+
+  // Remove the customed wrapping character at head and tail of the string.
+  template <typename T>
+  inline std::basic_string<T> unwrapper(const std::basic_string<T>& toUnwrap)
+  {
+	  return toUnwrap.substr(1, toUnwrap.length() - 2);
+  }
+
   /*--- split sentinel separated strings into a vector of trimmed strings ---*/
 
   template <typename T>
@@ -133,6 +150,41 @@ namespace Utilities
       splits.push_back(trim(temp));
     return splits;
   }
+
+  template <typename T>
+  inline std::vector<std::basic_string<T>> splitPlus(const std::basic_string<T>& toSplit, T splitOn = ',')
+  {
+	  std::vector<std::basic_string<T>> splits;
+	  std::basic_string<T> temp;
+	  typename std::basic_string<T>::const_iterator iter;
+	  bool exceptFlag = false;
+	  for (iter = toSplit.begin(); iter != toSplit.end(); ++iter)
+	  {
+		  if (*iter == '[')
+		  {
+			  exceptFlag = true;
+			  temp += *iter;
+		  }
+		  else if (*iter == ']')
+		  {
+			  exceptFlag = false;
+			  temp += *iter;
+		  }
+		  else if (*iter != splitOn || (*iter == splitOn && exceptFlag == true))
+		  {
+			  temp += *iter;
+		  }
+		  else
+		  {
+			  splits.push_back(trim(temp));
+			  temp.clear();
+		  }
+	  }
+	  if (temp.length() > 0)
+		  splits.push_back(trim(temp));
+	  return splits;
+  }
+
   /*--- show collection of string splits ------------------------------------*/
 
   template <typename T>
