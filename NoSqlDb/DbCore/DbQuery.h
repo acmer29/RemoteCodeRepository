@@ -182,11 +182,13 @@ namespace DbQuery {
 					}
 				}
 				else {
-					for (int j = 0; j < result.size(); ++j) {
-						if (result[j].descrip() != keyValuePair[i].second) {
-							typename queryResult<T>::Results::iterator iter = result.begin() + j;
-							result.erase(iter);
+					typename queryResult<T>::Results::iterator iter = result.begin();
+					while (iter != result.end()) {
+						typename queryResult<T>::Instance element = *iter;
+						if (checker(element, keyValuePair[i].first, keyValuePair[i].second) == false) {
+							iter = result.erase(iter);
 						}
+						else if (iter != result.end()) iter++;
 					}
 				}
 			}
@@ -199,11 +201,13 @@ namespace DbQuery {
 					}
 				}
 				else {
-					for (int j = 0; j < result.size(); ++j) {
-						if (std::string(result[j].dateTime()) != keyValuePair[i].second) {
-							typename queryResult<T>::Results::iterator iter = result.begin() + j;
-							result.erase(iter);
+					typename queryResult<T>::Results::iterator iter = result.begin();
+					while (iter != result.end()) {
+						typename queryResult<T>::Instance element = *iter;
+						if (checker(element, keyValuePair[i].first, keyValuePair[i].second) == false) {
+							iter = result.erase(iter);
 						}
+						else if (iter != result.end()) iter++;
 					}
 				}
 			}
@@ -216,11 +220,13 @@ namespace DbQuery {
 					}
 				}
 				else {
-					for (int j = 0; j < result.size(); ++j) {
-						if (checker(result[j], keyValuePair[i].first, keyValuePair[i].second) == false) {
-							typename queryResult<T>::Results::iterator iter = result.begin() + j;
-							result.erase(iter);
+					typename queryResult<T>::Results::iterator iter = result.begin();
+					while (iter != result.end()) {
+						typename queryResult<T>::Instance element = *iter;
+						if (checker(element, keyValuePair[i].first, keyValuePair[i].second) == false) {
+							iter = result.erase(iter);
 						}
+						else if (iter != result.end()) iter++;
 					}
 				}
 			}
@@ -237,7 +243,6 @@ namespace DbQuery {
 	//	   key = "children", value = "["childname1", "childname2"]" (all without outside quotes).
 	template<typename T>
 	bool queryResult<T>::checker(typename queryResult<T>::Instance& element, std::string& key, std::string& value) {
-		std::cout << value << " in checker function" << std::endl;
 		if (key == "name") {
 			if (element.name() == value) return true;
 		}
@@ -266,7 +271,7 @@ namespace DbQuery {
 				else j += 1;
 			}
 			if (i == len1) {
-				std::cout << element.name() << std::endl;
+				// std::cout << element.name() << std::endl;
 				return true;
 			}
 			else return false;
@@ -278,7 +283,7 @@ namespace DbQuery {
 
 	template<typename T>
 	void queryResult<T>::resultDisplay(typename queryResult<T>::Results& toOutput) {
-		std::cout << "The query returns " << toOutput.size() << " result(s)" << std::endl;
+		std::cout << "\n  The query returns " << toOutput.size() << " result(s)" << std::endl;
 		showHeader(std::cout);
 		int vectorLen = toOutput.size();
 		std::ostream& out = std::cout;
