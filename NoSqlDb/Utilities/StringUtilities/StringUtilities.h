@@ -126,6 +126,36 @@ namespace Utilities
 	  return toUnwrap.substr(1, toUnwrap.length() - 2);
   }
 
+  // Modified version of original unwrapper, integrated unwrappable checking.
+  // Reject wrapper except "\"", "\/", "()", "[]", "{}"
+  template <typename T>
+  inline std::basic_string<T> unwrapPlus(const std::basic_string<T>& toUnwrap, T wrapper = '\"') {
+	  if (toUnwrap.size() == 0) throw("Attempt unwrap empty string\n");
+	  typename std::basic_string<T>::const_iterator front = toUnwrap.begin(), last = toUnwrap.end() - 1;
+	  if (wrapper == '\"' || wrapper == '/') {
+		  // std::cout << toUnwrap << " unwrapPlus " << *front << " "  << *last << std::endl;
+		  if (*front != *last) throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+		  else return toUnwrap.substr(1, toUnwrap.length() - 2);
+	  }
+	  else {
+		  if (wrapper == '(') {
+			  if (*front == '(' && *last == ')') return toUnwrap.substr(1, toUnwrap.length() - 2);
+			  else throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+		  }
+		  else if (wrapper == '[') {
+			  if (*front == '[' && *last == ']') return toUnwrap.substr(1, toUnwrap.length() - 2);
+			  else throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+		  }
+		  else if (wrapper == '{') {
+			  if (*front == '{' && *last == '}') return toUnwrap.substr(1, toUnwrap.length() - 2);
+			  else throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+		  }
+		  else {
+			  throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+		  }
+	  }
+  }
+
   /*--- split sentinel separated strings into a vector of trimmed strings ---*/
 
   template <typename T>
@@ -151,6 +181,7 @@ namespace Utilities
     return splits;
   }
 
+  // The modified version of split, which can skip splict character in the "[]" s
   template <typename T>
   inline std::vector<std::basic_string<T>> splitPlus(const std::basic_string<T>& toSplit, T splitOn = ',')
   {
