@@ -5,6 +5,7 @@
 #include "../Utilities/StringUtilities/StringUtilities.h"
 #include <algorithm>
 #include <utility>
+#include <regex>
 namespace DbQuery {
 	template<typename T>
 	class queryResult {
@@ -135,9 +136,7 @@ namespace DbQuery {
 	// expression: the expression of the condition of query, which can be represented into three forms:
 	//			   1. Exactly the string, the string can be a string or a "[]" wrapped array. 
 	//				  ex: name: "name", children: "["child1", "child2"]"
-	//			   2. Part of the string, like SQL, use "*" for 0 or multiple characters, and use "?" for exactly one charachter
-	//				  ex: name: "n*me", dateTime: "$Jan-20-2018$"
-	//			   3. Regular expression, represent as /exp/.
+	//			   2. Regular expression, represent as /exp/.
 	//				  ex: name: "/[A-Z]*/"
 	// Mainwhile, expression can contain filters, start with "$".
 	// 
@@ -171,7 +170,14 @@ namespace DbQuery {
 		for (int i = 0; i < pairLen; ++i) {
 			if (i > 0 && result.size() == 0) return result;
 			if (keyValuePair[i].first == "name") {
-				if (targetDb.contains(keyValuePair[i].second)) result.push_back(targetDb[keyValuePair[i].second]);
+				if (Utilities::checkWrapper(keyValuePair[i].second, '/') == true) {
+					NoSqlDb::DbCore<T>::iterator iter = targetDb.begin();
+					while (iter != targetDb.end()) {
+						if (checker(iter->second, keyValuePair[i].first, keyValuePair[i].second)) result.push_back(iter->second);
+						iter++;
+					}
+				}
+				else if (targetDb.contains(keyValuePair[i].second)) result.push_back(targetDb[keyValuePair[i].second]);
 			}
 			else if (keyValuePair[i].first == "description") {
 				if (result.size() == 0) {
@@ -238,19 +244,34 @@ namespace DbQuery {
 	// key: "name", "description", "dateTime", "children" (all without quotes). 
 	// Any string except these will throw exception.
 	// value: string without quotes, except corresponding value of children, which will be a "[]" wrapped array, 
-	//        each element in array will wrapped with "\""
+	//        each element in array will wrapped with "\"" (no outside quotes).
 	// Ex: key = "name", value = "name" (all without quotes).
 	//	   key = "children", value = "["childname1", "childname2"]" (all without outside quotes).
 	template<typename T>
 	bool queryResult<T>::checker(typename queryResult<T>::Instance& element, std::string& key, std::string& value) {
 		if (key == "name") {
-			if (element.name() == value) return true;
+			if (Utilities::checkWrapper(value, '/') == true) {
+				std::regex regExp(Utilities::unwrapPlus(value, '/'));
+				if (std::regex_match(element.name(), regExp)) return true;
+				else return false;
+			}
+			else if (element.name() == value) return true;
 		}
 		else if (key == "description") {
-			if (element.descrip() == value) return true;
+			if (Utilities::checkWrapper(value, '/') == true) {
+				std::regex regExp(Utilities::unwrapPlus(value, '/'));
+				if (std::regex_match(element.descrip(), regExp)) return true;
+				else return false;
+			}
+			else if (element.descrip() == value) return true;
 		}
 		else if (key == "dateTime") {
-			if (std::string(element.dateTime()) == value) return true;
+			if (Utilities::checkWrapper(value, '/') == true) {
+				std::regex regExp(Utilities::unwrapPlus(value, '/'));
+				if (std::regex_match(std::string(element.dateTime()), regExp)) return true;
+				else return false;
+			}
+			else if (std::string(element.dateTime()) == value) return true;
 		}
 		else if (key == "children") {
 			std::vector<std::string> childrenName;
@@ -264,6 +285,17 @@ namespace DbQuery {
 			std::vector<std::string> candidate = element.children();
 			int i = 0, j = 0, len1 = childrenName.size(), len2 = candidate.size();
 			while (i < len1 && j < len2) {
+				if (Utilities::checkWrapper(childrenName[i], '/') == true) {
+					bool flag = false;
+					std::regex regExp(Utilities::unwrapPlus(childrenName[i], '/'));
+					for (int k = 0; k < candidate.size(); ++k) {
+						if (std::regex_match(candidate[k], regExp) == true) {
+							flag = true;
+							break;
+						}
+					}
+					if (flag == true) i += 1;
+				}
 				if (childrenName[i] == candidate[j]) {
 					i += 1;
 					j += 1;

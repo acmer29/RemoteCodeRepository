@@ -156,6 +156,14 @@ namespace Utilities
 	  }
   }
 
+  template<typename T>
+  inline bool checkWrapper(const std::basic_string<T>& toCheck, T wrapper) {
+	  if (toCheck.size() == 0) return false;
+	  typename std::basic_string<T>::const_iterator front = toCheck.begin(), last = toCheck.end() - 1;
+	  if (*front == wrapper && *last == wrapper) return true;
+	  else return false;
+  }
+
   /*--- split sentinel separated strings into a vector of trimmed strings ---*/
 
   template <typename T>
