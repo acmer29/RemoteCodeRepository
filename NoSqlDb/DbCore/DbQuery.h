@@ -15,7 +15,7 @@ namespace DbQuery {
 		using Instance = NoSqlDb::DbElement<T>;
 		using kvpair = std::pair<std::string, std::string>;
 
-		explicit queryResult(NoSqlDb::DbCore<T>& target);
+		explicit queryResult() {}
 		//Copy constructor, used in return value of and(), or(), not() operation.
 		explicit queryResult(Results input, NoSqlDb::DbCore<T>& target);
 
@@ -44,13 +44,9 @@ namespace DbQuery {
 	private:
 		Results result;
 		NoSqlDb::DbCore<T> db;
-		bool checker(Instance& element, std::string& key, std::string& value);
+		bool checker(Instance& element, std::string& key, std::string& value, bool removeDuplicate = false);
+		Results dbToResult();
 	};
-
-	template<typename T>
-	queryResult<T>::queryResult(NoSqlDb::DbCore<T>& target) {
-		db = target;
-	}
 
 	template<typename T> 
 	queryResult<T>::queryResult(Results input, NoSqlDb::DbCore<T>& target) {
@@ -90,7 +86,7 @@ namespace DbQuery {
 		std::string name = Utilities::trim(data[0]);
 		if (Utilities::isUnwrappable(name, '\"') || data[0].size() > 2) {
 			name = Utilities::unwrapper(name);
-			if (db.contains(name)) return false;
+			if (targetDb.contains(name)) return false;
 			dbRecord.name(name);
 		}
 		else return false;
@@ -102,7 +98,7 @@ namespace DbQuery {
 		for (int i = 0; i < children.size(); ++i) {
 			std::string childName = Utilities::trim(children[i]);
 			if (Utilities::isUnwrappable(childName, '\"')) {
-				if (db.contains(childName) == false) {
+				if (targetDb.contains(childName) == false) {
 					if (shouldStrict == true) return false;
 					else {
 						std::string child = "\"" + childName + "\",\"\",[]" + ",[\"\"]";
@@ -153,7 +149,7 @@ namespace DbQuery {
 		std::vector<std::string> conditions;
 		std::vector<kvpair> keyValuePair;
 		conditions = Utilities::splitPlus(queryString);
-		int items = conditions.size();
+		size_t items = conditions.size();
 		for (int i = 0; i < items; ++i) {
 			std::vector<std::string> condition;
 			condition = Utilities::splitPlus(conditions[i], ':');
@@ -164,80 +160,39 @@ namespace DbQuery {
 			// std::cout << condition[0] << " " << condition[1] << std::endl;
 			keyValuePair.push_back(kvpair(condition[0], condition[1]));
 		}
-		
 		std::sort(keyValuePair.begin(), keyValuePair.end(), [](kvpair a, kvpair b) { return a.first > b.first; });
-		int pairLen = keyValuePair.size();
+		size_t pairLen = keyValuePair.size();
 		for (int i = 0; i < pairLen; ++i) {
-			if (i > 0 && result.size() == 0) return result;
+			if (i > 0 && db.size() == 0) return result;
+			if (db.dbStore().empty() == 0 && keyValuePair[i].first != "name") {
+				NoSqlDb::DbCore<T>::iterator iter = targetDb.begin();
+				while (iter != targetDb.end()) {
+					if (checker(iter->second, keyValuePair[i].first, keyValuePair[i].second, true)) db[iter->first] = iter->second;
+					iter++;
+				}
+				continue;
+			}
 			if (keyValuePair[i].first == "name") {
 				if (Utilities::checkWrapper(keyValuePair[i].second, '/') == true) {
 					NoSqlDb::DbCore<T>::iterator iter = targetDb.begin();
 					while (iter != targetDb.end()) {
-						if (checker(iter->second, keyValuePair[i].first, keyValuePair[i].second)) result.push_back(iter->second);
+						if (checker(iter->second, keyValuePair[i].first, keyValuePair[i].second)) db[iter->first] = iter->second;
 						iter++;
 					}
 				}
-				else if (targetDb.contains(keyValuePair[i].second)) result.push_back(targetDb[keyValuePair[i].second]);
+				else if (targetDb.contains(keyValuePair[i].second)) db[keyValuePair[i].second] = targetDb[keyValuePair[i].second];
 			}
-			else if (keyValuePair[i].first == "description") {
-				if (result.size() == 0) {
-					NoSqlDb::DbCore<T>::iterator iter = targetDb.begin();
-					while (iter != targetDb.end()) {
-						if (targetDb[iter->first].descrip() == keyValuePair[i].second) result.push_back(targetDb[iter->first]);
-						iter++;
+			else {
+				typename NoSqlDb::DbCore<T>::iterator iter = db.begin();
+				while (iter != db.end()) {
+					if (checker(iter->second, keyValuePair[i].first, keyValuePair[i].second) == false) {
+						iter = db.dbStore().erase(iter);
 					}
-				}
-				else {
-					typename queryResult<T>::Results::iterator iter = result.begin();
-					while (iter != result.end()) {
-						typename queryResult<T>::Instance element = *iter;
-						if (checker(element, keyValuePair[i].first, keyValuePair[i].second) == false) {
-							iter = result.erase(iter);
-						}
-						else if (iter != result.end()) iter++;
-					}
-				}
-			}
-			else if (keyValuePair[i].first == "dateTime") {
-				if (result.size() == 0) {
-					NoSqlDb::DbCore<T>::iterator iter = targetDb.begin();
-					while (iter != targetDb.end()) {
-						if (std::string(targetDb[iter->first].dateTime()) == keyValuePair[i].second) result.push_back(targetDb[iter->first]);
-						iter++;
-					}
-				}
-				else {
-					typename queryResult<T>::Results::iterator iter = result.begin();
-					while (iter != result.end()) {
-						typename queryResult<T>::Instance element = *iter;
-						if (checker(element, keyValuePair[i].first, keyValuePair[i].second) == false) {
-							iter = result.erase(iter);
-						}
-						else if (iter != result.end()) iter++;
-					}
-				}
-			}
-			else if (keyValuePair[i].first == "children") {
-				if (result.size() == 0) {
-					NoSqlDb::DbCore<T>::iterator iter = targetDb.begin();
-					while (iter != targetDb.end()) {
-						if (checker(targetDb[iter->first], keyValuePair[i].first, keyValuePair[i].second)) result.push_back(targetDb[iter->first]);
-						iter++;
-					}
-				}
-				else {
-					typename queryResult<T>::Results::iterator iter = result.begin();
-					while (iter != result.end()) {
-						typename queryResult<T>::Instance element = *iter;
-						if (checker(element, keyValuePair[i].first, keyValuePair[i].second) == false) {
-							iter = result.erase(iter);
-						}
-						else if (iter != result.end()) iter++;
-					}
+					else if (iter != db.end()) iter++;
 				}
 			}
 		}
-		return result;
+		return dbToResult();
 	}
 	
 	// The checker operation of find, internal access only (private function).
@@ -248,7 +203,10 @@ namespace DbQuery {
 	// Ex: key = "name", value = "name" (all without quotes).
 	//	   key = "children", value = "["childname1", "childname2"]" (all without outside quotes).
 	template<typename T>
-	bool queryResult<T>::checker(typename queryResult<T>::Instance& element, std::string& key, std::string& value) {
+	bool queryResult<T>::checker(typename queryResult<T>::Instance& element, std::string& key, std::string& value, bool removeDuplicate) {
+		if (removeDuplicate == true) {
+			if (db.contains(element.name())) return false;
+		}
 		if (key == "name") {
 			if (Utilities::checkWrapper(value, '/') == true) {
 				std::regex regExp(Utilities::unwrapPlus(value, '/'));
@@ -283,7 +241,7 @@ namespace DbQuery {
 			}
 			std::sort(childrenName.begin(), childrenName.end(), [](std::string a, std::string b) {return a < b; });
 			std::vector<std::string> candidate = element.children();
-			int i = 0, j = 0, len1 = childrenName.size(), len2 = candidate.size();
+			size_t i = 0, j = 0, len1 = childrenName.size(), len2 = candidate.size();
 			while (i < len1 && j < len2) {
 				if (Utilities::checkWrapper(childrenName[i], '/') == true) {
 					bool flag = false;
@@ -311,13 +269,24 @@ namespace DbQuery {
 		else {
 			throw("Query key invalid at: " + key);
 		}
+		return false;
+	}
+
+	template<typename T>
+	typename queryResult<T>::Results queryResult<T>::dbToResult() {
+		typename NoSqlDb::DbCore<T>::iterator iter = db.begin();
+		while (iter != db.end()) {
+			result.push_back(iter->second);
+			iter++;
+		}
+		return result;
 	}
 
 	template<typename T>
 	void queryResult<T>::resultDisplay(typename queryResult<T>::Results& toOutput) {
 		std::cout << "\n  The query returns " << toOutput.size() << " result(s)" << std::endl;
 		showHeader(std::cout);
-		int vectorLen = toOutput.size();
+		size_t vectorLen = toOutput.size();
 		std::ostream& out = std::cout;
 		for (int i = 0; i < vectorLen; ++i) {
 			out << "\n  ";
