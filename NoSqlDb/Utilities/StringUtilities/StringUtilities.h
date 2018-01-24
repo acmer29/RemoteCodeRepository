@@ -190,26 +190,34 @@ namespace Utilities
   }
 
   // The modified version of split, which can skip splict character in the "[]" s
+  // Split '[', ']', '\"' will be rejected.
   template <typename T>
   inline std::vector<std::basic_string<T>> splitPlus(const std::basic_string<T>& toSplit, T splitOn = ',')
   {
+	  if (splitOn == '[' || splitOn == ']' || splitOn == '\"') throw("Unproper split on string: " + toSplit);
 	  std::vector<std::basic_string<T>> splits;
 	  std::basic_string<T> temp;
 	  typename std::basic_string<T>::const_iterator iter;
-	  bool exceptFlag = false;
+	  int exceptFlag = 0;
+	  bool quoteFlag = false;
 	  for (iter = toSplit.begin(); iter != toSplit.end(); ++iter)
 	  {
 		  if (*iter == '[')
 		  {
-			  exceptFlag = true;
+			  exceptFlag += 1;
 			  temp += *iter;
 		  }
 		  else if (*iter == ']')
 		  {
-			  exceptFlag = false;
+			  exceptFlag -= 1;
 			  temp += *iter;
 		  }
-		  else if (*iter != splitOn || (*iter == splitOn && exceptFlag == true))
+		  else if (*iter == '\"')
+		  {
+			  quoteFlag = !quoteFlag;
+			  temp += *iter;
+		  }
+		  else if (*iter != splitOn || (*iter == splitOn && (exceptFlag != 0 || quoteFlag == true)))
 		  {
 			  temp += *iter;
 		  }
@@ -221,6 +229,69 @@ namespace Utilities
 	  }
 	  if (temp.length() > 0)
 		  splits.push_back(trim(temp));
+	  return splits;
+  }
+
+  // The modified version of splitPlus, now the function can process multiple custom splits
+  // Spliter '[', ']', '\"' will be rejected.
+  template<typename T>
+  inline std::vector<std::basic_string<T>> splitSuperPlus(const std::basic_string<T>& toSplit, const std::basic_string<T>& splitSet)
+  {
+	  if(splitSet.find('[') != -1 || splitSet.find(']') != -1 || splitSet.find('\"') != -1) throw("Unproper split on string: " + toSplit);
+	  std::vector<std::basic_string<T>> splits;
+	  std::basic_string<T> temp;
+	  std::basic_string<T> splitHistory = "";
+	  typename std::basic_string<T>::const_iterator iter;
+	  int exceptFlag = 0;
+	  bool quoteFlag = false;
+	  for (iter = toSplit.begin(); iter != toSplit.end(); ++iter)
+	  {
+		  if (*iter == '[')
+		  {
+			  exceptFlag += 1;
+			  temp += *iter;
+		  }
+		  else if (*iter == ']')
+		  {
+			  exceptFlag -= 1;
+			  temp += *iter;
+		  }
+		  else if (*iter == '\"')
+		  {
+			  quoteFlag = !quoteFlag;
+			  temp += *iter;
+		  }
+		  else 
+		  {
+			  typename std::basic_string<T>::const_iterator iter2 = splitSet.begin();
+			  while (iter2 != splitSet.end()) {
+				  if (*iter != *iter2) {
+					  iter2++;
+				  }
+				  else if(*iter == *iter2 && (exceptFlag != 0 || quoteFlag == true)) {
+					  iter2 = splitSet.end();
+					  break;
+				  }
+				  else {
+					  if (trim(temp) == "") {
+						  temp += *iter2;
+						  splits.push_back(temp);
+						  temp.clear();
+					  }
+					  else {
+						  splits.push_back(trim(temp));
+						  temp.clear();
+						  temp += *iter2;
+						  splits.push_back(temp);
+						  temp.clear();
+					  }
+					  break;
+				  }
+			  }
+			  if(iter2 == splitSet.end()) temp += *iter;
+		  }
+	  }
+	  if (temp.length() > 0) splits.push_back(trim(temp));
 	  return splits;
   }
 
