@@ -68,6 +68,10 @@ namespace NoSqlDb
     Children children() const { return children_; }
     void children(const Children& children) { children_ = children; }
 
+	Children& category() { return category_; }
+	Children category() const { return category_; }
+	void category(const Children& category) { category_ = category; }
+
     T& payLoad() { return payLoad_; }
     T payLoad() const { return payLoad_; }
     void payLoad(const T& payLoad) { payLoad_ = payLoad; }
@@ -77,6 +81,7 @@ namespace NoSqlDb
     std::string descrip_;
     DateTime dateTime_;
     Children children_;
+	Children category_;
     T payLoad_;
   };
 

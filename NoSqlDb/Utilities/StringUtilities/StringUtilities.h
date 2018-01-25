@@ -156,11 +156,14 @@ namespace Utilities
 	  }
   }
 
+  // Check if string is correctly wrapped, also works when string wrapped by "()" or "[]"
   template<typename T>
   inline bool checkWrapper(const std::basic_string<T>& toCheck, T wrapper) {
 	  if (toCheck.size() == 0) return false;
 	  typename std::basic_string<T>::const_iterator front = toCheck.begin(), last = toCheck.end() - 1;
 	  if (*front == wrapper && *last == wrapper) return true;
+	  else if (*front == '(' && *last == ')' && wrapper == '(') return true;
+	  else if (*front == '[' && *last == ']' && wrapper == '[') return true;
 	  else return false;
   }
 

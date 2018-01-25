@@ -26,16 +26,16 @@ namespace DbQuery {
 		//                       create it and add relationship and insert.
 		// shouldStrict = true: If the record contains child that does not exist, 
 		//                      reject the operation and return false instantly.
-		bool insert(NoSqlDb::DbCore<T>& targetDb, std::string record, bool shouldStrict = false);
+		void insert(NoSqlDb::DbCore<T>& targetDb, std::string record, bool shouldStrict = false);
 
 		Results find(NoSqlDb::DbCore<T>& targetDb, std::string queryString);
+		Results find(Results& targetSet, std::string queryString);
 
 		void remove(NoSqlDb::DbCore<T>& targetDb, std::string queryString);
 		void remove(NoSqlDb::DbCore<T>& targetDb, Results& toRemove);
 
-		void update(NoSqlDb::DbCore<T>& targetDb, std::string queryString, std::string newValue, bool updateMode = false, bool updateMulti = true);
-		void update(NoSqlDb::DbCore<T>& targetDb, Results toUpdate, std::string newValue, bool updateMode = false, bool updateMulti = true);
-		void update(NoSqlDb::DbCore<T>& targetDb, std::string queryString, Instance newValue, bool updateMode = false, bool updateMulti = true);
+		void update(NoSqlDb::DbCore<T>& targetDb, std::string queryString, std::string newValue, bool updateMode = false);
+		void update(NoSqlDb::DbCore<T>& targetDb, Results toUpdate, std::string newValue, bool updateMode = false);
 
 		void drop(NoSqlDb::DbCore<T>& targetDb);
 		/*queryResult<T> and (const queryResult<T>&) const;
@@ -50,13 +50,16 @@ namespace DbQuery {
 	private:
 		Results result;
 		NoSqlDb::DbCore<T> db;
+
 		bool checker(Instance& element, std::string& key, std::string& value, bool removeDuplicate = false);
-		Results dbToResult(bool clearDb = false);
+		NoSqlDb::DbCore<T> finder(NoSqlDb::DbCore<T>& collection, std::string& key, std::string& expression);
+
+		Results dbToResult(NoSqlDb::DbCore<T>& targetDb, bool clearDb = false);
 		kvPairs keyValuePairGenerator(std::string queryString, bool updateCheck = false);
 		void internalFind(NoSqlDb::DbCore<T>& targetDb, std::string queryString);
 		std::pair<std::string, std::string> filterSolver(std::string& valueWithFilter);
-		std::vector<std::string> childrenNameGenerator(std::string& children);
-		NoSqlDb::DbCore<T> finder(NoSqlDb::DbCore<T>& collection, std::string& key, std::string& expression);
+		std::vector<std::string> valueListGenerator(std::string& children);
+		DateTime dateTimeFormatter(std::string& toFormat);
 	};
 
 	template<typename T> 
@@ -69,69 +72,86 @@ namespace DbQuery {
 		return result;
 	}
 
-	// Assume the accept string is like ("name", "", [], ["value", ""]), (without parentheses).
-	// The second metadata - description, can presents or absents, as well as the catagory parameter.
-	// The two pairs of bracket must present, the first represents to the children names, 
-	// The second represents to the payload array, contains payload value and catagory.
-	// All values, if present, must be wrapped with quotes.
-	// Any adjacent items, must be seprated with carma.
-	// Any violation of above criteria will be rejected.
+	// Record: 
+	//     Assume the accept string is like ("name", "", [], "value", [""]), (without outside parentheses).
+	//     The second metadata - description, can presents or absents, as well as the catagory parameter,
+	//     which is represented by the last array.
+	//     The two pairs of bracket must present, the first represents to the children names, 
+	//     and the second represents to the category array, which contains catagory.
+	//     All values, if present, must be wrapped with quotes.
+	//     Any adjacent items, must be seprated with ",".
+	//     Any violation of above criteria will be REJECTED.
+	// shouldStrict:
+	//		true (need explicate indicate): if inserting element whose child is not currently in the db, 
+	//										the operation will be REJECTED.
+	//		false (by default): if inserting element whose child is not currently in the db, a element 
+	//							like ("this/child/name", "", [], "", [""]) will be inserted. 
 	template<typename T> 
-	bool queryResult<T>::insert(NoSqlDb::DbCore<T>& targetDb, std::string record, bool shouldStrict) {
+	void queryResult<T>::insert(NoSqlDb::DbCore<T>& targetDb, std::string record, bool shouldStrict) {
 		// The instance to be insert in db.
 		typename queryResult<T>::Instance dbRecord;
-		// The vector to contain each data/metadata item.
+		// The vector / string to contain each data/metadata item.
 		std::vector<std::string> data;
-		// The vector to contian children names.
 		std::vector<std::string> children;
-		// The vector to contain payload and catagory (if have).
-		std::vector<std::string> payloads;
+		std::vector<std::string> categories;
+		std::string name;
+		std::string payLoad;
+		std::string description;
 		// Split raw input into metadata and / or data.
 		data = Utilities::splitPlus(record);
 		// Rule out the possible invalid input.
-		if (data.size() < 3 || data.size() > 4) return false;
-		// std::cout << "here!" << std::endl;
-		if (data.size() == 4) children = Utilities::split(Utilities::unwrapper(data[2]));
-		payloads = Utilities::split((data.size() == 3) ? Utilities::unwrapper(data[2]) : Utilities::unwrapper(data[3]));
-		if (payloads.empty() == true || payloads.size() > 2) return false;
-		std::string name = Utilities::trim(data[0]);
-		if (Utilities::isUnwrappable(name, '\"') || data[0].size() > 2) {
-			name = Utilities::unwrapper(name);
-			if (targetDb.contains(name)) return false;
-			dbRecord.name(name);
+		if (data.size() < 2) throw("Too few argument in insert operation: " + std::to_string(data.size()) + "given, 2 needed at least.\n");
+		else if (data.size() == 3) {
+			name = Utilities::unwrapPlus(Utilities::trim(data[0]));
+			children = valueListGenerator(data[1]);
+			payLoad = Utilities::unwrapPlus(Utilities::trim(data[0]));
 		}
-		else return false;
-		if (data.size() == 4) {
-			std::string description = Utilities::trim(data[1]);
-			if (Utilities::isUnwrappable(description, '\"')) dbRecord.descrip(unwrapper(description));
-			else return false;
+		// 0    1  2  3
+		// name "" [] ""
+		// name "" [] [""]
+		// name [] "" [""]
+		else if (data.size() == 4) {
+			name = Utilities::unwrapPlus(Utilities::trim(data[0]));
+			description = (Utilities::checkWrapper(data[1], '[') == true) ? "" : Utilities::unwrapPlus(Utilities::trim(data[1]));
+			children = (Utilities::checkWrapper(data[1], '[') == true) ? valueListGenerator(data[1]) : valueListGenerator(data[2]);
+			payLoad = (Utilities::checkWrapper(data[1], '[') == true) ? Utilities::unwrapPlus(Utilities::trim(data[2])) 
+			  : ((Utilities::checkWrapper(data[3], '[') == true) ? "" : Utilities::unwrapPlus(Utilities::trim(data[3])));
+			if (Utilities::checkWrapper(data[3], '[') == true) categories= valueListGenerator(data[3]);
 		}
-		for (int i = 0; i < children.size(); ++i) {
-			std::string childName = Utilities::trim(children[i]);
-			if (Utilities::isUnwrappable(childName, '\"')) {
-				if (targetDb.contains(childName) == false) {
-					if (shouldStrict == true) return false;
-					else {
-						std::string child = "\"" + childName + "\",\"\",[]" + ",[\"\"]";
-						insert(targetDb, child);
-					}
-				}
-				dbRecord.children().push_back(Utilities::unwrapper(childName));
-			}
-			else return false;
+		else if (data.size() == 5) {
+			name = Utilities::unwrapPlus(Utilities::trim(data[0]));
+			description = Utilities::unwrapPlus(Utilities::trim(data[1]));
+			children = valueListGenerator(data[2]);
+			payLoad = Utilities::unwrapPlus(Utilities::trim(data[3]));
+			categories = valueListGenerator(data[3]);
 		}
-		std::sort(dbRecord.children().begin(), dbRecord.children().end(), [](std::string a, std::string b) {return a < b; });
-		std::string payload = Utilities::trim(payloads[0]);
-		if (Utilities::isUnwrappable(payloads[0], '\"')) dbRecord.payLoad(Utilities::unwrapper(payload));
-		else return false;
-		if (payloads.size() > 1) {
-			// TODO: Add Catagory
+		else {
+			throw("Too many arguments in insert operation: " + std::to_string(data.size()) + "given, 2 needed at most.\n");
 		}
-		
+		dbRecord.name(name);
+		dbRecord.descrip(description);
+		dbRecord.children(children);
+		dbRecord.payLoad(payLoad);
+		dbRecord.category(categories);
 		dbRecord.dateTime(DateTime().now());
 		targetDb[name] = dbRecord;
-		// std::cout << "\n" << db[name].name() << " " << db[name].descrip() << " " << db[name].payLoad() << std::endl;
-		return true;
+		std::cout << "\nInserted: -\n" << "name: " << dbRecord.name() << ", description: " << dbRecord.descrip() << ", payLoad: " << dbRecord.payLoad() << std::endl;
+		std::cout << "With children: ";
+		typename NoSqlDb::DbElement<T>::Children::iterator iter = dbRecord.children().begin();
+		while (iter != dbRecord.children().end()) {
+			std::cout << *iter << " ";
+			iter++;
+		}
+		std::cout << std::endl;
+		std::cout << "With category: ";
+		iter = dbRecord.category().begin();
+		while (iter != dbRecord.category().end()) {
+			std::cout << *iter << " ";
+			iter++;
+		}
+		std::cout << std::endl;
+		std::cout << "Operation successful!" << std::endl;
+		return;
 	}
 
 	// The queryString has a basic form - (column: "expression") (no parentheses)
@@ -166,7 +186,19 @@ namespace DbQuery {
 			return result;
 		}
 		internalFind(targetDb, queryString);
-		return dbToResult();
+		return dbToResult(db, true);
+	}
+
+	template<typename T>
+	typename queryResult<T>::Results queryResult<T>::find(Results& targetSet, std::string queryString) {
+		typename queryResult<T>::Results::iterator iter = targetSet.begin();
+		while (iter != targetSet.end()) {
+			db[iter->name()] = *iter;
+			iter++;
+		}
+		internalFind(db, queryString);
+		targetSet = dbToResult(db, true);
+		return targetSet;
 	}
 
 	// The shadow function of "find" function, and the real worker of the find.
@@ -185,7 +217,7 @@ namespace DbQuery {
 				return;
 			}
 			if (keyValuePair[i].first == "children") {
-				std::vector<std::string> childrenName = childrenNameGenerator(keyValuePair[i].second);
+				std::vector<std::string> childrenName = valueListGenerator(keyValuePair[i].second);
 				size_t nameLen = childrenName.size();
 				for (int j = 0; j < nameLen; ++j) {
 					db = finder(db, keyValuePair[i].first, childrenName[j]);
@@ -262,7 +294,7 @@ namespace DbQuery {
 			else if (std::string(element.dateTime()) == value) return true;
 		}
 		else if (key == "children") {
-			std::vector<std::string> childrenName = childrenNameGenerator(value);
+			std::vector<std::string> childrenName = valueListGenerator(value);
 			std::vector<std::string> candidate = element.children();
 			size_t i = 0, j = 0, len1 = childrenName.size(), len2 = candidate.size();
 			while (i < len1 && j < len2) {
@@ -320,6 +352,7 @@ namespace DbQuery {
 					else if (iter != collection.end()) iter++;
 				}
 			}
+			else throw("Unrecognized filter: " + filter + "\n");
 		}
 		else {
 			typename NoSqlDb::DbCore<T>::iterator iter = collection.begin();
@@ -379,7 +412,7 @@ namespace DbQuery {
 	// except the all keys will appear no more than once.
 	// The children item can be decorated with filters (or call operators), start with "$" and wrapped with "()".
 	//		normal form: children: "["childname1", "childname2"]"
-	//		with filter: children: "$(filter)["childname1", "childname2"]"
+	//		with filter: children: "$(filter)(["childname1", "childname2"])"
 	// In update operation, valid filters are:
 	//		1. $(add): add all children in the "[]", if the child is already existed, skip that child.
 	//		2. $(remove): remove all children in the "[]", if the child is already removed, skip that child.
@@ -390,11 +423,8 @@ namespace DbQuery {
 	//		If updateMode = false (default-set), try to add a non-exist childName will be rejected (throw exception).
 	//		If updateMode = true (need explict indicate), try to add a non-exist childName will result of a insert of 
 	//													   a new dbElement("childName", "", "[]", "[""]") into database.
-	// The updateMulti determines the function behavior if queryString returns more than one results,
-	//		If updateMulti = true (default-set), all query result will get updated by newValue.
-	//		If updateMulti = false (need explict indicate), query result > 1 will be rejected (throw exception).
 	template<typename T>
-	void queryResult<T>::update(NoSqlDb::DbCore<T>& targetDb, std::string queryString, std::string newValue, bool updateMode, bool updateMulti) {
+	void queryResult<T>::update(NoSqlDb::DbCore<T>& targetDb, std::string queryString, std::string newValue, bool updateMode) {
 		if (result.size() != 0) result.clear();
 		internalFind(targetDb, queryString);
 		kvPairs keyValuePair = keyValuePairGenerator(newValue, true);
@@ -417,7 +447,7 @@ namespace DbQuery {
 						std::string filter = filterChildren.first;
 						if (filter != "add" && filter != "remove" && filter != "replace") throw("filter usage invalid in query string: " + queryString);
 						else {
-							std::vector<std::string> childrenName = childrenNameGenerator(filterChildren.second);
+							std::vector<std::string> childrenName = valueListGenerator(filterChildren.second);
 							if (filter == "replace") {
 								targetDb[iter->first].children().clear();
 								for (int j = 0; j < childrenName.size(); ++i) {
@@ -437,42 +467,47 @@ namespace DbQuery {
 								}
 							}
 							else if (filter == "add") {
-								std::vector<std::string> *tmp = new std::vector<std::string>;
+								std::vector<std::string> tmp;
 								std::vector<std::string>::iterator p = targetDb[iter->first].children().begin();
 								std::vector<std::string>::iterator q = childrenName.begin();
 								while (p != targetDb[iter->first].children().end() && q != childrenName.end()) {
 									if (*q < *p) {
-										tmp->push_back(*q);
+										tmp.push_back(*q);
 										q++;
 									}
 									else if (*q > *p) {
-										tmp->push_back(*p);
+										tmp.push_back(*p);
 										p++;
 									}
 									else {
-										tmp->push_back(*p);
+										tmp.push_back(*p);
 										p++, q++;
 									}
 								}
+								
 								while (p != targetDb[iter->first].children().end()) {
-									tmp->push_back(*p);
+									tmp.push_back(*p);
 									p++;
 								}
 								while (q != childrenName.end()) {
-									tmp->push_back(*q);
+									tmp.push_back(*q);
 									q++;
 								}
 								targetDb[iter->first].children().clear();
-								p = tmp->begin();
-								while (p != tmp->end()) {
+								p = tmp.begin();
+								while (p != tmp.end()) {
 									targetDb[iter->first].children().push_back(*p);
+									p++;
 								}
-								delete tmp;
+
+							}
+							else {
+								throw("Unrecognized filter: " + filter + " at query string: " + queryString);
 							}
 						}
 					}
 					else {
-						std::vector<std::string> childrenName = childrenNameGenerator(keyValuePair[i].second);
+						std::vector<std::string> childrenName = valueListGenerator(keyValuePair[i].second);
 						targetDb[iter->first].children().clear();
 						for (int j = 0; j < childrenName.size(); ++i) {
 							targetDb[iter->first].children().push_back(childrenName[j]);
@@ -481,12 +516,13 @@ namespace DbQuery {
 				}
 			}
 		}
+		std::cout << "\n  Update operation affects " << db.size() + "result" << ((db.size() > 1) ? "s." : ".") << std::endl;
 		db.dbStore().clear();
 		return;
 	}
 
 	template<typename T>
-	std::vector<std::string> queryResult<T>::childrenNameGenerator(std::string& children) {
+	std::vector<std::string> queryResult<T>::valueListGenerator(std::string& children) {
 		std::vector<std::string> childrenName;
 		std::string valueAfter = Utilities::unwrapPlus(children, '[');
 		childrenName = Utilities::split(valueAfter);
@@ -498,14 +534,36 @@ namespace DbQuery {
 		return childrenName;
 	}
 
+	// 1 day
+	// year, month, week, day, hour, minute, second
 	template<typename T>
-	typename queryResult<T>::Results queryResult<T>::dbToResult(bool clearDb) {
-		typename NoSqlDb::DbCore<T>::iterator iter = db.begin();
-		while (iter != db.end()) {
+	DateTime queryResult<T>::dateTimeFormatter(std::string& toFormat) {
+		if (toFormat == "now") return DateTime.now();
+		toFormat = Utilities.trim(toFormat);
+		std::string num = "";
+		std::string timeUnit = "";
+		size_t strLen = toFormat.length();
+		for (int i = 0; i < strLen; ++i) {
+			if ('0' >= toFormat[i] && toFormat[i] >= '9') num += toFormat[i];
+			else break;
+		}
+		if (i >= strLen) throw("Please indicate the time unit.\n");
+		timeUnit = Utilities::trim(toFormat.substr(i, toFormat.length()));
+		if (timeUnit == "year") {
+			//TODO: ADD PROCESS CODE
+		}
+	}
+
+	template<typename T>
+	typename queryResult<T>::Results queryResult<T>::dbToResult(NoSqlDb::DbCore<T>& targetDb, bool clearDb) {
+		if (result.size() != 0) result.clear();
+		typename NoSqlDb::DbCore<T>::iterator iter = targetDb.begin();
+		while (iter != targetDb.end()) {
 			result.push_back(iter->second);
 			iter++;
 		}
-		if (clearDb == true) db.dbStore().clear();
+		if (clearDb == true) targetDb.dbStore().clear();
+		std::cout << "Converting " << std::to_string(result.size()) << " into output results" << std::endl;
 		return result;
 	}
 
