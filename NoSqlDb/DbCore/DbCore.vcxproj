@@ -152,7 +152,6 @@
   <ItemGroup>
     <ClInclude Include="..\Utilities\TestUtilities\TestUtilities.h" />
     <ClInclude Include="DbCore.h" />
-    <ClInclude Include="DbQuery.h" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DateTime\DateTime.vcxproj">
