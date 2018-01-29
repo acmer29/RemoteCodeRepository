@@ -157,8 +157,8 @@
     <ProjectReference Include="..\DateTime\DateTime.vcxproj">
       <Project>{c1e1f450-b7e1-4796-84d5-7d3c831dff68}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Query\Query.vcxproj">
-      <Project>{676d3260-d149-462a-a4df-114378a0249d}</Project>
+    <ProjectReference Include="..\Persistence\Persistence.vcxproj">
+      <Project>{86e3d375-86ec-4399-833d-61bb562e5fd5}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

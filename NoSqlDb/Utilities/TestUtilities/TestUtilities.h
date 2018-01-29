@@ -35,6 +35,7 @@
 */
 
 #include <vector>
+#include <functional>
 
 /////////////////////////////////////////////////////////////////////
 // TestExecutor class
@@ -97,9 +98,17 @@ public:
   bool doTests();
   void registerTest(Test t, const std::string& testName);
   void registerTest(TestStr ts);
+
+protected:
+	Tests & getTest();
+
 private:
   Tests tests_;
 };
+
+inline TestExecutive::Tests& TestExecutive::getTest() {
+	return tests_;
+}
 
 inline void TestExecutive::registerTest(Test t, const std::string& testName)
 {
