@@ -1,0 +1,35 @@
+
+                                      CodeAnalysis - Version 1.4
+    ==============================================================================================
+     Tue Jan 30 17:54:58 2018
+     Path: "D:\Spring2018\cse687\NoSqlDb\Persistence"
+     Args: Persisence.h, /m, /r, /f
+                                                                               
+           Code Metrics - Start Line, Size (lines/code), and Complexity (number of scopes)
+    ==============================================================================================
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+                             namespace                   Global Namespace       1       1      18
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+              Persisence.h   namespace                      DbPersistence      10     152      17
+              Persisence.h       class                        persistence      12      14       8
+              Persisence.h    function                            persist      28      45       4
+              Persisence.h    function                            restore      75      27       3
+              Persisence.h    function                        restoreName     104       8       1
+              Persisence.h    function                 restoreDescription     114       7       1
+              Persisence.h    function                    restoreDateTime     123       7       1
+              Persisence.h    function                    restoreChildren     132      11       2
+              Persisence.h    function                    restorePayLoads     145      16       3
+
+                          Functions Exceeding Metric Limits and Public Data
+    ==============================================================================================
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+
+
+
+    searched     6 dirs
+   processed     1 files

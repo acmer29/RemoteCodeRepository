@@ -1,0 +1,33 @@
+
+                                      CodeAnalysis - Version 1.4
+    ==============================================================================================
+     Tue Jan 30 11:29:53 2018
+     Path: "D:\Spring2018\cse687\NoSqlDb\XmlDocument\XmlDocument"
+     Args: XmlDocument.h, /m, /r, /f
+                                                                               
+           Code Metrics - Start Line, Size (lines/code), and Complexity (number of scopes)
+    ==============================================================================================
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+                             namespace                   Global Namespace       1       1       9
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+             XmlDocument.h   namespace                      XmlProcessing      84      79       8
+             XmlDocument.h       class                        XmlDocument      89      36       5
+             XmlDocument.h    function                        XmlDocument      95       2       1
+             XmlDocument.h    function                         docElement     104       2       1
+             XmlDocument.h    function                                DFS     130       5       1
+             XmlDocument.h    function                                DFS     146       6       1
+             XmlDocument.h    function                                DFS     156       6       1
+
+                          Functions Exceeding Metric Limits and Public Data
+    ==============================================================================================
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+
+
+
+    searched     6 dirs
+   processed     1 files

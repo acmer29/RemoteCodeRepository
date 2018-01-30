@@ -130,7 +130,7 @@ namespace Utilities
   // Reject wrapper except "\"", "\/", "()", "[]", "{}"
   template <typename T>
   inline std::basic_string<T> unwrapPlus(const std::basic_string<T>& toUnwrap, T wrapper = '\"') {
-	  if (toUnwrap.size() == 0) throw("Attempt unwrap empty string\n");
+	  if (toUnwrap.size() == 0) throw std::exception("Attempt unwrap empty string.\n");
 	  typename std::basic_string<T>::const_iterator front = toUnwrap.begin(), last = toUnwrap.end() - 1;
 	  if (wrapper == '\"' || wrapper == '/') {
 		  // std::cout << toUnwrap << " unwrapPlus " << *front << " "  << *last << std::endl;
@@ -140,18 +140,18 @@ namespace Utilities
 	  else {
 		  if (wrapper == '(') {
 			  if (*front == '(' && *last == ')') return toUnwrap.substr(1, toUnwrap.length() - 2);
-			  else throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+			  else throw std::exception("Incorrectly wrapping string.\n");
 		  }
 		  else if (wrapper == '[') {
 			  if (*front == '[' && *last == ']') return toUnwrap.substr(1, toUnwrap.length() - 2);
-			  else throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+			  else throw std::exception("Incorrectly wrapping string.\n");
 		  }
 		  else if (wrapper == '{') {
 			  if (*front == '{' && *last == '}') return toUnwrap.substr(1, toUnwrap.length() - 2);
-			  else throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+			  else throw std::exception("Incorrectly wrapping string.\n");
 		  }
 		  else {
-			  throw("Incorrectly wrapping string at: " + toUnwrap + "\n");
+			  throw std::exception("Incorrectly wrapping string.\n");
 		  }
 	  }
   }
@@ -197,7 +197,7 @@ namespace Utilities
   template <typename T>
   inline std::vector<std::basic_string<T>> splitPlus(const std::basic_string<T>& toSplit, T splitOn = ',')
   {
-	  if (splitOn == '[' || splitOn == ']' || splitOn == '\"') throw("Unproper split on string: " + toSplit);
+	  if (splitOn == '[' || splitOn == ']' || splitOn == '\"') throw std::exception("Split Plus: Unproper split of input string.\n");
 	  std::vector<std::basic_string<T>> splits;
 	  std::basic_string<T> temp;
 	  typename std::basic_string<T>::const_iterator iter;
@@ -232,69 +232,6 @@ namespace Utilities
 	  }
 	  if (temp.length() > 0)
 		  splits.push_back(trim(temp));
-	  return splits;
-  }
-
-  // The modified version of splitPlus, now the function can process multiple custom splits
-  // Spliter '[', ']', '\"' will be rejected.
-  template<typename T>
-  inline std::vector<std::basic_string<T>> splitSuperPlus(const std::basic_string<T>& toSplit, const std::basic_string<T>& splitSet)
-  {
-	  if(splitSet.find('[') != -1 || splitSet.find(']') != -1 || splitSet.find('\"') != -1) throw("Unproper split on string: " + toSplit);
-	  std::vector<std::basic_string<T>> splits;
-	  std::basic_string<T> temp;
-	  std::basic_string<T> splitHistory = "";
-	  typename std::basic_string<T>::const_iterator iter;
-	  int exceptFlag = 0;
-	  bool quoteFlag = false;
-	  for (iter = toSplit.begin(); iter != toSplit.end(); ++iter)
-	  {
-		  if (*iter == '[')
-		  {
-			  exceptFlag += 1;
-			  temp += *iter;
-		  }
-		  else if (*iter == ']')
-		  {
-			  exceptFlag -= 1;
-			  temp += *iter;
-		  }
-		  else if (*iter == '\"')
-		  {
-			  quoteFlag = !quoteFlag;
-			  temp += *iter;
-		  }
-		  else 
-		  {
-			  typename std::basic_string<T>::const_iterator iter2 = splitSet.begin();
-			  while (iter2 != splitSet.end()) {
-				  if (*iter != *iter2) {
-					  iter2++;
-				  }
-				  else if(*iter == *iter2 && (exceptFlag != 0 || quoteFlag == true)) {
-					  iter2 = splitSet.end();
-					  break;
-				  }
-				  else {
-					  if (trim(temp) == "") {
-						  temp += *iter2;
-						  splits.push_back(temp);
-						  temp.clear();
-					  }
-					  else {
-						  splits.push_back(trim(temp));
-						  temp.clear();
-						  temp += *iter2;
-						  splits.push_back(temp);
-						  temp.clear();
-					  }
-					  break;
-				  }
-			  }
-			  if(iter2 == splitSet.end()) temp += *iter;
-		  }
-	  }
-	  if (temp.length() > 0) splits.push_back(trim(temp));
 	  return splits;
   }
 

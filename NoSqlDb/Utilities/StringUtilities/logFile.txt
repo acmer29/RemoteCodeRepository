@@ -1,0 +1,38 @@
+
+                                      CodeAnalysis - Version 1.4
+    ==============================================================================================
+     Tue Jan 30 16:45:11 2018
+     Path: "D:\Spring2018\cse687\NoSqlDb\Utilities\StringUtilities"
+     Args: StringUtilities.h, /m, /r, /f
+                                                                               
+           Code Metrics - Start Line, Size (lines/code), and Complexity (number of scopes)
+    ==============================================================================================
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+                             namespace                   Global Namespace       1       1      34
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+         StringUtilities.h   namespace                          Utilities      49     205      33
+         StringUtilities.h    function                              Title      56       4       1
+         StringUtilities.h    function                              title      63       4       1
+         StringUtilities.h    function                            putline      70       4       1
+         StringUtilities.h    function                               trim      80      31       6
+         StringUtilities.h    function                      isUnwrappable     115       6       1
+         StringUtilities.h    function                          unwrapper     125       3       1
+         StringUtilities.h    function                         unwrapPlus     132      26       7
+         StringUtilities.h    function                       checkWrapper     161       8       1
+         StringUtilities.h    function                              split     174      20       4
+         StringUtilities.h    function                          splitPlus     199      38       7
+         StringUtilities.h    function                         showSplits     242      11       2
+
+                          Functions Exceeding Metric Limits and Public Data
+    ==============================================================================================
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+
+
+
+    searched     6 dirs
+   processed     1 files
