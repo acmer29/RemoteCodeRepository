@@ -3,29 +3,7 @@
 #include "../Utilities/StringUtilities/StringUtilities.h"
 #include "../Query/Query.h"
 
-using namespace Utilities;
-
-#ifdef TEST_ALL
-
-
-class DbProvider {
-
-};
-
-class QueryProvider {
-
-};
-
-class PersistenceProvider {
-
-};
-
-class
-
-int main() {
-
-}
-#endif
+using namespace DbTest;
 
 #ifndef TEST_TEST
 bool test_always_passes() { return true; }
@@ -36,7 +14,7 @@ bool test_always_throws() {
 }
 
 int main() {
-	DbTest::test tester;
+	test tester;
 	tester.registerTest(test_always_passes, "A should-pass test");
 	tester.registerTest(test_always_fails, "A should-fail test");
 	tester.registerTest(test_always_throws, "A should-throw test");

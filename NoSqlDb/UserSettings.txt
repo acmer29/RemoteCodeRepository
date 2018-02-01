@@ -1,9 +1,9 @@
-D:\Spring2018\cse687\NoSqlDb\Test
+D:\Spring2018\cse687\NoSqlDb\Query
 false
 false
 false
 true
-Test.h
+Query.h
 false
 true
 false

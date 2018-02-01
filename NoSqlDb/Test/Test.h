@@ -45,7 +45,7 @@ namespace DbTest{
 		}
 		out << "------" << std::endl;
 		out << "  " << "PASSED: " << std::setw(4) << passedTests.size() << std::endl;
-		out << "  " << "FAILED: " << std::setw(4) << passedTests.size() << std::endl;
+		out << "  " << "FAILED: " << std::setw(4) << failedTests.size() << std::endl;
 	}
 }
 #endif // !TEST_H

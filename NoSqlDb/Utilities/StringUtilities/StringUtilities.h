@@ -131,6 +131,7 @@ namespace Utilities
   template <typename T>
   inline std::basic_string<T> unwrapPlus(const std::basic_string<T>& toUnwrap, T wrapper = '\"') {
 	  if (toUnwrap.size() == 0) throw std::exception("Attempt unwrap empty string.\n");
+	  if (checkWrapper(toUnwrap, wrapper) == false) throw std::exception("Incorrectly wrapping string.\n");
 	  typename std::basic_string<T>::const_iterator front = toUnwrap.begin(), last = toUnwrap.end() - 1;
 	  if (wrapper == '\"' || wrapper == '/') {
 		  // std::cout << toUnwrap << " unwrapPlus " << *front << " "  << *last << std::endl;
