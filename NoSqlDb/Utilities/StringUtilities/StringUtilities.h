@@ -198,7 +198,7 @@ namespace Utilities
   template <typename T>
   inline std::vector<std::basic_string<T>> splitPlus(const std::basic_string<T>& toSplit, T splitOn = ',')
   {
-	  if (splitOn == '[' || splitOn == ']' || splitOn == '\"') throw std::exception("Split Plus: Unproper split of input string.\n");
+	  if (splitOn == '(' || splitOn == ')' || splitOn == '\"') throw std::exception("Split Plus: Unproper split of input string.\n");
 	  std::vector<std::basic_string<T>> splits;
 	  std::basic_string<T> temp;
 	  typename std::basic_string<T>::const_iterator iter;
@@ -206,12 +206,12 @@ namespace Utilities
 	  bool quoteFlag = false;
 	  for (iter = toSplit.begin(); iter != toSplit.end(); ++iter)
 	  {
-		  if (*iter == '[')
+		  if (*iter == '(')
 		  {
 			  exceptFlag += 1;
 			  temp += *iter;
 		  }
-		  else if (*iter == ']')
+		  else if (*iter == ')')
 		  {
 			  exceptFlag -= 1;
 			  temp += *iter;
