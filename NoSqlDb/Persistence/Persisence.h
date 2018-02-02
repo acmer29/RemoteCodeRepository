@@ -3,6 +3,7 @@
 #define PERSISTENCE_H
 #include <iostream>
 #include <fstream>
+// #include <locale>
 #include "../DbCore/DbCore.h"
 #include "../XmlDocument/XmlDocument/XmlDocument.h"
 #include "../XmlDocument/XmlElement/XmlElement.h"
@@ -10,13 +11,18 @@
 namespace DbPersistence {
 	template<typename T>
 	class persistence {
-		using Content = std::vector<NoSqlDb::DbElement<T>>;
-		using Document = XmlProcessing::XmlDocument; 
-		using sPtr = std::shared_ptr < XmlProcessing::AbstractXmlElement >;
 	public:
+
+		using Content = std::vector<NoSqlDb::DbElement<T>>;
+		using Document = XmlProcessing::XmlDocument;
+		using sPtr = std::shared_ptr < XmlProcessing::AbstractXmlElement >;
+		
 		void persist(Content toPersist, const std::string& fileName);
+		
 		Content restore(const std::string& fileName);
+
 	private:
+
 		void restoreName(NoSqlDb::DbElement<T>& record, const sPtr& rData);
 		void restoreDescription(NoSqlDb::DbElement<T>& record, const sPtr& rData);
 		void restoreDateTime(NoSqlDb::DbElement<T>& record, const sPtr& rData);
@@ -49,15 +55,15 @@ namespace DbPersistence {
 				children->addChild(childName);
 			}
 			record->addChild(children);
-			sPtr payLoad = XmlProcessing::makeTaggedElement("payLoad");
-			sPtr payLoadValue = XmlProcessing::makeTaggedElement("value");
+			sPtr payLoad = XmlProcessing::makeTaggedElement("payLoads");
+			sPtr payLoadValue = XmlProcessing::makeTaggedElement("payLoad");
 			payLoadValue->addChild(XmlProcessing::makeTextElement((*iter).payLoad()));
 			payLoad->addChild(payLoadValue);
-			sPtr categories = XmlProcessing::makeTaggedElement("category");
+			sPtr categories = XmlProcessing::makeTaggedElement("categories");
 			std::vector<std::string> categoryName = (*iter).category();
 			std::vector<std::string>::iterator cateIter;
 			for (cateIter = categoryName.begin(); cateIter != categoryName.end(); cateIter++) {
-				sPtr category = XmlProcessing::makeTaggedElement("value");
+				sPtr category = XmlProcessing::makeTaggedElement("category");
 				category->addChild(XmlProcessing::makeTextElement(*cateIter));
 				categories->addChild(category);
 			}
@@ -65,16 +71,20 @@ namespace DbPersistence {
 			record->addChild(payLoad);
 			root->addChild(record);
 		}
+		// std::locale loc = std::locale::global(std::locale(""));
 		std::ofstream saveFile(fileName + ".xml");
 		saveFile << file.toString();
 		std::cout << "Saved " << toPersist.size() << " to " << fileName << std::endl;
+		// std::locale::global(loc);
 		return;
 	}
 
 	template<typename T>
 	typename persistence<T>::Content persistence<T>::restore(const std::string& fileName) {
 		Content collection;
+		// std::locale loc = std::locale::global(std::locale(""));
 		Document file(fileName, XmlProcessing::XmlDocument::file);
+		// std::locale::global(loc);
 		std::vector<sPtr> records = file.elements("Database").select();
 		std::cout << "Restore operation retrieves " << records.size() << " records from xml file" << std::endl;
 		std::vector<sPtr>::iterator iter;
@@ -86,10 +96,10 @@ namespace DbPersistence {
 				else if ((*rData)->tag() == "description") restoreDescription(record, (*rData));
 				else if ((*rData)->tag() == "dateTime") restoreDateTime(record, (*rData));
 				else if ((*rData)->tag() == "children") restoreChildren(record, (*rData));
-				else if ((*rData)->tag() == "payLoad") restorePayLoads(record, (*rData));
+				else if ((*rData)->tag() == "payLoads") restorePayLoads(record, (*rData));
 			}
 			/*std::cout << "One record" << std::endl;
-			std::cout << record.name() << " " << record.descrip() << " " << std::string(record.dateTime()) << " " << record.payLoad() << std::endl;
+			std::cout << record.name() << " " << record.descrip() << " " << std::string(record.dateTime()) << " " << record.payLoad().size() << record.category().size() << std::endl;
 			for (int i = 0; i < record.children().size(); ++i) std::cout << record.children()[i] << " ";
 			std::cout << std::endl;
 			for (int i = 0; i < record.category().size(); ++i) std::cout << record.category()[i] << " ";
@@ -152,6 +162,7 @@ namespace DbPersistence {
 			auto categories = (*(payLoads[1])).children()[0];
 			std::vector<sPtr> categoriesName = categories->children();
 			for (std::vector<sPtr>::iterator cateIter = categoriesName.begin(); cateIter != categoriesName.end(); cateIter++) {
+				if ((*cateIter)->children().size() == 0) break;
 				auto categoryName = (*cateIter)->children()[0];
 				std::string categoryFine = Utilities::trim(categoryName->value());
 				record.category().push_back(categoryFine.substr(0, categoryFine.length() - 1));

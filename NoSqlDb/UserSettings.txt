@@ -1,9 +1,9 @@
-D:\Spring2018\cse687\NoSqlDb\Query
-false
-false
-false
+D:\Spring2018\cse687\NoSqlDb
 true
-Query.h
+true
+true
+false
+FolderSelection
 false
 true
 false

@@ -49,6 +49,10 @@ namespace NoSqlDb
   public:
     using Key = std::string;
     using Children = std::vector<Key>;
+	struct payLoadComplex {
+		Children category_;
+		T payLoad_;
+	};
 
     // methods to get and set DbElement fields
 
@@ -65,24 +69,30 @@ namespace NoSqlDb
     void dateTime(const DateTime& dateTime) { dateTime_ = dateTime; }
 
     Children& children() { return children_; }
-    Children children() const { return children_; }
+    const Children& children() const { return children_; }
     void children(const Children& children) { children_ = children; }
 
-	Children& category() { return category_; }
-	Children category() const { return category_; }
-	void category(const Children& category) { category_ = category; }
+	Children& category() { return payLoads_.category_; }
+	Children category() const { return payLoads_.category_; }
+	void category(const Children& category) { payLoads_.category_ = category; }
 
-    T& payLoad() { return payLoad_; }
-    T payLoad() const { return payLoad_; }
-    void payLoad(const T& payLoad) { payLoad_ = payLoad; }
+    T& payLoad() { return payLoads_.payLoad_; }
+    T payLoad() const { return payLoads_.payLoad_; }
+    void payLoad(const T& payLoad) { payLoads_.payLoad_ = payLoad; }
+
+	payLoadComplex& payLoads() { return payLoads_; }
+	payLoadComplex payLoads() const { return payLoads_; }
+	void payLoads(const payLoadComplex& another) {
+		payLoads_.category_ = another.category;
+		payLoads_.payLoad_ = another.payLoad;
+	}
 
   private:
     std::string name_;
     std::string descrip_;
     DateTime dateTime_;
     Children children_;
-	Children category_;
-    T payLoad_;
+	payLoadComplex payLoads_;
   };
 
   /////////////////////////////////////////////////////////////////////

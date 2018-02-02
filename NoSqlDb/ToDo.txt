@@ -1,5 +1,6 @@
   ToDo
 =========================
+1. Add not filter
 3. Add and test protection of persistence
 4. Write all unit tests by using test class
 5. PDF file containing package diagram
