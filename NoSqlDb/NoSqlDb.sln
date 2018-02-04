@@ -31,6 +31,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XmlElementParts", "XmlDocum
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "XmlParser", "XmlDocument\XmlParser\XmlParser.vcxproj", "{82A1627C-4365-4154-A360-301EB80F1521}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Executive", "Executive\Executive.vcxproj", "{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -181,6 +183,18 @@ Global
 		{82A1627C-4365-4154-A360-301EB80F1521}.Release|x64.Build.0 = Release|x64
 		{82A1627C-4365-4154-A360-301EB80F1521}.Release|x86.ActiveCfg = Release|Win32
 		{82A1627C-4365-4154-A360-301EB80F1521}.Release|x86.Build.0 = Release|Win32
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Debug|Win32.ActiveCfg = Debug|Win32
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Debug|Win32.Build.0 = Debug|Win32
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Debug|x64.ActiveCfg = Debug|x64
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Debug|x64.Build.0 = Debug|x64
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Debug|x86.ActiveCfg = Debug|Win32
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Debug|x86.Build.0 = Debug|Win32
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Release|Win32.ActiveCfg = Release|Win32
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Release|Win32.Build.0 = Release|Win32
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Release|x64.ActiveCfg = Release|x64
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Release|x64.Build.0 = Release|x64
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Release|x86.ActiveCfg = Release|Win32
+		{7B7D27D7-86EA-4655-8847-C0BCDCF2441D}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

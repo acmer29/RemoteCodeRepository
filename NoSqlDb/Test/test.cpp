@@ -1,17 +1,17 @@
-#include "Test.h"
+
 #include "../DateTime/DateTime.h"
 #include "../Utilities/StringUtilities/StringUtilities.h"
-#include "../Query/Query.h"
-
+#include "Test.h"
 using namespace DbTest;
 
-#ifndef TEST_TEST
+#ifdef TEST_TEST
 bool test_always_passes() { return true; }
 bool test_always_fails() { return false; }
 bool test_always_throws() {
-	std::exception ex("exception\n         -- msg: this test always throws -- ");
-	throw(ex);
+	throw std::exception("exception\n         -- msg: this test always throws -- ");
 }
+
+//----< test stub >----------------------------------------------------
 
 int main() {
 	test tester;
@@ -23,3 +23,4 @@ int main() {
 	return 0;
 }
 #endif
+

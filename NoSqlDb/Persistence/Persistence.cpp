@@ -77,6 +77,8 @@ bool test3() {
 	return true;
 }
 
+//----< test stub >----------------------------------------------------
+
 int main() {
 	DbTest::test tester;
 	tester.registerTest(test1, "Test1: persist operation");
