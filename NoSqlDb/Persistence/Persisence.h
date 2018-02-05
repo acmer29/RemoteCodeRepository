@@ -1,9 +1,35 @@
 #pragma once
+/////////////////////////////////////////////////////////////////////
+// Persistence.h - Implements persist functions,				   //
+//					include persist and restore                    //
+// ver 1.1                                                         //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018         //
+/////////////////////////////////////////////////////////////////////
+/*
+* Package Operations:
+* -------------------
+* This package provides one class - persistence
+* persistence class provides two functions, persist and restore
+* persist saves results from query into a XML file
+* restore retrieves records in the XML file into a std::vector, which can use query + insert load them into the database
+*
+* Required Files:
+* ---------------
+* DbCore.h, DbCore.cpp
+* DateTime.h, DateTime.cpp
+* StringUtilities.h, StringUtilities.cpp
+* Query.h Query.cpp
+* XmlDocument.h, XmlDocument.cpp
+*
+* Maintenance History:
+* --------------------
+* ver 1.0 : 28 Jan 2018 - Finished persist and restore function
+* ver 1.1 : 31 Jan 2018 - Refactored restore function
+*/
 #ifndef PERSISTENCE_H
 #define PERSISTENCE_H
 #include <iostream>
 #include <fstream>
-// #include <locale>
 #include "../DbCore/DbCore.h"
 #include "../XmlDocument/XmlDocument/XmlDocument.h"
 #include "../XmlDocument/XmlElement/XmlElement.h"
@@ -30,6 +56,7 @@ namespace DbPersistence {
 		void restoreChildren(NoSqlDb::DbElement<T>& record, const sPtr& rData);
 	};
 
+	// Persist a vector of DbElement into "fileName".xml
 	template<typename T>
 	void persistence<T>::persist(Content toPersist, const std::string& fileName) {
 		sPtr root = XmlProcessing::makeTaggedElement("Database");
@@ -71,22 +98,18 @@ namespace DbPersistence {
 			record->addChild(payLoad);
 			root->addChild(record);
 		}
-		// std::locale loc = std::locale::global(std::locale(""));
 		std::ofstream saveFile(fileName + ".xml");
 		saveFile << file.toString();
 		std::cout << "Saved " << toPersist.size() << " to " << fileName << std::endl;
-		// std::locale::global(loc);
 		return;
 	}
 
+	// Restore all records from "fileName" into a vector of DbElement
 	template<typename T>
 	typename persistence<T>::Content persistence<T>::restore(const std::string& fileName) {
 		Content collection;
-		// std::locale loc = std::locale::global(std::locale(""));
 		Document file(fileName, XmlProcessing::XmlDocument::file);
-		// std::locale::global(loc);
 		std::vector<sPtr> records = file.elements("Database").select();
-		std::cout << "Restore operation retrieves " << records.size() << " records from xml file" << std::endl;
 		std::vector<sPtr>::iterator iter;
 		for (iter = records.begin(); iter != records.end(); iter++) {
 			NoSqlDb::DbElement<T> record;
@@ -98,15 +121,8 @@ namespace DbPersistence {
 				else if ((*rData)->tag() == "children") restoreChildren(record, (*rData));
 				else if ((*rData)->tag() == "payLoads") restorePayLoads(record, (*rData));
 			}
-			/*std::cout << "One record" << std::endl;
-			std::cout << record.name() << " " << record.descrip() << " " << std::string(record.dateTime()) << " " << record.payLoad().size() << record.category().size() << std::endl;
-			for (int i = 0; i < record.children().size(); ++i) std::cout << record.children()[i] << " ";
-			std::cout << std::endl;
-			for (int i = 0; i < record.category().size(); ++i) std::cout << record.category()[i] << " ";
-			std::cout << std::endl;*/
 			collection.push_back(record);
 		}
-		std::cout << "Restrored " << collection.size() << " records" << std::endl;
 		return collection;
 	}
 

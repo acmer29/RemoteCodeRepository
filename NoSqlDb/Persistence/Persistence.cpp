@@ -29,7 +29,6 @@ bool test1() {
 	querier.from(db).find().resultDisplay();
 	Utilities::putline();
 
-	// querier.from(db).find("name", "/Tianyu Qi.*/");
 	querier.from(db).find();
 	persistor.persist(querier.eval(), "sample");
 

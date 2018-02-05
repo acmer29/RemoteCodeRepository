@@ -1,4 +1,34 @@
 #pragma once
+/////////////////////////////////////////////////////////////////////
+// Test.h - Implements database test operations, and test cases    //
+// ver 1.2                                                         //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018         //
+/////////////////////////////////////////////////////////////////////
+/*
+* Package Operations:
+* -------------------
+* This package provides two class test and testCase
+* test class inherited from testExecutive, 
+* provides methods for unit test, include registerTest, testsRun and testSummary
+* testCase class has all test functions of the project, 
+* mainly used as demo all the requirement
+*
+* Required Files:
+* ---------------
+* DbCore.h, DbCore.cpp
+* DateTime.h, DateTime.cpp
+* StringUtilities.h, StringUtilities.cpp
+* Query.h Query.cpp
+* Persistence.h, Persistence.cpp
+* Test.h, Test.cpp
+*
+* Maintenance History:
+* --------------------
+* ver 1.0 : 26 Jan 2018 - Test inherited from testExecutive
+* ver 1.1 : 01 Feb 2018 - Test class finished, all unit tests finished
+* ver 1.1 : 04 Feb 2018 - Refactored testCase, add requirement demo functions
+*/
+
 #ifndef TEST_H
 #define TEST_H
 #include <iostream>
@@ -114,8 +144,16 @@ namespace DbTest{
 
 		std::cout << "\n After update the element key \"Tianyu Qi0\", add it a child \"Tianyu Qi1\", and remove child \"Tianyu Qi0\" from element key \"Tianyu Qi\"";
 		std::cout << "\n And also find element name \"Tianyu Qi\" and \"Tianyu Qi0\", update their datetime column";
-
 		querier.from(db).find("name", "Tianyu Qi0").orFind("name", "Tianyu Qi1").orFind("name", "Tianyu Qi").resultDisplay();
+
+		try {
+			querier.from(db).find("name: \"Tianyu Qi\"").update("name", "Tianyu QiX");
+			return false;
+		}
+		catch (std::exception& ex) {
+			std::cout << "Catch exception of try editing the name";
+			std::cout << ex.what() << std::endl;
+		}
 
 		if (querier.from(db).find("name: \"Tianyu Qi1\"").eval()[0].payLoad() != "Droped CSE 687" || querier.eval()[0].descrip() != "A student") return false;
 
@@ -191,7 +229,7 @@ namespace DbTest{
 		querier.from(db).find("name: \"Tianyu Qi\"").update("dateTime: \"Mon Jan 01 23:59:59 2018\"");
 		querier.from(db).find("name: \"Tianyu Qi0\"").update("dateTime: \"Mon Jul 01 23:59:59 2017\"");
 
-		std::cout << "\n Before query operation" << std::endl;
+		std::cout << "\n Before persist operation" << std::endl;
 		querier.from(db).resultDisplay();
 		Utilities::putline();
 		
@@ -249,12 +287,14 @@ namespace DbTest{
 
 	bool testCase::testR12() {
 		Utilities::title("#12: Accompanied by a test executive that clearly demonstrates you've met all the functional requirements");
-		std::cout << "Inmlemented by Test.h and Test.cpp" << std::endl;
+		Utilities::putline();
+		std::cout << "Implemented by Test.h and Test.cpp" << std::endl;
 		return true;
 	}
 
 	bool testCase::testR13() {
 		Utilities::title("provide a pdf file containing a package diagram");
+		Utilities::putline();
 		return true;
 	}
 
