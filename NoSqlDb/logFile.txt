@@ -1,7 +1,7 @@
 
                                       CodeAnalysis - Version 1.4
     ==============================================================================================
-     Sun Feb  4 21:32:56 2018
+     Mon Feb  5 11:14:28 2018
      Path: "D:\Spring2018\cse687\NoSqlDb"
      Args: *.h, *.cpp, *.cs, /m, /r, /f
                                                                                
@@ -10,7 +10,7 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                             namespace                   Global Namespace       1       1     645
+                             namespace                   Global Namespace       1       1     650
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -68,47 +68,51 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                  DbCore.h   namespace                            NoSqlDb      41     224      54
-                  DbCore.h       class                          DbElement      48      49      31
-                  DbCore.h      struct                     payLoadComplex      52       4       1
-              public data: Children category_ ; 
-              public data: T payLoad_ ; 
-                  DbCore.h    function                               name      58       2       1
-                  DbCore.h    function                               name      59       2       1
-                  DbCore.h    function                               name      60       2       1
-                  DbCore.h    function                            descrip      62       2       1
-                  DbCore.h    function                            descrip      63       2       1
-                  DbCore.h    function                            descrip      64       2       1
-                  DbCore.h    function                           dateTime      66       2       1
-                  DbCore.h    function                           dateTime      67       2       1
-                  DbCore.h    function                           dateTime      68       2       1
-                  DbCore.h    function                           children      70       2       1
-                  DbCore.h    function                           children      71       2       1
-                  DbCore.h    function                           children      72       2       1
-                  DbCore.h    function                           category      74       2       1
-                  DbCore.h    function                           category      75       2       1
-                  DbCore.h    function                           category      76       2       1
-                  DbCore.h    function                            payLoad      78       2       1
-                  DbCore.h    function                            payLoad      79       2       1
-                  DbCore.h    function                            payLoad      80       2       1
-                  DbCore.h    function                           payLoads      82       2       1
-                  DbCore.h    function                           payLoads      83       2       1
-                  DbCore.h    function                           payLoads      85       4       1
-                  DbCore.h       class                             DbCore     105      27      14
-                  DbCore.h    function                              begin     119       2       1
-                  DbCore.h    function                                end     120       2       1
-                  DbCore.h    function                            dbStore     124       2       1
-                  DbCore.h    function                            dbStore     125       2       1
-                  DbCore.h    function                            dbStore     126       2       1
-                  DbCore.h    function                           contains     140       4       1
-                  DbCore.h    function                               keys     148      11       2
-                  DbCore.h    function                               size     163       3       1
-                  DbCore.h    function                         operator[]     172       7       2
-                  DbCore.h    function                         operator[]     185       7       2
-                  DbCore.h    function                           showKeys     200       7       2
-                  DbCore.h    function                         showHeader     210      12       1
-                  DbCore.h    function                           showElem     226      16       3
-                  DbCore.h    function                             showDb     246      18       2
+                  DbCore.h   namespace                            NoSqlDb      41     236      60
+                  DbCore.h       class                     payLoadComplex      43      14       7
+                  DbCore.h    function                           category      44       2       1
+                  DbCore.h    function                           category      45       2       1
+                  DbCore.h    function                           category      46       2       1
+                  DbCore.h    function                            payLoad      48       2       1
+                  DbCore.h    function                            payLoad      49       2       1
+                  DbCore.h    function                            payLoad      50       2       1
+                  DbCore.h       class                          DbElement      63      46      30
+                  DbCore.h    function                               name      70       2       1
+                  DbCore.h    function                               name      71       2       1
+                  DbCore.h    function                               name      72       2       1
+                  DbCore.h    function                            descrip      74       2       1
+                  DbCore.h    function                            descrip      75       2       1
+                  DbCore.h    function                            descrip      76       2       1
+                  DbCore.h    function                           dateTime      78       2       1
+                  DbCore.h    function                           dateTime      79       2       1
+                  DbCore.h    function                           dateTime      80       2       1
+                  DbCore.h    function                           children      82       2       1
+                  DbCore.h    function                           children      83       2       1
+                  DbCore.h    function                           children      84       2       1
+                  DbCore.h    function                           category      86       2       1
+                  DbCore.h    function                           category      87       2       1
+                  DbCore.h    function                           category      88       2       1
+                  DbCore.h    function                            payLoad      90       2       1
+                  DbCore.h    function                            payLoad      91       2       1
+                  DbCore.h    function                            payLoad      92       2       1
+                  DbCore.h    function                           payLoads      94       2       1
+                  DbCore.h    function                           payLoads      95       2       1
+                  DbCore.h    function                           payLoads      97       4       1
+                  DbCore.h       class                             DbCore     117      27      14
+                  DbCore.h    function                              begin     131       2       1
+                  DbCore.h    function                                end     132       2       1
+                  DbCore.h    function                            dbStore     136       2       1
+                  DbCore.h    function                            dbStore     137       2       1
+                  DbCore.h    function                            dbStore     138       2       1
+                  DbCore.h    function                           contains     152       4       1
+                  DbCore.h    function                               keys     160      11       2
+                  DbCore.h    function                               size     175       3       1
+                  DbCore.h    function                         operator[]     184       7       2
+                  DbCore.h    function                         operator[]     197       7       2
+                  DbCore.h    function                           showKeys     212       7       2
+                  DbCore.h    function                         showHeader     222      12       1
+                  DbCore.h    function                           showElem     238      16       3
+                  DbCore.h    function                             showDb     258      18       2
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -117,138 +121,137 @@
                 DbCore.cpp    function                                         46       8       1
                 DbCore.cpp    function                                         58       7       1
                 DbCore.cpp    function                                         69      36       1
-                DbCore.cpp    function                                        108      67       1
-                DbCore.cpp    function                                        183      32       5
+                DbCore.cpp    function                                        113      30       4
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-               Executive.h   namespace                        DbExecutive       9      14       3
-               Executive.h       class                         dbExecutor      10       8       2
-               Executive.h    function                               demo      19       3       1
+               Executive.h   namespace                        DbExecutive      35      14       3
+               Executive.h       class                         dbExecutor      36       8       2
+               Executive.h    function                               demo      45       3       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-             Executive.cpp    function                               main       4       4       1
+             Executive.cpp    function                               main       5       4       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-              Persisence.h    function                        restoreName     114       8       1
-              Persisence.h    function                 restoreDescription     124       7       1
-              Persisence.h    function                    restoreDateTime     133       7       1
-              Persisence.h    function                    restoreChildren     142      11       2
-              Persisence.h    function                    restorePayLoads     155      17       3
-              Persisence.h   namespace                      DbPersistence      11     162       9
-              Persisence.h       class                        persistence      13      19       8
-              Persisence.h    function                            persist      34      47       4
-              Persisence.h    function                            restore      83      29       3
+              Persisence.h    function                        restoreName     130       8       1
+              Persisence.h    function                 restoreDescription     140       7       1
+              Persisence.h    function                    restoreDateTime     149       7       1
+              Persisence.h    function                    restoreChildren     158      11       2
+              Persisence.h    function                    restorePayLoads     171      17       3
+              Persisence.h   namespace                      DbPersistence      37     152       9
+              Persisence.h       class                        persistence      39      19       8
+              Persisence.h    function                            persist      61      45       4
+              Persisence.h    function                            restore     109      19       3
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-           Persistence.cpp    function                              test1      14      24       1
-           Persistence.cpp    function                              test2      39      21       2
-           Persistence.cpp    function                              test3      61      18       3
-           Persistence.cpp    function                               main      82       9       1
+           Persistence.cpp    function                              test1      14      23       1
+           Persistence.cpp    function                              test2      38      21       2
+           Persistence.cpp    function                              test3      60      18       3
+           Persistence.cpp    function                               main      81       9       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                   Query.h    function                                        114       3       1
-                   Query.h    function                                        119       9       2
-                   Query.h    function                                        130       6       1
-                   Query.h    function                                        140      28       5
-                   Query.h    function                                        148       4       1
-                   Query.h    function                                        157       8       3
-                   Query.h    function                                        159       4       1
-                   Query.h    function                                        170      19       5
-                   Query.h    function                                        171       4       1
-                   Query.h    function                                        175      11       3
-                   Query.h    function                                        180       4       1
-                   Query.h    function                                        192      26       6
-                   Query.h    function                                        200       7       2
-                   Query.h    function                                        207       7       2
-                   Query.h    function                                        221      27       6
-                   Query.h    function                                        224      12       2
-                   Query.h    function                                        230       4       1
-                   Query.h    function                                        238       6       2
-                   Query.h    function                                        239       3       1
-                   Query.h    function                                        250      11       3
-                   Query.h    function                                        253       6       2
-                   Query.h    function                                        254       3       1
-                   Query.h    function                                        263      13       3
-                   Query.h    function                                        268       6       2
-                   Query.h    function                                        269       3       1
-                   Query.h    function                                        278      20       5
-                   Query.h    function                                        287       3       1
-                   Query.h    function                                        300      36      10
-                   Query.h    function                                        305       4       1
-                   Query.h    function                                        311      16       5
-                   Query.h    function                                        312      14       4
+                   Query.h    function                                        113       1       1
+                   Query.h    function                                        116       8       2
+                   Query.h    function                                        126       5       1
+                   Query.h    function                                        135      27       5
+                   Query.h    function                                        142       4       1
+                   Query.h    function                                        151       8       3
+                   Query.h    function                                        153       4       1
+                   Query.h    function                                        165      19       5
+                   Query.h    function                                        166       4       1
+                   Query.h    function                                        170      11       3
+                   Query.h    function                                        175       4       1
+                   Query.h    function                                        188      25       6
+                   Query.h    function                                        195       7       2
+                   Query.h    function                                        202       7       2
+                   Query.h    function                                        216      24       6
+                   Query.h    function                                        217      12       2
+                   Query.h    function                                        223       4       1
+                   Query.h    function                                        231       6       2
+                   Query.h    function                                        232       3       1
+                   Query.h    function                                        243      11       3
+                   Query.h    function                                        246       6       2
+                   Query.h    function                                        247       3       1
+                   Query.h    function                                        257      13       3
+                   Query.h    function                                        262       6       2
+                   Query.h    function                                        263       3       1
+                   Query.h    function                                        273      19       5
+                   Query.h    function                                        281       3       1
+                   Query.h    function                                        296      35      10
+                   Query.h    function                                        301       4       1
+                   Query.h    function                                        307      16       5
+                   Query.h    function                                        308      14       4
+                   Query.h    function                                        312       4       1
                    Query.h    function                                        316       4       1
-                   Query.h    function                                        320       4       1
-                   Query.h    function                                        330       4       1
-                   Query.h    function                                        338       9       5
-                   Query.h    function                                        339       1       1
-                   Query.h    function                                        340       1       1
-                   Query.h    function                                        341       1       1
-                   Query.h    function                                        342       1       1
-                   Query.h    function                                        349       9       5
+                   Query.h    function                                        325       4       1
+                   Query.h    function                                        334       9       5
+                   Query.h    function                                        335       1       1
+                   Query.h    function                                        336       1       1
+                   Query.h    function                                        337       1       1
+                   Query.h    function                                        338       1       1
+                   Query.h    function                                        346       9       5
+                   Query.h    function                                        347       1       1
+                   Query.h    function                                        348       1       1
+                   Query.h    function                                        349       1       1
                    Query.h    function                                        350       1       1
-                   Query.h    function                                        351       1       1
-                   Query.h    function                                        352       1       1
-                   Query.h    function                                        353       1       1
-                   Query.h    function                                        360       8       3
-                   Query.h    function                                        370       8       3
-                   Query.h    function                                        389       9       2
-                   Query.h    function                                        400      26       7
-                   Query.h    function                                        402       3       1
-                   Query.h    function                                        405       3       1
-                   Query.h    function                                        408       3       1
-                   Query.h    function                                        411      11       2
-                   Query.h    function                                        413       7       1
-                   Query.h    function                                        428      10       1
-                   Query.h    function                                        440       9       2
-                   Query.h    function                                        451       5       1
-                   Query.h    function                                        458      33       6
-                   Query.h    function                                        472       7       2
-                   Query.h    function                                        475       3       1
-                   Query.h    function                                        480       7       2
-                   Query.h    function                                        483       3       1
-                   Query.h    function                                        493       3       1
-                   Query.h    function                                        499      10       1
-                   Query.h    function                                        511      10       2
-                   Query.h    function                                        513       5       1
-                   Query.h    function                                        523      10       2
-                   Query.h    function                                        525       5       1
-                   Query.h    function                                        535      10       2
-                   Query.h    function                                        537       5       1
-                   Query.h    function                                        547      10       2
-                   Query.h    function                                        549       5       1
-                   Query.h    function                                        559      21       7
-                   Query.h    function                                        563       8       3
-                   Query.h    function                                        566       3       1
-                   Query.h    function                                        573       3       1
-                   Query.h    function                                        582      21       3
-                   Query.h    function                                        606      11       1
-                   Query.h    function                                        619      11       3
-                   Query.h    function                                        625       1       1
-                   Query.h    function                                        634      24       9
-                   Query.h    function                                        637       3       1
-                   Query.h    function                                        645       1       1
-                   Query.h    function                                        646       1       1
-                   Query.h    function                                        647       1       1
-                   Query.h    function                                        648       1       1
-                   Query.h    function                                        649       1       1
-                   Query.h    function                                        650       1       1
-                   Query.h    function                                        651       1       1
-                   Query.h    function                                        660      15       2
-                   Query.h    function                                        677      19       7
-                   Query.h    function                                        686       5       4
-                   Query.h    function                                        687       1       1
-                   Query.h    function                                        688       1       1
-                   Query.h    function                                        691       1       1
-                   Query.h    function                                        692       1       1
-                   Query.h    function                                        698      14       3
-                   Query.h    function                                        705       5       2
-                   Query.h    function                                        714       9       2
+                   Query.h    function                                        358       8       3
+                   Query.h    function                                        369       8       3
+                   Query.h    function                                        381       8       2
+                   Query.h    function                                        391      28       7
+                   Query.h    function                                        395       3       1
+                   Query.h    function                                        398       3       1
+                   Query.h    function                                        401       3       1
+                   Query.h    function                                        404      11       2
+                   Query.h    function                                        406       7       1
+                   Query.h    function                                        422      10       1
+                   Query.h    function                                        436       8       2
+                   Query.h    function                                        447       4       1
+                   Query.h    function                                        454      32       6
+                   Query.h    function                                        467       7       2
+                   Query.h    function                                        470       3       1
+                   Query.h    function                                        475       7       2
+                   Query.h    function                                        478       3       1
+                   Query.h    function                                        489       3       1
+                   Query.h    function                                        495      10       1
+                   Query.h    function                                        507      10       2
+                   Query.h    function                                        509       5       1
+                   Query.h    function                                        519      10       2
+                   Query.h    function                                        521       5       1
+                   Query.h    function                                        531      10       2
+                   Query.h    function                                        533       5       1
+                   Query.h    function                                        543      10       2
+                   Query.h    function                                        545       5       1
+                   Query.h    function                                        555      21       7
+                   Query.h    function                                        559       8       3
+                   Query.h    function                                        562       3       1
+                   Query.h    function                                        569       3       1
+                   Query.h    function                                        578      17       2
+                   Query.h    function                                        598      11       1
+                   Query.h    function                                        612       9       3
+                   Query.h    function                                        618       1       1
+                   Query.h    function                                        625      24       9
+                   Query.h    function                                        628       3       1
+                   Query.h    function                                        636       1       1
+                   Query.h    function                                        637       1       1
+                   Query.h    function                                        638       1       1
+                   Query.h    function                                        639       1       1
+                   Query.h    function                                        640       1       1
+                   Query.h    function                                        641       1       1
+                   Query.h    function                                        642       1       1
+                   Query.h    function                                        652      15       2
+                   Query.h    function                                        670      18       7
+                   Query.h    function                                        678       5       4
+                   Query.h    function                                        679       1       1
+                   Query.h    function                                        680       1       1
+                   Query.h    function                                        683       1       1
+                   Query.h    function                                        684       1       1
+                   Query.h    function                                        691      14       3
+                   Query.h    function                                        698       5       2
+                   Query.h    function                                        707       9       2
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -280,26 +283,11 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                    Test.h   namespace                             DbTest      13     325      28
-                    Test.h       class                           testCase      15      21      20
-                    Test.h    function                             testR1      37       6       1
-                    Test.h    function                             testR2      44       6       1
-                    Test.h    function                             testR3      51       6       1
-                    Test.h    function                             testR4      58      35       1
-                    Test.h    function                             testR5      94      33       1
-                    Test.h    function                             testR6     128      31       1
-                    Test.h    function                             testR7     160      21       1
-                    Test.h    function                             testR8     182      37       2
-                    Test.h    function                             testR9     220       6       1
-                    Test.h    function                            testR10     227       6       1
-                    Test.h    function                            testR11     234      15       1
-                    Test.h    function                            testR12     250       5       1
-                    Test.h    function                            testR13     256       4       1
-                    Test.h    function                           casesRun     261      28       4
-                    Test.h    function                              check     290       6       1
-                    Test.h       class                               test     297       9       7
-                    Test.h    function                           testsRun     307      14       3
-                    Test.h    function                       testsSummary     322      15       3
+                    Test.h   namespace                             DbTest      43      65      30
+                    Test.h       class                           testCase      45      21      22
+                    Test.h       class                               test      67       9       7
+                    Test.h    function                           testsRun      77      14       3
+                    Test.h    function                       testsSummary      92      15       3
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -518,10 +506,25 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                  test.cpp    function                 test_always_passes       7       2       1
-                  test.cpp    function                  test_always_fails       8       2       1
-                  test.cpp    function                 test_always_throws      10       3       1
-                  test.cpp    function                               main      16       9       1
+                  test.cpp    function                             testR1       8       6       1
+                  test.cpp    function                             testR2      15       6       1
+                  test.cpp    function                             testR3      22       6       1
+                  test.cpp    function                             testR4      29      35       1
+                  test.cpp    function                             testR5      65      41       3
+                  test.cpp    function                             testR6     107      31       1
+                  test.cpp    function                             testR7     139      21       1
+                  test.cpp    function                             testR8     161      37       2
+                  test.cpp    function                             testR9     199       6       1
+                  test.cpp    function                            testR10     206       6       1
+                  test.cpp    function                            testR11     213      15       1
+                  test.cpp    function                            testR12     229       6       1
+                  test.cpp    function                            testR13     236       5       1
+                  test.cpp    function                           casesRun     242      28       4
+                  test.cpp    function                              check     271       6       1
+                  test.cpp    function                 test_always_passes     278       2       1
+                  test.cpp    function                  test_always_fails     279       2       1
+                  test.cpp    function                 test_always_throws     281       3       1
+                  test.cpp    function                               main     287       9       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -551,14 +554,9 @@
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
               DateTime.cpp    function                           DateTime      57      28      15
-                DbCore.cpp    function                                        108      67       1
                  Query.cpp    function                                        19118446744073709551427      63
              Tokenizer.cpp    function                               main     329      61       8
 
-              public data: DbCore.h : 53 - struct payLoadComplex
-                Children category_ ; 
-              public data: DbCore.h : 54 - struct payLoadComplex
-                T payLoad_ ; 
               public data: TestUtilities.h : 93 - struct {
                 Test test ; 
               public data: TestUtilities.h : 94 - struct {

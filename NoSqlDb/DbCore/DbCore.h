@@ -39,6 +39,21 @@
 
 namespace NoSqlDb
 {
+	template<typename T, typename Children>
+	class payLoadComplex {
+	public:
+		Children & category() { return category_; }
+		Children category() const { return category_; }
+		void category(const Children& category) { category_ = category; }
+
+		T& payLoad() { return payLoad_; }
+		T payLoad() const { return payLoad_; }
+		void payLoad(const T& payLoad) { payLoad_ = payLoad; }
+
+	private:
+		Children category_;
+		T payLoad_;
+	};
   /////////////////////////////////////////////////////////////////////
   // DbElement class
   // - provides the value part of a NoSql key-value database
@@ -49,10 +64,7 @@ namespace NoSqlDb
   public:
     using Key = std::string;
     using Children = std::vector<Key>;
-	struct payLoadComplex {
-		Children category_;
-		T payLoad_;
-	};
+	using payLoadComplex = payLoadComplex<T, Children>;
 
     // methods to get and set DbElement fields
 
@@ -72,19 +84,19 @@ namespace NoSqlDb
     const Children& children() const { return children_; }
     void children(const Children& children) { children_ = children; }
 
-	Children& category() { return payLoads_.category_; }
-	Children category() const { return payLoads_.category_; }
-	void category(const Children& category) { payLoads_.category_ = category; }
+	Children& category() { return payLoads_.category(); }
+	Children category() const { return payLoads_.category(); }
+	void category(const Children& category) { payLoads_.category(category); }
 
-    T& payLoad() { return payLoads_.payLoad_; }
-    T payLoad() const { return payLoads_.payLoad_; }
-    void payLoad(const T& payLoad) { payLoads_.payLoad_ = payLoad; }
+    T& payLoad() { return payLoads_.payLoad(); }
+    T payLoad() const { return payLoads_.payLoad(); }
+    void payLoad(const T& payLoad) { payLoads_.payLoad(payLoad); }
 
 	payLoadComplex& payLoads() { return payLoads_; }
 	payLoadComplex payLoads() const { return payLoads_; }
 	void payLoads(const payLoadComplex& another) {
-		payLoads_.category_ = another.category;
-		payLoads_.payLoad_ = another.payLoad;
+		payLoads_.category(another.category());
+		payLoads_.payLoad(another.payLoad);
 	}
 
   private:
