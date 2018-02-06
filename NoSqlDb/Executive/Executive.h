@@ -21,6 +21,10 @@
 * Persistence.h, Persistence.cpp
 * Executive.h, Executive.cpp
 *
+* Build Process:
+* --------------
+* devenv NoSqlDb.sln /rebuild debug
+*
 * Maintenance History:
 * --------------------
 * ver 1.0 : 02 Feb 2018 - Implement dbExecutive class and test demos

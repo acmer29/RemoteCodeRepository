@@ -22,11 +22,15 @@
 * Persistence.h, Persistence.cpp
 * Test.h, Test.cpp
 *
+* Build Process:
+* --------------
+* devenv NoSqlDb.sln /rebuild debug
+*
 * Maintenance History:
 * --------------------
 * ver 1.0 : 26 Jan 2018 - Test inherited from testExecutive
 * ver 1.1 : 01 Feb 2018 - Test class finished, all unit tests finished
-* ver 1.1 : 04 Feb 2018 - Refactored testCase, add requirement demo functions
+* ver 1.2 : 04 Feb 2018 - Refactored testCase, add requirement demo functions
 */
 
 #ifndef TEST_H
@@ -74,6 +78,7 @@ namespace DbTest{
 		Tests tests_;
 	};
 
+	// -----< testsRun: Provide a simple form for test functions to run >-----
 	inline bool test::testsRun() {
 		tests_ = getTest();
 		TestExecutor<Test> executor;
@@ -89,6 +94,7 @@ namespace DbTest{
 		return final;
 	}
 
+	// -----< testSummary: Shows which test passed and which test failed >------
 	inline void test::testsSummary() {
 		Utilities::putline();
 		std::ostream& out = std::cout;

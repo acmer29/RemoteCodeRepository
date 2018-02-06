@@ -2,7 +2,7 @@
 #define XMLELEMENT_H
 ///////////////////////////////////////////////////////////////////
 // XmlElement.h - define XML Element types                       //
-// ver 1.7                                                       //
+// ver 1.8                                                       //
 // Application: Help for CSE687 Pr#2, Spring 2015                //
 // Platform:    Dell XPS 2720, Win 8.1 Pro, Visual Studio 2013   //
 // Author:      Jim Fawcett, CST 4-187, 443-3948                 //
@@ -43,6 +43,14 @@
 *
 * Maintenance History:
 * --------------------
+* ver 1.8 : 02 Feb 2018
+* - added methods:
+*   - AbstractXmlElement::attributes()
+*   - AbstractXmlElement::attributeValue(const std::string& name)
+*   - TaggedElement::attributes()
+*   - TaggedElement::attributeValue(const std::string& name)
+*   These complete attribute handling started in ver 1.7
+* - Extended text stub in XmlElement.cpp to demonstrate these additions
 * ver 1.7 : 16 Mar 2015
 * - added items to ToDo list
 * ver 1.6 : 08 Mar 2015
@@ -54,7 +62,7 @@
 *   constraint that if present it must be the first child of the document.  The
 *   best way to handle this seemed to be to create anther element type and have
 *   the XmlDocument constructor always add as the first child.
-* - Fixed a bug in DocElement::addChild found by Venkat Subha Rao Cheedella. 
+* - Fixed a bug in DocElement::addChild found by Venkat Subha Rao Cheedella.
 *   addChild now correctly handles allowing as many comments and ProcInstructions
 *   as needed but only one tagged element as the root of the XML information.
 * ver 1.3 : 17 Feb 15
@@ -102,179 +110,206 @@
 
 namespace XmlProcessing
 {
-  /////////////////////////////////////////////////////////////////////////////
-  // AbstractXmlElement - base class for all concrete element types
+	/////////////////////////////////////////////////////////////////////////////
+	// AbstractXmlElement - base class for all concrete element types
 
-  class AbstractXmlElement
-  {
-  public:
-    using sPtr = std::shared_ptr < AbstractXmlElement > ;
+	class AbstractXmlElement
+	{
+	public:
+		using sPtr = std::shared_ptr < AbstractXmlElement >;
+		using Attribute = std::pair<std::string, std::string>;
+		using Attributes = std::vector<Attribute>;
 
-    virtual bool addChild(std::shared_ptr<AbstractXmlElement> pChild);
-    virtual bool removeChild(std::shared_ptr<AbstractXmlElement> pChild);
-    virtual bool addAttrib(const std::string& name, const std::string& value);
-    virtual bool removeAttrib(const std::string& name);
-    virtual std::vector<sPtr> children();
-    virtual std::string tag() { return ""; }
-    virtual std::string value() = 0;
-    virtual std::string toString() = 0;
-    virtual ~AbstractXmlElement();
-  protected:
-    static size_t count;
-    static size_t tabSize;
-  };
+		virtual bool addChild(std::shared_ptr<AbstractXmlElement> pChild);
+		virtual bool removeChild(std::shared_ptr<AbstractXmlElement> pChild);
+		virtual std::vector<sPtr> children();
+		virtual bool addAttrib(const std::string& name, const std::string& value);
+		virtual bool removeAttrib(const std::string& name);
+		virtual std::string attributeValue(const std::string& name);
+		virtual Attributes attributes();
+		virtual std::string tag() { return ""; }
+		virtual std::string value() = 0;
+		virtual std::string toString() = 0;
+		virtual ~AbstractXmlElement();
+	protected:
+		static size_t count;
+		static size_t tabSize;
+	};
 
-  inline bool AbstractXmlElement::addChild(std::shared_ptr<AbstractXmlElement> pChild) { return false; }
-  inline bool AbstractXmlElement::removeChild(std::shared_ptr<AbstractXmlElement> pChild) { return false; }
-  inline std::vector<AbstractXmlElement::sPtr> AbstractXmlElement::children()
-  {
-    return std::vector<sPtr>();
-  }
-  inline bool AbstractXmlElement::addAttrib(const std::string& name, const std::string& value) { return false; }
-  inline bool AbstractXmlElement::removeAttrib(const std::string& name) { return false; }
-  inline AbstractXmlElement::~AbstractXmlElement() {}
+	inline bool AbstractXmlElement::addChild(std::shared_ptr<AbstractXmlElement> pChild) { return false; }
+	inline bool AbstractXmlElement::removeChild(std::shared_ptr<AbstractXmlElement> pChild) { return false; }
+	inline std::vector<AbstractXmlElement::sPtr> AbstractXmlElement::children()
+	{
+		return std::vector<sPtr>();  // return empty child collection
+	}
+	inline AbstractXmlElement::Attributes AbstractXmlElement::attributes()
+	{
+		return AbstractXmlElement::Attributes();  // return empty attributes collection
+	}
+	inline std::string AbstractXmlElement::attributeValue(const std::string& name)
+	{
+		return "";
+	}
+	inline bool AbstractXmlElement::addAttrib(const std::string& name, const std::string& value) { return false; }
+	inline bool AbstractXmlElement::removeAttrib(const std::string& name) { return false; }
+	inline AbstractXmlElement::~AbstractXmlElement() {}
 
-  /////////////////////////////////////////////////////////////////////////////
-  // DocElement - holds the document prologue, XML tree, and epilog
+	/////////////////////////////////////////////////////////////////////////////
+	// DocElement - holds the document prologue, XML tree, and epilog
 
-  class DocElement : public AbstractXmlElement
-  {
-  public:
-    DocElement(std::shared_ptr<AbstractXmlElement> pRoot = nullptr);
-    ~DocElement() {}
-    DocElement(const DocElement& doc) = delete;
-    DocElement& operator=(const DocElement& doc) = delete;
-    virtual bool addChild(std::shared_ptr<AbstractXmlElement> pChild);
-    virtual bool removeChild(std::shared_ptr<AbstractXmlElement> pChild);
-    virtual std::vector<sPtr> children();
-    virtual std::string value();
-    virtual std::string toString();
-  private:
-    bool hasXmlRoot();
-    std::vector<std::shared_ptr<AbstractXmlElement>> children_;
-  };
+	class DocElement : public AbstractXmlElement
+	{
+	public:
+		DocElement(std::shared_ptr<AbstractXmlElement> pRoot = nullptr);
+		~DocElement() {}
+		DocElement(const DocElement& doc) = delete;
+		DocElement& operator=(const DocElement& doc) = delete;
+		virtual bool addChild(std::shared_ptr<AbstractXmlElement> pChild);
+		virtual bool removeChild(std::shared_ptr<AbstractXmlElement> pChild);
+		virtual std::vector<sPtr> children();
+		virtual std::string value();
+		virtual std::string toString();
+	private:
+		bool hasXmlRoot();
+		std::vector<std::shared_ptr<AbstractXmlElement>> children_;
+	};
 
-  inline std::vector<AbstractXmlElement::sPtr> DocElement::children()
-  {
-    return children_;
-  }
-  std::shared_ptr<AbstractXmlElement> makeDocElement(std::shared_ptr<AbstractXmlElement> pRoot = nullptr);
+	inline std::vector<AbstractXmlElement::sPtr> DocElement::children()
+	{
+		return children_;
+	}
+	std::shared_ptr<AbstractXmlElement> makeDocElement(std::shared_ptr<AbstractXmlElement> pRoot = nullptr);
 
-  /////////////////////////////////////////////////////////////////////////////
-  // TextElement - represents the text part of an XML element
+	/////////////////////////////////////////////////////////////////////////////
+	// TextElement - represents the text part of an XML element
 
-  class TextElement : public AbstractXmlElement
-  {
-  public:
-    TextElement(const std::string& text) : text_(text) {}
-    virtual ~TextElement() {}
-    TextElement(const TextElement& te) = delete;
-    TextElement& operator=(const TextElement& te) = delete;
-    virtual std::string value();
-    virtual std::string toString();
-  private:
-    std::string text_;
-  };
+	class TextElement : public AbstractXmlElement
+	{
+	public:
+		TextElement(const std::string& text) : text_(text) {}
+		virtual ~TextElement() {}
+		TextElement(const TextElement& te) = delete;
+		TextElement& operator=(const TextElement& te) = delete;
+		virtual std::string value();
+		virtual std::string toString();
+	private:
+		std::string text_;
+	};
 
-  inline std::string TextElement::value() { return text_; }
+	inline std::string TextElement::value() { return text_; }
 
-  std::shared_ptr<AbstractXmlElement> makeTextElement(const std::string& text);
+	std::shared_ptr<AbstractXmlElement> makeTextElement(const std::string& text);
 
-  /////////////////////////////////////////////////////////////////////////////
-  // Element - represents a tagged element with attributes and child elements
+	/////////////////////////////////////////////////////////////////////////////
+	// Element - represents a tagged element with attributes and child elements
 
-  class TaggedElement : public AbstractXmlElement
-  {
-  public:
-    TaggedElement(const std::string& tag) : tag_(tag) {};
-    TaggedElement(const TaggedElement& te) = delete;
-    virtual ~TaggedElement() {}
-    TaggedElement& operator=(const TaggedElement& te) = delete;
-    virtual bool addChild(std::shared_ptr<AbstractXmlElement> pChild);
-    virtual bool removeChild(std::shared_ptr<AbstractXmlElement> pChild);
-    virtual std::vector<sPtr> children();
-    virtual bool addAttrib(const std::string& name, const std::string& value);
-    virtual bool removeAttrib(const std::string& name);
-    virtual std::string tag();
-    virtual std::string value();
-    virtual std::string toString();
-  private:
-    std::string tag_;
-    std::vector<std::shared_ptr<AbstractXmlElement>> children_;
-    std::vector<std::pair<std::string, std::string>> attribs_;
-  };
+	class TaggedElement : public AbstractXmlElement
+	{
+	public:
+		TaggedElement(const std::string& tag) : tag_(tag) {};
+		TaggedElement(const TaggedElement& te) = delete;
+		virtual ~TaggedElement() {}
+		TaggedElement& operator=(const TaggedElement& te) = delete;
+		virtual bool addChild(std::shared_ptr<AbstractXmlElement> pChild);
+		virtual bool removeChild(std::shared_ptr<AbstractXmlElement> pChild);
+		virtual std::vector<sPtr> children();
+		virtual bool addAttrib(const std::string& name, const std::string& value);
+		virtual bool removeAttrib(const std::string& name);
+		virtual AbstractXmlElement::Attributes attributes();
+		virtual std::string attributeValue(const std::string& name);
+		virtual std::string tag();
+		virtual std::string value();
+		virtual std::string toString();
+	private:
+		std::string tag_;
+		std::vector<std::shared_ptr<AbstractXmlElement>> children_;
+		AbstractXmlElement::Attributes attribs_;
+	};
 
-  inline std::vector<AbstractXmlElement::sPtr> TaggedElement::children()
-  {
-    return children_;
-  }
-  inline std::string TaggedElement::tag() { return tag_; }
-  std::shared_ptr<AbstractXmlElement> makeTaggedElement(const std::string& tag);
+	inline std::vector<AbstractXmlElement::sPtr> TaggedElement::children()
+	{
+		return children_;
+	}
+	inline AbstractXmlElement::Attributes TaggedElement::attributes()
+	{
+		return attribs_;
+	}
+	inline std::string TaggedElement::attributeValue(const std::string& name)
+	{
+		for (auto attrib : attribs_)
+		{
+			if (attrib.first == name)
+				return attrib.second;
+		}
+		return "";
+	}
+	inline std::string TaggedElement::tag() { return tag_; }
+	std::shared_ptr<AbstractXmlElement> makeTaggedElement(const std::string& tag, const std::string& body = "");
 
-  /////////////////////////////////////////////////////////////////////////////
-  // CommentElement - represents XML comments, e.g., <!-- comment text -->
-  //
-  // Incomplete
+	/////////////////////////////////////////////////////////////////////////////
+	// CommentElement - represents XML comments, e.g., <!-- comment text -->
+	//
+	// Incomplete
 
-  class CommentElement : public AbstractXmlElement
-  {
-  public:
-    CommentElement(const std::string& text) : commentText_(text) {}
-    CommentElement(const CommentElement& ce) = delete;
-    virtual ~CommentElement() {}
-    CommentElement& operator=(const CommentElement& ce) = delete;
-    virtual std::string value() { return commentText_; }
-    virtual std::string toString();
-  private:
-    std::string commentText_ = "to be defined";
-  };
+	class CommentElement : public AbstractXmlElement
+	{
+	public:
+		CommentElement(const std::string& text) : commentText_(text) {}
+		CommentElement(const CommentElement& ce) = delete;
+		virtual ~CommentElement() {}
+		CommentElement& operator=(const CommentElement& ce) = delete;
+		virtual std::string value() { return commentText_; }
+		virtual std::string toString();
+	private:
+		std::string commentText_ = "to be defined";
+	};
 
-  std::shared_ptr<AbstractXmlElement> makeCommentElement(const std::string& comment);
+	std::shared_ptr<AbstractXmlElement> makeCommentElement(const std::string& comment);
 
-  /////////////////////////////////////////////////////////////////////////////
-  // ProcInstrElement - represents XML Processing Instructions, e.g., <?xml version="1.0"?>
-  //
-  // Incomplete
+	/////////////////////////////////////////////////////////////////////////////
+	// ProcInstrElement - represents XML Processing Instructions, e.g., <?xml version="1.0"?>
+	//
+	// Incomplete
 
-  class ProcInstrElement : public AbstractXmlElement
-  {
-  public:
-    ProcInstrElement(const ProcInstrElement& pe) = delete;
-    ProcInstrElement(const std::string& type) : type_(type) {}
-    ProcInstrElement& operator=(const ProcInstrElement& pe) = delete;
-    virtual bool addAttrib(const std::string& name, const std::string& value);
-    virtual bool removeAttrib(const std::string& name);
-    virtual std::string value() { return type_; }
-    virtual std::string toString();
-  private:
-    std::vector<std::pair<std::string, std::string>> attribs_;
-    std::string type_ = "xml declaration";
-    std::string text;
-  };
+	class ProcInstrElement : public AbstractXmlElement
+	{
+	public:
+		ProcInstrElement(const ProcInstrElement& pe) = delete;
+		ProcInstrElement(const std::string& type) : type_(type) {}
+		ProcInstrElement& operator=(const ProcInstrElement& pe) = delete;
+		virtual bool addAttrib(const std::string& name, const std::string& value);
+		virtual bool removeAttrib(const std::string& name);
+		virtual std::string value() { return type_; }
+		virtual std::string toString();
+	private:
+		std::vector<std::pair<std::string, std::string>> attribs_;
+		std::string type_ = "xml declaration";
+		std::string text;
+	};
 
-  std::shared_ptr<AbstractXmlElement> makeProcInstrElement(const std::string& type);
+	std::shared_ptr<AbstractXmlElement> makeProcInstrElement(const std::string& type);
 
-  /////////////////////////////////////////////////////////////////////////////
-  // XmlDeclarElement - <?xml version="1.0"?>
+	/////////////////////////////////////////////////////////////////////////////
+	// XmlDeclarElement - <?xml version="1.0"?>
 
-  class XmlDeclarElement : public AbstractXmlElement
-  {
-  public:
-    XmlDeclarElement(const ProcInstrElement& pe) = delete;
-    XmlDeclarElement() {}
-    XmlDeclarElement& operator=(const ProcInstrElement& pe) = delete;
-    virtual bool addAttrib(const std::string& name, const std::string& value);
-    virtual bool removeAttrib(const std::string& name);
-    virtual std::string value() { return ""; }
-    virtual std::string toString();
-  private:
-    std::vector<std::pair<std::string, std::string>> attribs_;
-    std::string type_ = "xml declaration";
-  };
+	class XmlDeclarElement : public AbstractXmlElement
+	{
+	public:
+		XmlDeclarElement(const ProcInstrElement& pe) = delete;
+		XmlDeclarElement() {}
+		XmlDeclarElement& operator=(const ProcInstrElement& pe) = delete;
+		virtual bool addAttrib(const std::string& name, const std::string& value);
+		virtual bool removeAttrib(const std::string& name);
+		virtual std::string value() { return ""; }
+		virtual std::string toString();
+	private:
+		std::vector<std::pair<std::string, std::string>> attribs_;
+		std::string type_ = "xml declaration";
+	};
 
-  std::shared_ptr<AbstractXmlElement> makeXmlDeclarElement();
+	std::shared_ptr<AbstractXmlElement> makeXmlDeclarElement();
 
 
-  void title(const std::string& title, char underlineChar = '-');
+	void title(const std::string& title, char underlineChar = '-');
 }
 #endif

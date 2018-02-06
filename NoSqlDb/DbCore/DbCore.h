@@ -42,7 +42,7 @@ namespace NoSqlDb
 	template<typename T, typename Children>
 	class payLoadComplex {
 	public:
-		Children & category() { return category_; }
+		Children& category() { return category_; }
 		Children category() const { return category_; }
 		void category(const Children& category) { category_ = category; }
 

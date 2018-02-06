@@ -1,7 +1,7 @@
 
                                       CodeAnalysis - Version 1.4
     ==============================================================================================
-     Mon Feb  5 11:14:28 2018
+     Tue Feb  6 18:36:56 2018
      Path: "D:\Spring2018\cse687\NoSqlDb"
      Args: *.h, *.cpp, *.cs, /m, /r, /f
                                                                                
@@ -10,7 +10,7 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                             namespace                   Global Namespace       1       1     650
+                             namespace                   Global Namespace       1       1     659
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -125,142 +125,142 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-               Executive.h   namespace                        DbExecutive      35      14       3
-               Executive.h       class                         dbExecutor      36       8       2
-               Executive.h    function                               demo      45       3       1
+               Executive.h   namespace                        DbExecutive      39      14       3
+               Executive.h       class                         dbExecutor      40       8       2
+               Executive.h    function                               demo      49       3       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-             Executive.cpp    function                               main       5       4       1
+             Executive.cpp    function                               main      12       4       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-              Persisence.h    function                        restoreName     130       8       1
-              Persisence.h    function                 restoreDescription     140       7       1
-              Persisence.h    function                    restoreDateTime     149       7       1
-              Persisence.h    function                    restoreChildren     158      11       2
-              Persisence.h    function                    restorePayLoads     171      17       3
-              Persisence.h   namespace                      DbPersistence      37     152       9
-              Persisence.h       class                        persistence      39      19       8
-              Persisence.h    function                            persist      61      45       4
-              Persisence.h    function                            restore     109      19       3
+              Persisence.h    function                        restoreName     135       7       1
+              Persisence.h    function                 restoreDescription     145       6       1
+              Persisence.h    function                    restoreDateTime     154       6       1
+              Persisence.h    function                    restoreChildren     163      10       2
+              Persisence.h    function                    restorePayLoads     176      15       3
+              Persisence.h   namespace                      DbPersistence      42     150       9
+              Persisence.h       class                        persistence      44      19       8
+              Persisence.h    function                            persist      66      44       4
+              Persisence.h    function                            restore     113      19       3
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-           Persistence.cpp    function                              test1      14      23       1
-           Persistence.cpp    function                              test2      38      21       2
-           Persistence.cpp    function                              test3      60      18       3
-           Persistence.cpp    function                               main      81       9       1
+           Persistence.cpp    function                              test1      20      23       1
+           Persistence.cpp    function                              test2      44      21       2
+           Persistence.cpp    function                              test3      66      18       3
+           Persistence.cpp    function                               main      87       9       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                   Query.h    function                                        113       1       1
-                   Query.h    function                                        116       8       2
-                   Query.h    function                                        126       5       1
-                   Query.h    function                                        135      27       5
-                   Query.h    function                                        142       4       1
-                   Query.h    function                                        151       8       3
-                   Query.h    function                                        153       4       1
-                   Query.h    function                                        165      19       5
-                   Query.h    function                                        166       4       1
-                   Query.h    function                                        170      11       3
-                   Query.h    function                                        175       4       1
-                   Query.h    function                                        188      25       6
-                   Query.h    function                                        195       7       2
-                   Query.h    function                                        202       7       2
-                   Query.h    function                                        216      24       6
-                   Query.h    function                                        217      12       2
-                   Query.h    function                                        223       4       1
-                   Query.h    function                                        231       6       2
-                   Query.h    function                                        232       3       1
-                   Query.h    function                                        243      11       3
-                   Query.h    function                                        246       6       2
-                   Query.h    function                                        247       3       1
-                   Query.h    function                                        257      13       3
-                   Query.h    function                                        262       6       2
-                   Query.h    function                                        263       3       1
-                   Query.h    function                                        273      19       5
-                   Query.h    function                                        281       3       1
-                   Query.h    function                                        296      35      10
-                   Query.h    function                                        301       4       1
-                   Query.h    function                                        307      16       5
-                   Query.h    function                                        308      14       4
-                   Query.h    function                                        312       4       1
-                   Query.h    function                                        316       4       1
-                   Query.h    function                                        325       4       1
-                   Query.h    function                                        334       9       5
-                   Query.h    function                                        335       1       1
-                   Query.h    function                                        336       1       1
-                   Query.h    function                                        337       1       1
-                   Query.h    function                                        338       1       1
-                   Query.h    function                                        346       9       5
-                   Query.h    function                                        347       1       1
-                   Query.h    function                                        348       1       1
-                   Query.h    function                                        349       1       1
-                   Query.h    function                                        350       1       1
-                   Query.h    function                                        358       8       3
-                   Query.h    function                                        369       8       3
-                   Query.h    function                                        381       8       2
-                   Query.h    function                                        391      28       7
-                   Query.h    function                                        395       3       1
-                   Query.h    function                                        398       3       1
-                   Query.h    function                                        401       3       1
-                   Query.h    function                                        404      11       2
-                   Query.h    function                                        406       7       1
-                   Query.h    function                                        422      10       1
-                   Query.h    function                                        436       8       2
-                   Query.h    function                                        447       4       1
-                   Query.h    function                                        454      32       6
-                   Query.h    function                                        467       7       2
-                   Query.h    function                                        470       3       1
+                   Query.h    function                                        118       1       1
+                   Query.h    function                                        121       8       2
+                   Query.h    function                                        131       5       1
+                   Query.h    function                                        141      27       5
+                   Query.h    function                                        148       4       1
+                   Query.h    function                                        157       8       3
+                   Query.h    function                                        159       4       1
+                   Query.h    function                                        171      19       5
+                   Query.h    function                                        172       4       1
+                   Query.h    function                                        176      11       3
+                   Query.h    function                                        181       4       1
+                   Query.h    function                                        194      24       6
+                   Query.h    function                                        200       7       2
+                   Query.h    function                                        207       7       2
+                   Query.h    function                                        221      24       6
+                   Query.h    function                                        222      12       2
+                   Query.h    function                                        228       4       1
+                   Query.h    function                                        236       6       2
+                   Query.h    function                                        237       3       1
+                   Query.h    function                                        248      11       3
+                   Query.h    function                                        251       6       2
+                   Query.h    function                                        252       3       1
+                   Query.h    function                                        262      13       3
+                   Query.h    function                                        267       6       2
+                   Query.h    function                                        268       3       1
+                   Query.h    function                                        278      19       5
+                   Query.h    function                                        286       3       1
+                   Query.h    function                                        301      35      10
+                   Query.h    function                                        306       4       1
+                   Query.h    function                                        312      16       5
+                   Query.h    function                                        313      14       4
+                   Query.h    function                                        317       4       1
+                   Query.h    function                                        321       4       1
+                   Query.h    function                                        330       4       1
+                   Query.h    function                                        339       9       5
+                   Query.h    function                                        340       1       1
+                   Query.h    function                                        341       1       1
+                   Query.h    function                                        342       1       1
+                   Query.h    function                                        343       1       1
+                   Query.h    function                                        351       9       5
+                   Query.h    function                                        352       1       1
+                   Query.h    function                                        353       1       1
+                   Query.h    function                                        354       1       1
+                   Query.h    function                                        355       1       1
+                   Query.h    function                                        363       8       3
+                   Query.h    function                                        374       8       3
+                   Query.h    function                                        387       8       2
+                   Query.h    function                                        398      29       7
+                   Query.h    function                                        402       3       1
+                   Query.h    function                                        405       3       1
+                   Query.h    function                                        408       3       1
+                   Query.h    function                                        411      12       2
+                   Query.h    function                                        414       7       1
+                   Query.h    function                                        430      10       1
+                   Query.h    function                                        444       8       2
+                   Query.h    function                                        455       4       1
+                   Query.h    function                                        462      32       6
                    Query.h    function                                        475       7       2
                    Query.h    function                                        478       3       1
-                   Query.h    function                                        489       3       1
-                   Query.h    function                                        495      10       1
-                   Query.h    function                                        507      10       2
-                   Query.h    function                                        509       5       1
-                   Query.h    function                                        519      10       2
-                   Query.h    function                                        521       5       1
-                   Query.h    function                                        531      10       2
-                   Query.h    function                                        533       5       1
-                   Query.h    function                                        543      10       2
-                   Query.h    function                                        545       5       1
-                   Query.h    function                                        555      21       7
-                   Query.h    function                                        559       8       3
-                   Query.h    function                                        562       3       1
-                   Query.h    function                                        569       3       1
-                   Query.h    function                                        578      17       2
-                   Query.h    function                                        598      11       1
-                   Query.h    function                                        612       9       3
-                   Query.h    function                                        618       1       1
-                   Query.h    function                                        625      24       9
-                   Query.h    function                                        628       3       1
-                   Query.h    function                                        636       1       1
-                   Query.h    function                                        637       1       1
-                   Query.h    function                                        638       1       1
-                   Query.h    function                                        639       1       1
-                   Query.h    function                                        640       1       1
-                   Query.h    function                                        641       1       1
-                   Query.h    function                                        642       1       1
-                   Query.h    function                                        652      15       2
-                   Query.h    function                                        670      18       7
-                   Query.h    function                                        678       5       4
-                   Query.h    function                                        679       1       1
-                   Query.h    function                                        680       1       1
-                   Query.h    function                                        683       1       1
-                   Query.h    function                                        684       1       1
-                   Query.h    function                                        691      14       3
-                   Query.h    function                                        698       5       2
-                   Query.h    function                                        707       9       2
+                   Query.h    function                                        483       7       2
+                   Query.h    function                                        486       3       1
+                   Query.h    function                                        497       3       1
+                   Query.h    function                                        503      10       1
+                   Query.h    function                                        516      10       2
+                   Query.h    function                                        518       5       1
+                   Query.h    function                                        529      10       2
+                   Query.h    function                                        531       5       1
+                   Query.h    function                                        542      10       2
+                   Query.h    function                                        544       5       1
+                   Query.h    function                                        555      10       2
+                   Query.h    function                                        557       5       1
+                   Query.h    function                                        568      21       7
+                   Query.h    function                                        572       8       3
+                   Query.h    function                                        575       3       1
+                   Query.h    function                                        582       3       1
+                   Query.h    function                                        592      17       2
+                   Query.h    function                                        612      11       1
+                   Query.h    function                                        626       9       3
+                   Query.h    function                                        632       1       1
+                   Query.h    function                                        639      25       9
+                   Query.h    function                                        642       3       1
+                   Query.h    function                                        651       1       1
+                   Query.h    function                                        652       1       1
+                   Query.h    function                                        653       1       1
+                   Query.h    function                                        654       1       1
+                   Query.h    function                                        655       1       1
+                   Query.h    function                                        656       1       1
+                   Query.h    function                                        657       1       1
+                   Query.h    function                                        667      15       2
+                   Query.h    function                                        685      19       7
+                   Query.h    function                                        694       5       4
+                   Query.h    function                                        695       1       1
+                   Query.h    function                                        696       1       1
+                   Query.h    function                                        699       1       1
+                   Query.h    function                                        700       1       1
+                   Query.h    function                                        707      15       3
+                   Query.h    function                                        715       5       2
+                   Query.h    function                                        725       9       2
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                 Query.cpp    function                                         17      32       1
-                 Query.cpp    function                                         50      28       1
-                 Query.cpp    function                                         79      35       1
-                 Query.cpp    function                                        115      32       1
-                 Query.cpp    function                                        148      42       1
-                 Query.cpp    function                                        19118446744073709551427      63
+                 Query.cpp    function                                         18      32       1
+                 Query.cpp    function                                         52      28       1
+                 Query.cpp    function                                         82      35       1
+                 Query.cpp    function                                        119      32       1
+                 Query.cpp    function                                        153      42       1
+                 Query.cpp    function                                        198      14       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -283,11 +283,11 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                    Test.h   namespace                             DbTest      43      65      30
-                    Test.h       class                           testCase      45      21      22
-                    Test.h       class                               test      67       9       7
-                    Test.h    function                           testsRun      77      14       3
-                    Test.h    function                       testsSummary      92      15       3
+                    Test.h   namespace                             DbTest      47      67      31
+                    Test.h       class                           testCase      49      21      23
+                    Test.h       class                               test      71       9       7
+                    Test.h    function                           testsRun      82      14       3
+                    Test.h    function                       testsSummary      98      15       3
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -373,13 +373,13 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-             XmlDocument.h   namespace                      XmlProcessing      84      79      23
-             XmlDocument.h       class                        XmlDocument      89      36      20
-             XmlDocument.h    function                        XmlDocument      95       2       1
-             XmlDocument.h    function                         docElement     104       2       1
-             XmlDocument.h    function                                DFS     130       5       1
-             XmlDocument.h    function                                DFS     146       6       1
-             XmlDocument.h    function                                DFS     156       6       1
+             XmlDocument.h   namespace                      XmlProcessing      92      83      23
+             XmlDocument.h       class                        XmlDocument      97      40      20
+             XmlDocument.h    function                        XmlDocument     105       4       1
+             XmlDocument.h    function                         docElement     116       2       1
+             XmlDocument.h    function                                DFS     142       5       1
+             XmlDocument.h    function                                DFS     158       6       1
+             XmlDocument.h    function                                DFS     168       6       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -408,76 +408,80 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-              XmlElement.h   namespace                      XmlProcessing     104     176      65
-              XmlElement.h       class                 AbstractXmlElement     109      17       8
-              XmlElement.h    function                                tag     117       2       1
-              XmlElement.h    function                           addChild     126       2       1
-              XmlElement.h    function                        removeChild     127       2       1
-              XmlElement.h    function                           children     130       3       1
-              XmlElement.h    function                          addAttrib     132       2       1
-              XmlElement.h    function                       removeAttrib     133       2       1
-              XmlElement.h    function                ~AbstractXmlElement     134       2       1
-              XmlElement.h       class                         DocElement     141      15      13
-              XmlElement.h    function                        ~DocElement     143       2       1
-              XmlElement.h    function                           children     158       3       1
-              XmlElement.h       class                        TextElement     167      11       5
-              XmlElement.h    function                        TextElement     168       2       1
-              XmlElement.h    function                       ~TextElement     169       2       1
-              XmlElement.h    function                              value     178       2       1
-              XmlElement.h       class                      TaggedElement     187      19      15
-              XmlElement.h    function                      TaggedElement     188       1       1
-              XmlElement.h    function                     ~TaggedElement     190       2       1
-              XmlElement.h    function                           children     208       3       1
-              XmlElement.h    function                                tag     210       2       1
-              XmlElement.h       class                     CommentElement     220      11       5
-              XmlElement.h    function                     CommentElement     221       2       1
-              XmlElement.h    function                    ~CommentElement     223       2       1
-              XmlElement.h    function                              value     225       2       1
-              XmlElement.h       class                   ProcInstrElement     240      14       9
-              XmlElement.h    function                   ProcInstrElement     242       2       1
-              XmlElement.h    function                              value     246       2       1
-              XmlElement.h       class                   XmlDeclarElement     261      13       9
-              XmlElement.h    function                   XmlDeclarElement     263       2       1
-              XmlElement.h    function                              value     267       2       1
+              XmlElement.h   namespace                      XmlProcessing     112     203      70
+              XmlElement.h       class                 AbstractXmlElement     117      21      10
+              XmlElement.h    function                                tag     129       2       1
+              XmlElement.h    function                           addChild     138       2       1
+              XmlElement.h    function                        removeChild     139       2       1
+              XmlElement.h    function                           children     142       3       1
+              XmlElement.h    function                         attributes     146       3       1
+              XmlElement.h    function                     attributeValue     150       3       1
+              XmlElement.h    function                          addAttrib     152       2       1
+              XmlElement.h    function                       removeAttrib     153       2       1
+              XmlElement.h    function                ~AbstractXmlElement     154       2       1
+              XmlElement.h       class                         DocElement     161      15      13
+              XmlElement.h    function                        ~DocElement     163       2       1
+              XmlElement.h    function                           children     178       3       1
+              XmlElement.h       class                        TextElement     187      11       5
+              XmlElement.h    function                        TextElement     188       2       1
+              XmlElement.h    function                       ~TextElement     189       2       1
+              XmlElement.h    function                              value     198       2       1
+              XmlElement.h       class                      TaggedElement     207      21      18
+              XmlElement.h    function                      TaggedElement     208       1       1
+              XmlElement.h    function                     ~TaggedElement     210       2       1
+              XmlElement.h    function                           children     230       3       1
+              XmlElement.h    function                         attributes     234       3       1
+              XmlElement.h    function                     attributeValue     238       8       2
+              XmlElement.h    function                                tag     245       2       1
+              XmlElement.h       class                     CommentElement     255      11       5
+              XmlElement.h    function                     CommentElement     256       2       1
+              XmlElement.h    function                    ~CommentElement     258       2       1
+              XmlElement.h    function                              value     260       2       1
+              XmlElement.h       class                   ProcInstrElement     275      14       9
+              XmlElement.h    function                   ProcInstrElement     277       2       1
+              XmlElement.h    function                              value     281       2       1
+              XmlElement.h       class                   XmlDeclarElement     296      13       9
+              XmlElement.h    function                   XmlDeclarElement     298       2       1
+              XmlElement.h    function                              value     302       2       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-            XmlElement.cpp    function                         DocElement      72       7       1
-            XmlElement.cpp    function                         hasXmlRoot      82       8       2
-            XmlElement.cpp    function                           addChild      93      27       3
-            XmlElement.cpp    function                        removeChild     123       9       2
-            XmlElement.cpp    function                              value     133       2       1
-            XmlElement.cpp    function                           toString     139       6       1
-            XmlElement.cpp    function                           toString     220       6       1
-            XmlElement.cpp    function                           addChild     151       4       1
-            XmlElement.cpp    function                        removeChild     158       9       2
-            XmlElement.cpp    function                          addAttrib     170       5       1
-            XmlElement.cpp    function                       removeAttrib     178      11       3
-            XmlElement.cpp    function                              value     190       2       1
-            XmlElement.cpp    function                           toString     196      18       2
-            XmlElement.cpp    function                           toString     318       8       1
-            XmlElement.cpp    function                          addAttrib     232       5       1
-            XmlElement.cpp    function                       removeAttrib     240      11       3
-            XmlElement.cpp    function                           toString     254      15       2
-            XmlElement.cpp    function                           toString     275      15       2
-            XmlElement.cpp    function                          addAttrib     293       5       1
-            XmlElement.cpp    function                       removeAttrib     301      11       3
+            XmlElement.cpp    function                         DocElement      77       7       1
+            XmlElement.cpp    function                         hasXmlRoot      87       8       2
+            XmlElement.cpp    function                           addChild      98      27       3
+            XmlElement.cpp    function                        removeChild     128       9       2
+            XmlElement.cpp    function                              value     138       2       1
+            XmlElement.cpp    function                           toString     144       6       1
+            XmlElement.cpp    function                           toString     225       6       1
+            XmlElement.cpp    function                           addChild     156       4       1
+            XmlElement.cpp    function                        removeChild     163       9       2
+            XmlElement.cpp    function                          addAttrib     175       5       1
+            XmlElement.cpp    function                       removeAttrib     183      11       3
+            XmlElement.cpp    function                              value     195       2       1
+            XmlElement.cpp    function                           toString     201      18       2
+            XmlElement.cpp    function                           toString     323       8       1
+            XmlElement.cpp    function                          addAttrib     237       5       1
+            XmlElement.cpp    function                       removeAttrib     245      11       3
+            XmlElement.cpp    function                           toString     259      15       2
+            XmlElement.cpp    function                           toString     280      15       2
+            XmlElement.cpp    function                          addAttrib     298       5       1
+            XmlElement.cpp    function                       removeAttrib     306      11       3
             XmlElement.cpp    function                     makeDocElement      24       4       1
-            XmlElement.cpp    function                  makeTaggedElement      32       4       1
-            XmlElement.cpp    function                    makeTextElement      39       4       1
-            XmlElement.cpp    function                 makeCommentElement      46       4       1
-            XmlElement.cpp    function               makeProcInstrElement      53       4       1
-            XmlElement.cpp    function               makeXmlDeclarElement      60       4       1
-            XmlElement.cpp    function                              title     332       4       1
-            XmlElement.cpp    function                               main     342      18       1
+            XmlElement.cpp    function                  makeTaggedElement      32       9       2
+            XmlElement.cpp    function                    makeTextElement      44       4       1
+            XmlElement.cpp    function                 makeCommentElement      51       4       1
+            XmlElement.cpp    function               makeProcInstrElement      58       4       1
+            XmlElement.cpp    function               makeXmlDeclarElement      65       4       1
+            XmlElement.cpp    function                              title     337       4       1
+            XmlElement.cpp    function                               main     347      25       2
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-               XmlParser.h   namespace                      XmlProcessing      66      50      52
-               XmlParser.h       class                          XmlParser      70      36      51
-               XmlParser.h    function                               good     106       2       1
-               XmlParser.h    function                         attributes     107       2       1
-               XmlParser.h    function                            verbose     109       6       1
+               XmlParser.h   namespace                      XmlProcessing      68      50      53
+               XmlParser.h       class                          XmlParser      72      36      52
+               XmlParser.h    function                               good     108       2       1
+               XmlParser.h    function                         attributes     109       2       1
+               XmlParser.h    function                            verbose     112       5       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -492,12 +496,12 @@
              XmlParser.cpp    function                    createProcInstr     168      17       3
              XmlParser.cpp    function                      createComment     188      18       3
              XmlParser.cpp    function                   createTaggedElem     209      18       3
-             XmlParser.cpp    function                     createTextElem     230      11       2
-             XmlParser.cpp    function                     processEndElem     244       7       2
-             XmlParser.cpp    function                      processMarkup     254      38       7
-             XmlParser.cpp    function                        processText     295       5       1
-             XmlParser.cpp    function                      buildDocument     303      27       4
-             XmlParser.cpp    function                               main     337      14       1
+             XmlParser.cpp    function                     createTextElem     230      22       3
+             XmlParser.cpp    function                     processEndElem     255       7       2
+             XmlParser.cpp    function                      processMarkup     265      38       7
+             XmlParser.cpp    function                        processText     306       5       1
+             XmlParser.cpp    function                      buildDocument     314      27       4
+             XmlParser.cpp    function                               main     348      14       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -506,25 +510,25 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                  test.cpp    function                             testR1       8       6       1
-                  test.cpp    function                             testR2      15       6       1
-                  test.cpp    function                             testR3      22       6       1
-                  test.cpp    function                             testR4      29      35       1
-                  test.cpp    function                             testR5      65      41       3
-                  test.cpp    function                             testR6     107      31       1
-                  test.cpp    function                             testR7     139      21       1
-                  test.cpp    function                             testR8     161      37       2
-                  test.cpp    function                             testR9     199       6       1
-                  test.cpp    function                            testR10     206       6       1
-                  test.cpp    function                            testR11     213      15       1
-                  test.cpp    function                            testR12     229       6       1
-                  test.cpp    function                            testR13     236       5       1
-                  test.cpp    function                           casesRun     242      28       4
-                  test.cpp    function                              check     271       6       1
-                  test.cpp    function                 test_always_passes     278       2       1
-                  test.cpp    function                  test_always_fails     279       2       1
-                  test.cpp    function                 test_always_throws     281       3       1
-                  test.cpp    function                               main     287       9       1
+                  test.cpp    function                             testR1      15       6       1
+                  test.cpp    function                             testR2      23       6       1
+                  test.cpp    function                             testR3      31       6       1
+                  test.cpp    function                             testR4      39      35       1
+                  test.cpp    function                             testR5      76      45       3
+                  test.cpp    function                             testR6     123      31       1
+                  test.cpp    function                             testR7     156      21       1
+                  test.cpp    function                             testR8     179      38       2
+                  test.cpp    function                             testR9     219       6       1
+                  test.cpp    function                            testR10     227       6       1
+                  test.cpp    function                            testR11     235      24       2
+                  test.cpp    function                            testR12     261       6       1
+                  test.cpp    function                            testR13     269       5       1
+                  test.cpp    function                           casesRun     276      28       4
+                  test.cpp    function                              check     306       6       1
+                  test.cpp    function                 test_always_passes     314       2       1
+                  test.cpp    function                  test_always_fails     316       2       1
+                  test.cpp    function                 test_always_throws     319       3       1
+                  test.cpp    function                               main     325       9       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -554,7 +558,6 @@
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
               DateTime.cpp    function                           DateTime      57      28      15
-                 Query.cpp    function                                        19118446744073709551427      63
              Tokenizer.cpp    function                               main     329      61       8
 
               public data: TestUtilities.h : 93 - struct {
@@ -563,5 +566,5 @@
                 std :: string testName ; 
 
 
-    searched   126 dirs
+    searched   117 dirs
    processed    33 files

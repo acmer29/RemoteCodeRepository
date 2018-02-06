@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////
+// Persistence.cpp - Test persistence function of persistence.h	   //
+// ver 1.1                                                         //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018         //
+/////////////////////////////////////////////////////////////////////
+
 #include "Persisence.h"
 #include <iostream>
 #include <iomanip>

@@ -1,3 +1,9 @@
+/////////////////////////////////////////////////////////////////////
+// Test.cpp - Implements requirements demo function				   //
+//			  And implements the tests of test class		       //
+// ver 1.2                                                         //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018         //
+/////////////////////////////////////////////////////////////////////
 
 #include "../DateTime/DateTime.h"
 #include "../Utilities/StringUtilities/StringUtilities.h"
@@ -5,6 +11,7 @@
 
 using namespace DbTest;
 
+// ----< demo requirement #1 >-----
 bool testCase::testR1() {
 	Utilities::title("#1: Implemented in C++ and using the facilities of the standard C++ Libraries and Visual Studio 2017");
 	Utilities::putline();
@@ -12,6 +19,7 @@ bool testCase::testR1() {
 	return true;
 }
 
+// ----< demo requirement #2 >-----
 bool testCase::testR2() {
 	Utilities::title("#2: Use the C++ standard library\'s streams for all console I/O and new and delete for all heap-based memory management");
 	Utilities::putline();
@@ -19,6 +27,7 @@ bool testCase::testR2() {
 	return true;
 }
 
+// ----< demo requirement #3 >-----
 bool testCase::testR3() {
 	Utilities::title("#3: Implement a generic key-value in-memory database where each value consists of metadata and a generic type of payload");
 	Utilities::putline();
@@ -26,6 +35,7 @@ bool testCase::testR3() {
 	return true;
 }
 
+// ----< demo requirement #4 >-----
 bool testCase::testR4() {
 	Utilities::title("#4: Support addition and deletion of key/value pairs");
 	Utilities::putline();
@@ -62,6 +72,7 @@ bool testCase::testR4() {
 	return true;
 }
 
+// ----< demo requirement #5 >-----
 bool testCase::testR5() {
 	Utilities::title("#5: Support update of database elements, including replace one element with a new instance");
 	Utilities::putline();
@@ -72,27 +83,31 @@ bool testCase::testR5() {
 	querier.from(db).resultDisplay();
 	Utilities::putline();
 
-	querier.from(db).find("name: \"Tianyu Qi1\"").update("payLoad: \"Droped CSE 687\", description: \"A student\"");
-
 	std::cout << "\n After finding the element name \"Tianyu Qi1\" updating its payLoad and description";
-
+	querier.from(db).find("name: \"Tianyu Qi1\"").update("payLoad: \"Droped CSE 687\", description: \"A student\"");
 	querier.from(db).find("name: \"Tianyu Qi1\"").resultDisplay();
 
+	std::cout << "\n After update the element key \"Tianyu Qi0\", add it a child \"Tianyu Qi1\", and remove child \"Tianyu Qi0\" from element key \"Tianyu Qi\"";
+	std::cout << "\n And also find element name \"Tianyu Qi\" and \"Tianyu Qi0\", update their datetime column";
 	querier.from(db).find("name: \"Tianyu Qi0\"").update("children: \"$(add)(Tianyu Qi1)\"");
 	querier.from(db).find("name", "Tianyu Qi").update("children: \"$(remove)(Tianyu Qi, Tianyu Qi0)\"");
 	querier.from(db).find("name: \"Tianyu Qi\"").update("dateTime: \"Mon Jan 01 23:59:59 2018\"");
 	querier.from(db).find("name: \"Tianyu Qi0\"").update("dateTime: \"Mon Jul 01 23:59:59 2017\"");
-
-	std::cout << "\n After update the element key \"Tianyu Qi0\", add it a child \"Tianyu Qi1\", and remove child \"Tianyu Qi0\" from element key \"Tianyu Qi\"";
-	std::cout << "\n And also find element name \"Tianyu Qi\" and \"Tianyu Qi0\", update their datetime column";
 	querier.from(db).find("name", "Tianyu Qi0").orFind("name", "Tianyu Qi1").orFind("name", "Tianyu Qi").resultDisplay();
+
+	std::cout << "\n After finding the element name \"Tianyu Qi\", update its category adding one category\"forTest\"";
+	querier.from(db).find("name", "Tianyu Qi").update("category", "$(add)(forTest)");
+	querier.from(db).find("name", "Tianyu Qi").resultDisplay();
+	if (querier.from(db).find("name", "Tianyu Qi").hasCategory("forTest") == false) return false;
+
+	Utilities::putline();
 
 	try {
 		querier.from(db).find("name: \"Tianyu Qi\"").update("name", "Tianyu QiX");
 		return false;
 	}
 	catch (std::exception& ex) {
-		std::cout << "Catch exception of try editing the name";
+		std::cout << "Catch the exception of try editing the name";
 		std::cout << ex.what() << std::endl;
 	}
 
@@ -104,6 +119,7 @@ bool testCase::testR5() {
 	return true;
 }
 
+// ----< demo requirement #6 >-----
 bool testCase::testR6() {
 	Utilities::title("#6: Support queries in different forms");
 	Utilities::putline();
@@ -136,6 +152,7 @@ bool testCase::testR6() {
 	return true;
 }
 
+// ----< demo requirement #7 >-----
 bool testCase::testR7() {
 	Utilities::title("#7: Support queries on the set of keys returned by a previous query & queries on the union of results of one or more previous queries");
 	Utilities::putline();
@@ -158,6 +175,7 @@ bool testCase::testR7() {
 	return true;
 }
 
+// ----< demo requirement #8 >-----
 bool testCase::testR8() {
 	Utilities::title("#8: Persist a collection of database contents, defined by a collection of keys, to an XML file, on command");
 	Utilities::putline();
@@ -174,14 +192,15 @@ bool testCase::testR8() {
 	querier.from(db).resultDisplay();
 	Utilities::putline();
 
-	std::cout << "Persist all the elements with payLoad equals to \"Taking CSE 687\" to \"Persistence\\test.xml\"" << std::endl;
+	std::cout << "\n Persist all the elements with payLoad equals to \"Taking CSE 687\" to \"Persistence\\test.xml\"" << std::endl;
 	DbPersistence::persistence<std::string> persistor;
 	persistor.persist(querier.from(db).find("payLoad", "Taking CSE 687").eval(), "test");
-	std::cout << XmlProcessing::XmlDocument("test.xml", XmlProcessing::XmlDocument::file).toString() << std::endl;
+
+	std::cout << "\n The persisted XML file can be found in Executive\\test.xml" << std::endl;
 
 	std::cout << "\n Restored and augmented from \"test.xml\"" << std::endl;
 	querier.from(db).remove("name: \"/Tianyu Qi[0-9]/\"");
-	std::cout << "Before restore" << std::endl;
+	std::cout << "\n Before restore" << std::endl;
 	querier.from(db).resultDisplay();
 	Utilities::putline();
 	std::vector<NoSqlDb::DbElement<std::string>> result = persistor.restore("test.xml");
@@ -196,13 +215,15 @@ bool testCase::testR8() {
 	return true;
 }
 
+// ----< demo requirement #9 >-----
 bool testCase::testR9() {
 	Utilities::title("#9: Implement a Payload type that contains a string and a vector of std::string");
 	Utilities::putline();
-	std::cout << "\n Implemented in DbCore.h line 52-54, 83-88, 95" << std::endl;
+	std::cout << "\n Implemented in DbCore.h line 42-56, 67, 95-100" << std::endl;
 	return true;
 }
 
+// ----< demo requirement #10 >-----
 bool testCase::testR10() {
 	Utilities::title("#10: Provide, in your implementation, at least the following packages: Executive, DBCore, Query, Test");
 	Utilities::putline();
@@ -210,6 +231,7 @@ bool testCase::testR10() {
 	return true;
 }
 
+// ----< demo requirement #11 >-----
 bool testCase::testR11() {
 	Utilities::title("#11: Submitted with contents, in the form of an XML file, that describe your project's package structure and dependency relationships");
 	DbQuery::queryResult<std::string> querier(db);
@@ -220,25 +242,37 @@ bool testCase::testR11() {
 	querier.from(db).insert("\"Test\", \"Provide methods of unit test and requirements demostration\", \"DbCore.h, DbCore.cpp, DateTime.h, DateTime.cpp, Utilities.h, Utilities.cpp, Query.h, Query.cpp, Persistence.h, Persistence.cpp, Test.h, Test.cpp, XmlDocument.h, XmlDocument.cpp\", \"Test.h, Test.cpp\", \"DbTest\"", false);
 	querier.from(db).insert("\"Executive\", \"Provide entry of database and invoke requirement demostration\", \"DbCore.h, DbCore.cpp, DateTime.h, DateTime.cpp, Utilities.h, Utilities.cpp, Query.h, Query.cpp, Persistence.h, Persistence.cpp, Test.h, Test.cpp, XmlDocument.h, XmlDocument.cpp, Executive.h, Executive.cpp\", \"Executive.h, Executive.cpp\", \"DbExecutive\"", false);
 
-	querier.from(db).resultDisplay();
 	DbPersistence::persistence<std::string> persistor;
 	persistor.persist(querier.from(db).eval(), "Project packege structure");
+
+	std::cout << "\n The project structure is shown as records in database, the XML file can be found in Executive\\Project package structure.xml" << std::endl;
+
+	querier.from(db).drop();
+	std::vector<NoSqlDb::DbElement<std::string>> result = persistor.restore("Project packege structure.xml");
+	for (auto item : result) {
+		querier.from(db).insert(item, false);
+	}
+	querier.from(db).resultDisplay();
+	if (querier.from(db).eval().size() != 5) return false;
 	return true;
 }
 
+// ----< demo requirement #12 >-----
 bool testCase::testR12() {
 	Utilities::title("#12: Accompanied by a test executive that clearly demonstrates you've met all the functional requirements");
 	Utilities::putline();
-	std::cout << "Implemented by Test.h and Test.cpp" << std::endl;
+	std::cout << "Implemented by testCase class in Test.h and Test.cpp, and this class is the actual worker now running these tests" << std::endl;
 	return true;
 }
 
+// ----< demo requirement #13 >-----
 bool testCase::testR13() {
 	Utilities::title("provide a pdf file containing a package diagram");
 	Utilities::putline();
 	return true;
 }
 
+// ----< casesRun: Load all requirement demos and provide a try-catch block to execute them >-----
 void testCase::casesRun(std::ostream& out) {
 	cases.push_back(std::mem_fn(&testCase::testR1));
 	cases.push_back(std::mem_fn(&testCase::testR2));
@@ -258,26 +292,30 @@ void testCase::casesRun(std::ostream& out) {
 		try {
 			bool result = now(*this);
 			check(result, out);
-			out << " -- \"" << "Requirement " << (i + 1) << "\"\n";
+			out << " -- " << "Requirement " << (i + 1) << "\n";
 		}
 		catch (std::exception &ex) {
 			check(false, out);
-			out << " -- \"" << "Requirement " << (i + 1) << "\"\n";
+			out << " -- " << "Requirement " << (i + 1) << "\n";
 			out << ex.what() << "\n";
 		}
 	}
 }
 
+// -----< check: Helper functions for casesRun, stole from TestExecutor >-----
 void testCase::check(bool result, std::ostream& out) {
 	if (result)
-		out << "  passed";
+		out << "\n  passed";
 	else
-		out << "  failed";
+		out << "\n  failed";
 }
 
 #ifdef TEST_TEST
+// ----< test function #1 >-----
 bool test_always_passes() { return true; }
+// ----< test function #2 >-----
 bool test_always_fails() { return false; }
+// ----< test function #3 >-----
 bool test_always_throws() {
 	throw std::exception("exception\n         -- msg: this test always throws -- ");
 }

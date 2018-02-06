@@ -2,7 +2,7 @@
 #define XMLDOCUMENT_H
 ///////////////////////////////////////////////////////////////////
 // XmlDocument.h - a container of XmlElement nodes               //
-// Ver 2.2                                                       //
+// Ver 2.5                                                       //
 // Application: Help for CSE687 Pr#2, Spring 2015                //
 // Platform:    Dell XPS 2720, Win 8.1 Pro, Visual Studio 2013   //
 // Author:      Jim Fawcett, CST 4-187, 443-3948                 //
@@ -17,7 +17,7 @@
 * a program-friendly wrapper around an Abstract Syntax Tree (AST) used to
 * contain the results of parsing XML markup.
 *
-* Abstract Syntax Trees, defined in this package, are unordered trees with 
+* Abstract Syntax Trees, defined in this package, are unordered trees with
 * two types of nodes:
 *   Terminal nodes     - nodes with no children
 *   Non-Terminal nodes - nodes which may have a finite number of children
@@ -35,7 +35,7 @@
 *
 * Required Files:
 * ---------------
-*   - XmlDocument.h, XmlDocument.cpp, 
+*   - XmlDocument.h, XmlDocument.cpp,
 *     XmlElement.h, XmlElement.cpp
 *
 * Build Process:
@@ -44,6 +44,14 @@
 *
 * Maintenance History:
 * --------------------
+* ver 2.5 : 02 Feb 2018
+* - completed attribute handling by adding two new methods to AbstractXmlElement
+*   and overrides of those methods in TaggedElement.
+* ver 2.4 : 30 Jan 2018
+* - added trimming of text end in XmlParser::CreateTextElement()
+* ver 2.3 : 18 Feb 2017
+* - now create docElement in XmlDocument constructor even if there is
+*   no argument.
 * ver 2.2 : 01 Jun 2015
 * - added building document from XML file using XmlParser in constructor
 * - added test to teststub
@@ -68,7 +76,7 @@
 *
 * ToDo:
 * -----
-* This is the beginning of an XmlDocument class for Project #2.  
+* This is the beginning of an XmlDocument class for Project #2.
 * It lays out a suggested design, which you are not compelled to follow.
 * If it helps then use it.  If not you don't have to.
 *
@@ -82,82 +90,86 @@
 
 namespace XmlProcessing
 {
-  ///////////////////////////////////////////////////////////////////////////
-  // XmlDocument class
+	///////////////////////////////////////////////////////////////////////////
+	// XmlDocument class
 
-  class XmlDocument
-  {
-  public:
-    using sPtr = std::shared_ptr < AbstractXmlElement > ;
-    enum sourceType { file, str };
+	class XmlDocument
+	{
+	public:
+		using sPtr = std::shared_ptr < AbstractXmlElement >;
+		enum sourceType { file, str };
 
-    // construction and assignment
+		// construction and assignment
 
-    XmlDocument(sPtr pRoot = nullptr) : pDocElement_(pRoot) {}
-    XmlDocument(const std::string& src, sourceType srcType=str);
-    XmlDocument(const XmlDocument& doc) = delete;
-    XmlDocument(XmlDocument&& doc);
-    XmlDocument& operator=(const XmlDocument& doc) = delete;
-    XmlDocument& operator=(XmlDocument&& doc);
+		XmlDocument(sPtr pRoot = nullptr) : pDocElement_(pRoot)
+		{
+			if (!pRoot)
+				pDocElement_ = makeDocElement();
+		}
+		XmlDocument(const std::string& src, sourceType srcType = str);
+		XmlDocument(const XmlDocument& doc) = delete;
+		XmlDocument(XmlDocument&& doc);
+		XmlDocument& operator=(const XmlDocument& doc) = delete;
+		XmlDocument& operator=(XmlDocument&& doc);
 
-    // access to docElement and XML root
+		// access to docElement and XML root
 
-    std::shared_ptr<AbstractXmlElement>& docElement() { return pDocElement_;  }
-    std::shared_ptr<AbstractXmlElement> xmlRoot();
-    bool xmlRoot(sPtr pRoot);
+		std::shared_ptr<AbstractXmlElement>& docElement() { return pDocElement_; }
+		std::shared_ptr<AbstractXmlElement> xmlRoot();
+		bool xmlRoot(sPtr pRoot);
 
-    // queries return XmlDocument references so they can be chained, e.g., doc.element("foobar").descendents();
+		// queries return XmlDocument references so they can be chained, e.g., doc.element("foobar").descendents();
 
-    XmlDocument& element(const std::string& tag);           // found_[0] contains first element (DFS order) with tag
-    XmlDocument& elements(const std::string& tag);          // found_ contains all children of first element with tag
-    XmlDocument& descendents(const std::string& tag = "");  // found_ contains descendents of prior found_[0]
-    std::vector<sPtr> select();                             // returns found_.  Uses std::move(found_) to clear found_
-    bool find(const std::string& tag, sPtr pElem, bool findall = true);
+		XmlDocument& element(const std::string& tag);           // found_[0] contains first element (DFS order) with tag
+		XmlDocument& elements(const std::string& tag);          // found_ contains all children of first element with tag
+		XmlDocument& descendents(const std::string& tag = "");  // found_ contains descendents of prior found_[0]
+		std::vector<sPtr> select();                             // returns found_.  Uses std::move(found_) to clear found_
+		bool find(const std::string& tag, sPtr pElem, bool findall = true);
 
-    size_t size();
-    std::string toString();
-    template<typename CallObj>
-    void DFS(sPtr pElem, CallObj& co);
-  private:
-    sPtr pDocElement_;         // AST that holds procInstr, comments, XML root, and more comments
-    std::vector<sPtr> found_;  // query results
-  };
+		size_t size();
+		std::string toString();
+		template<typename CallObj>
+		void DFS(sPtr pElem, CallObj& co);
+	private:
+		sPtr pDocElement_;         // AST that holds procInstr, comments, XML root, and more comments
+		std::vector<sPtr> found_;  // query results
+	};
 
-  //----< search subtree of XmlDocument >------------------------------------
+	//----< search subtree of XmlDocument >------------------------------------
 
-  template<typename CallObj>
-  void XmlDocument::DFS(sPtr pElem, CallObj& co)
-  {
-    co(*pElem);
-    for (auto pChild : pElem->children())
-      DFS(pChild, co);
-  }
-  ///////////////////////////////////////////////////////////////////////////
-  // Global Functions for Depth First Search
-  //
-  //   These functions take a callable object to define processing on each
-  //   element encountered on search traversal.  They may be functions,
-  //   functors, or lambdas - see XmlDocument.cpp for examples.
+	template<typename CallObj>
+	void XmlDocument::DFS(sPtr pElem, CallObj& co)
+	{
+		co(*pElem);
+		for (auto pChild : pElem->children())
+			DFS(pChild, co);
+	}
+	///////////////////////////////////////////////////////////////////////////
+	// Global Functions for Depth First Search
+	//
+	//   These functions take a callable object to define processing on each
+	//   element encountered on search traversal.  They may be functions,
+	//   functors, or lambdas - see XmlDocument.cpp for examples.
 
-  //----< search subtree of XmlDocument >------------------------------------
+	//----< search subtree of XmlDocument >------------------------------------
 
-  template<typename CallObj>
-  void DFS(XmlDocument::sPtr pElem, CallObj& co)
-  {
-    using sPtr = XmlDocument::sPtr;
-    co(*pElem);
-    for (auto pChild : pElem->children())
-      DFS(pChild, co);
-  }
-  //----< search entire XmlDocument >----------------------------------------
+	template<typename CallObj>
+	void DFS(XmlDocument::sPtr pElem, CallObj& co)
+	{
+		using sPtr = XmlDocument::sPtr;
+		co(*pElem);
+		for (auto pChild : pElem->children())
+			DFS(pChild, co);
+	}
+	//----< search entire XmlDocument >----------------------------------------
 
-  template<typename CallObj>
-  void DFS(XmlDocument& doc, CallObj& co)
-  {
-    using sPtr = XmlDocument::sPtr;
+	template<typename CallObj>
+	void DFS(XmlDocument& doc, CallObj& co)
+	{
+		using sPtr = XmlDocument::sPtr;
 
-    sPtr pDocElem = doc.docElement();
-    DFS(pDocElem, co);
-  }
+		sPtr pDocElem = doc.docElement();
+		DFS(pDocElem, co);
+	}
 }
 #endif
