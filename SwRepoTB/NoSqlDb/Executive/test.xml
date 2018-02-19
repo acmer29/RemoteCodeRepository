@@ -1,0 +1,96 @@
+
+  <Database>
+    <record>
+      <name>
+        Tianyu Qi0
+      </name>
+      <description>
+        student0
+      </description>
+      <dateTime>
+        Sat Jul  1 23:59:59 2017
+      </dateTime>
+      <children>
+      </children>
+      <payLoads>
+        <payLoad>
+          Taking CSE 687
+        </payLoad>
+        <categories>
+          <category>
+            Asian
+          </category>
+          <category>
+            Chinese
+          </category>
+          <category>
+            Male
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        Tianyu Qi1
+      </name>
+      <description>
+        student1
+      </description>
+      <dateTime>
+        Tue Feb  6 20:46:55 2018
+      </dateTime>
+      <children>
+      </children>
+      <payLoads>
+        <payLoad>
+          Taking CSE 687
+        </payLoad>
+        <categories>
+          <category>
+            Asian
+          </category>
+          <category>
+            CHINESE
+          </category>
+          <category>
+            Male
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        Tianyu Qi
+      </name>
+      <description>
+        True student
+      </description>
+      <dateTime>
+        Mon Jan  1 23:59:59 2018
+      </dateTime>
+      <children>
+        <childName>
+          Tianyu Qi0
+        </childName>
+        <childName>
+          Tianyu Qi1
+        </childName>
+      </children>
+      <payLoads>
+        <payLoad>
+          Taking CSE 687
+        </payLoad>
+        <categories>
+          <category>
+            C++
+          </category>
+          <category>
+            Haskell
+          </category>
+          <category>
+            Python
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+  </Database>

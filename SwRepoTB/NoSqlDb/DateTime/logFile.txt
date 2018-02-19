@@ -1,0 +1,53 @@
+
+                                      CodeAnalysis - Version 1.4
+    ==============================================================================================
+     Tue Jan 30 09:56:28 2018
+     Path: "D:\Spring2018\cse687\NoSqlDb\DateTime"
+     Args: DateTime.cpp, /m, /r, /f
+                                                                               
+           Code Metrics - Start Line, Size (lines/code), and Complexity (number of scopes)
+    ==============================================================================================
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+                             namespace                   Global Namespace       1       1      44
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+              DateTime.cpp    function                              ctime      18       6       1
+              DateTime.cpp    function                          localtime      27       5       1
+              DateTime.cpp    function                           DateTime      35       3       1
+              DateTime.cpp    function                   readDateTimePart      43       9       1
+              DateTime.cpp    function                           DateTime      57      28      15
+              DateTime.cpp    function                      operatorstd::      88       3       1
+              DateTime.cpp    function                           DateTime      92       2       1
+              DateTime.cpp    function                           makeTime     100      16       2
+              DateTime.cpp    function                       makeDuration     121       8       1
+              DateTime.cpp    function                                now     132       7       1
+              DateTime.cpp    function                          timepoint     142       3       1
+              DateTime.cpp    function                              ticks     148       4       1
+              DateTime.cpp    function                               time     155       6       1
+              DateTime.cpp    function                          operator<     164       3       1
+              DateTime.cpp    function                          operator>     170       3       1
+              DateTime.cpp    function                         operator+=     176       4       1
+              DateTime.cpp    function                          operator+     183       4       1
+              DateTime.cpp    function                         operator-=     190       4       1
+              DateTime.cpp    function                          operator-     197       3       1
+              DateTime.cpp    function                               year     203       5       1
+              DateTime.cpp    function                              month     211       5       1
+              DateTime.cpp    function                                day     219       5       1
+              DateTime.cpp    function                               hour     227       5       1
+              DateTime.cpp    function                             minute     235       5       1
+              DateTime.cpp    function                             second     243       5       1
+              DateTime.cpp    function                               main     256      28       3
+
+                          Functions Exceeding Metric Limits and Public Data
+    ==============================================================================================
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+              DateTime.cpp    function                           DateTime      57      28      15
+
+
+
+    searched     6 dirs
+   processed     1 files
