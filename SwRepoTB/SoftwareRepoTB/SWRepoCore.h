@@ -1,5 +1,6 @@
 #pragma once
 #ifndef SWREPOCORE_H
+#define SWREPOCORE_H
 #include <iostream>
 #include <vector>
 #include <string>

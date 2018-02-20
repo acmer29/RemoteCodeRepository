@@ -1,8 +1,10 @@
 #pragma once
 #ifndef CHECKIN_H
+#define CHECKIN_H
 #include "../SoftwareRepoTB/SWRepoCore.h"
 #include "../NoSqlDb/Query/Query.h"
 #include "../NoSqlDb/Utilities/StringUtilities/StringUtilities.h"
+#include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
 namespace SWRTBCheckin {
 	class Checkin {
 	public:
@@ -10,7 +12,7 @@ namespace SWRTBCheckin {
 
 		explicit Checkin(Repo& target) : repo(target) {}
 		
-		void checkin(const std::string& path);
+		void checkin(const std::string& path, const std::string& fileName);
 		void dependencySetter(const std::string& dependency);
 		void descriptionSetter(const std::string& description);
 		void categorySetter(const std::string& category);
@@ -19,11 +21,11 @@ namespace SWRTBCheckin {
 		Repo& repo;
 
 		//Helper functions
-		void pathFinder(const std::string& path);
 		void versionSolver();
 		void versionChecker();
+
+		FileSystem::Path filePath;
+		FileSystem::Directory fileDir;
 	};
-
-
 }
 #endif // !CHECKIN_H
