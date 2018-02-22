@@ -1,5 +1,6 @@
 #include "SWRepoCore.h"
-using namespace SWRTBCore;
+using namespace SWRTB;
+
 #ifdef TEST_SWREPOCORE
 int main() {
 
