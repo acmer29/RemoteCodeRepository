@@ -29,7 +29,9 @@ void Checkin::checkin(bool close) {
 
 Checkin& Checkin::selectFile(const std::string& path) {
 	if (filesForCheckin.size() != 0) filesForCheckin.clear();
-	pathSolver(path);
+	if (path == "") throw std::exception("Check-in: Please enter file spec.\n");
+	else if (path[0] == '$') localPathSolver(path.substr(1, path.length()));
+	else pathSolver(path);
 	return *this;
 }
 
@@ -66,6 +68,13 @@ void Checkin::pathSolver(const std::string& path) {
 		filesForCheckin.push_back(pathAct + item);
 	}
 	return;
+}
+
+void Checkin::localPathSolver(const std::string& fileName) {
+	querier.from(repo.core()).find("payLoad", "/" + openDirectory + fileName + "\\.[0-9]*/");
+	if (querier.eval().size() != 1) throw std::exception("Check-in: Cannot locate local file by given fileName.\n");
+	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
+	filesForCheckin.push_back(fileCplx.payLoad());
 }
 
 int Checkin::versionSetter(const std::string& fileName) {
@@ -185,16 +194,31 @@ bool test1() {
 	Utilities::title("Test1: Checkin single file");
 	Utilities::putline();
 	Core repoCore("D:/test/");
-	/*Checkin worker(repoCore);
+	Checkin worker(repoCore);
 	worker.selectFile("../test.txt").setDependence("").setCategory("").setDescription("this is something").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
-	worker.selectFile("D:/test/open/test.txt.1").setDependence("").setCategory("test, optional").setDescription("change it").checkin();
+	worker.selectFile("$test.txt").setDependence("").setCategory("test, optional").setDescription("change it").checkin();
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/").setDependence("test.txt.1").setDescription("some packages").setCategory("has header, has source").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
-	worker.selectFile("D:/test/open/test.txt.1").setDescription("$").setCategory("$").setDependence("$").checkin(true);
+	worker.selectFile("$test.txt").setDescription("$").setCategory("$").setDependence("$").checkin(true);
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
+
+	worker.selectFile("$test.cpp").setDependence("$").setDescription("$").setCategory("$").checkin(true);
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
+
+	worker.selectFile("$test.h").setDependence("$").setDescription("$").setCategory("$").checkin(true);
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
+
+	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/test.cpp").setDependence("test.txt.1").setDescription("some packages").setCategory("has source").checkin(false);
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
+
+	/*worker.selectFile("D:/tools/SurfacePro_BMR_15_2.177.0.zip").setDependence("test.txt.1").setDescription("some packages").setCategory("has source").checkin(false);
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
+
+	worker.selectFile("$SurfacePro_BMR_15_2.177.0.zip").setDependence("$").setDescription("$").setCategory("$").checkin(true);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();*/
 
 	return false;

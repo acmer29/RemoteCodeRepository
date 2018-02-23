@@ -46,6 +46,7 @@ namespace SWRTB {
 
 		//Helper functions
 		void pathSolver(const std::string& path);
+		void localPathSolver(const std::string& fileName);
 		int versionSetter(const std::string& fileName);
 		bool canClose(const std::string& key);
 		bool isNew(const std::string& fileName);
