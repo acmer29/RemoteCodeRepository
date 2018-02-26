@@ -9,6 +9,7 @@ Checkin::Checkin(Core& target) :
 	if (dirHelper.exists(openDirectory) == false) dirHelper.create(openDirectory);
 	closedDirectory = workDirectory + "closed/";
 	if (dirHelper.exists(closedDirectory) == false) dirHelper.create(closedDirectory);
+	structurePathFileName = workDirectory + "HeartOfRepo.xml";
 }
 
 void Checkin::checkin(bool close) {
@@ -24,6 +25,8 @@ void Checkin::checkin(bool close) {
 			closeCheckin(pathHelper.getName(item));
 		}
 	}
+	saveRepo();
+	cleanUp();
 	return;
 }
 
@@ -32,6 +35,11 @@ Checkin& Checkin::selectFile(const std::string& path) {
 	if (path == "") throw std::exception("Check-in: Please enter file spec.\n");
 	else if (path[0] == '$') localPathSolver(path.substr(1, path.length()));
 	else pathSolver(path);
+	return *this;
+}
+
+Checkin& Checkin::setNameSpace(const std::string& nameSpace) {
+	nameSpace_ = nameSpace;
 	return *this;
 }
 
@@ -65,7 +73,7 @@ void Checkin::pathSolver(const std::string& path) {
 	if (fileNames.size() == 0) throw std::exception("Check-in: Cannot checkin no file.\n");
 	for (auto item : fileNames) {
 		int currentVersion = versionSetter(item);
-		filesForCheckin.push_back(pathAct + item);
+		filesForCheckin.push_back(pathHelper.toLower(pathAct + item));
 	}
 	return;
 }
@@ -102,14 +110,14 @@ void Checkin::newCheckin(const std::string& pathFileName) {
 		throw std::exception("Check-in: New Checkin parameter cannot be $.\n");
 	std::string fileNameAct = pathHelper.getName(pathFileName) + "." + std::to_string(versionSetter(pathHelper.getName(pathFileName)));
 	std::string record = \
-		"\"" + fileNameAct + "\"" + ", " + \
+		"\"" + nameSpace_ + "::" + fileNameAct + "\"" + ", " + \
 		"\"" + description_ + "\"" + ", " + \
 		"\"" + dependencies_ + "\"" + ", " + \
 		"\"" + openDirectory + fileNameAct + "\"" + ", " + \
 		"\"" + categories_ + "\"";
 	std::cout << "The record is: " << record << std::endl;
 	querier.from(repo.core()).insert(record);
-	if (querier.from(repo.core()).find("name", fileNameAct).eval().size() != 1)
+	if (querier.from(repo.core()).find("name", nameSpace_ + "::" + fileNameAct).eval().size() != 1)
 		throw std::exception("Check-in: Check-in fails because of invalid parameter.\n");
 	copyFile(pathFileName, openDirectory + fileNameAct);
 	std::cout << "File: \"" << fileNameAct << "\" inserted into the database. Checkin type: New.\n";
@@ -142,15 +150,27 @@ void Checkin::closeCheckin(const std::string& fileName) {
 		std::cout << "File: \"" << fileName << "\" does not meet the requirement of close check-in, operation skipped.\n";
 		return;
 	}
-	copyFile(fileCplx.payLoad(), closedDirectory + key);
+	copyFile(fileCplx.payLoad(), closedDirectory + nameCleaner(key));
 	FileSystem::File(fileCplx.payLoad()).remove(fileCplx.payLoad());
-	fileCplx.payLoad(closedDirectory + key);
+	fileCplx.payLoad(closedDirectory + nameCleaner(key));
 	querier.from(repo.core()).update(fileCplx);
 	return;
 }
 
 bool Checkin::isNew(const std::string& fileName) {
 	return !(querier.from(repo.core()).find("payLoad", "/" + openDirectory + fileName + "\\.*/").eval().size());
+}
+
+std::string Checkin::nameCleaner(const std::string& NSFileName) {
+	size_t start = 0, end = NSFileName.length() - 1;
+	while (start != end) {
+		if (NSFileName[start] == ':' && NSFileName[start + 1] != ':') {
+			start += 1;
+			break;
+		}
+		else start += 1;
+	}
+	return NSFileName.substr(start, NSFileName.length());
 }
 
 // -----< copyFile: copy "path/to/source/file.ext" to "path/to/target/file.ext" >-----
@@ -178,6 +198,18 @@ void Checkin::copyFile(const std::string& fromPath, const std::string& toPath) {
 	else throw std::exception("Check-in: Bad state of target file.\n");
 }
 
+void Checkin::saveRepo() {
+	persistor.persist(querier.from(repo.core()).eval(), workDirectory + "HeartOfRepo");
+}
+
+void Checkin::cleanUp() {
+	nameSpace_ = "";
+	dependencies_ = "";
+	description_ = "";
+	categories_ = "";
+	filesForCheckin.clear();
+}
+
 bool Checkin::isFile(const std::string& path) {
 	DWORD dwAttrib = GetFileAttributesA(path.c_str());
 	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
@@ -195,8 +227,10 @@ bool test1() {
 	Utilities::putline();
 	Core repoCore("D:/test/");
 	Checkin worker(repoCore);
+
 	worker.selectFile("../test.txt").setDependence("").setCategory("").setDescription("this is something").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
+	
 	worker.selectFile("$test.txt").setDependence("").setCategory("test, optional").setDescription("change it").checkin();
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 

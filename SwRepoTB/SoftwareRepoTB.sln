@@ -37,6 +37,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Executive", "NoSqlDb\Execut
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Process", "Process\Process\Process.vcxproj", "{5E2548A1-C280-49E1-A2B6-55F4BA12B3F2}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Checkout", "Checkout\Checkout.vcxproj", "{E6C815E2-B948-4CB7-872A-563F10077178}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Win32 = Debug|Win32
@@ -245,6 +247,18 @@ Global
 		{5E2548A1-C280-49E1-A2B6-55F4BA12B3F2}.Release|x64.Build.0 = Release|x64
 		{5E2548A1-C280-49E1-A2B6-55F4BA12B3F2}.Release|x86.ActiveCfg = Release|Win32
 		{5E2548A1-C280-49E1-A2B6-55F4BA12B3F2}.Release|x86.Build.0 = Release|Win32
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Debug|Win32.ActiveCfg = Debug|Win32
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Debug|Win32.Build.0 = Debug|Win32
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Debug|x64.ActiveCfg = Debug|x64
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Debug|x64.Build.0 = Debug|x64
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Debug|x86.ActiveCfg = Debug|Win32
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Debug|x86.Build.0 = Debug|Win32
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Release|Win32.ActiveCfg = Release|Win32
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Release|Win32.Build.0 = Release|Win32
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Release|x64.ActiveCfg = Release|x64
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Release|x64.Build.0 = Release|x64
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Release|x86.ActiveCfg = Release|Win32
+		{E6C815E2-B948-4CB7-872A-563F10077178}.Release|x86.Build.0 = Release|Win32
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

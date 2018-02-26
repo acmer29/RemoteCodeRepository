@@ -20,8 +20,8 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{C73F526D-1E64-403D-8D0A-B23A14A9C7F3}</ProjectGuid>
-    <RootNamespace>Checkin</RootNamespace>
+    <ProjectGuid>{E6C815E2-B948-4CB7-872A-563F10077178}</ProjectGuid>
+    <RootNamespace>Checkout</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -29,7 +29,6 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -76,7 +75,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;TEST_CHECKIN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;TEST_CHECKOUT;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -119,10 +118,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="Checkin.h" />
+    <ClInclude Include="Checkout.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Checkin.cpp" />
+    <ClCompile Include="Checkout.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\FileSystem-Windows\FileSystemDemo\FileSystemDemo.vcxproj">

@@ -3,6 +3,7 @@
 #define CHECKIN_H
 #include "../SoftwareRepoTB/SWRepoCore.h"
 #include "../NoSqlDb/Query/Query.h"
+#include "../NoSqlDb/Persistence/Persisence.h"
 #include "../NoSqlDb/Utilities/StringUtilities/StringUtilities.h"
 #include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
 namespace SWRTB {
@@ -14,6 +15,8 @@ namespace SWRTB {
 		void checkin(bool close = false);
 
 		Checkin& selectFile(const std::string& path);
+
+		Checkin& setNameSpace(const std::string& nameSpace = "");
 
 		Checkin& setDependence(const std::string& dependencies = "");
 
@@ -27,6 +30,7 @@ namespace SWRTB {
 		Core& repo;
 
 		// Information data
+		std::string nameSpace_;
 		std::string dependencies_;
 		std::string description_;
 		std::string categories_;
@@ -35,10 +39,14 @@ namespace SWRTB {
 		// Query Helper
 		DbQuery::queryResult<std::string> querier;
 
-		// Directories
+		// Persistance Helper
+		DbPersistence::persistence<std::string> persistor;
+
+		// Directories and files
 		std::string workDirectory;
 		std::string openDirectory;
 		std::string closedDirectory;
+		std::string structurePathFileName;
 
 		// FileSystem helpers
 		FileSystem::Path pathHelper;
@@ -50,6 +58,7 @@ namespace SWRTB {
 		int versionSetter(const std::string& fileName);
 		bool canClose(const std::string& key);
 		bool isNew(const std::string& fileName);
+		std::string nameCleaner(const std::string& NSFileName);
 
 		void copyFile(const std::string& fromPath, const std::string& toPath);
 		
@@ -57,10 +66,13 @@ namespace SWRTB {
 		void resumeCheckin(const std::string& pathFileName);
 		void closeCheckin(const std::string& fileName);
 		
+		void saveRepo();
+
+		void cleanUp();
+
 		bool isFile(const std::string& path);
 		bool isDirectory(const std::string& path);
 
-		
 	};
 }
 #endif // !CHECKIN_H
