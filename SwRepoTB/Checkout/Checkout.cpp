@@ -10,31 +10,20 @@ Checkout::Checkout(Core& target, const std::string& targetDirectory) :
 	if (dirHelper.exists(targetDirectory) == false) dirHelper.create(targetDirectory);
 }
 
-Checkout& Checkout::restore(const std::string& pathFileName) {
-	std::string heart;
-	if (pathFileName == "") heart = repo.root() + "HeartOfRepo.xml";
-	else heart = pathFileName;
-	FileSystem::File heartOfRepo(heart);
-	if (heartOfRepo.exists(heart) == false) throw std::exception("I have lost my heart.\n");
-	std::vector<NoSqlDb::DbElement<std::string>> result = persistor.restore(heart);
-	for (auto item : result) querier.from(repo.core()).insert(item);
-	querier.from(repo.core()).resultDisplay();
-	return *this;
-}
-
-void Checkout::checkout(const std::string& fileNameVersion) {
+void Checkout::checkout(const std::string& NSPfileNameVersion) {
 	
-	if (canCheckout(fileNameVersion) == false)
+	if (canCheckout(NSPfileNameVersion) == false)
 		throw std::exception("Check-out: The file cannot be checken out.\n");
-	std::string fileName = removeVersion(fileNameVersion);
-	std::cout << fileName << std::endl;
-	copyFile(sourceDirectory + fileNameVersion, targetDirectory + fileName);
+	std::string NSPfileName = removeVersion(NSPfileNameVersion);
+	std::cout << NSPfileName << std::endl;
+	copyFile(sourceDirectory + NSPfileNameVersion, targetDirectory + NSPfileName);
 	return;
 }
 
-bool Checkout::canCheckout(const std::string& fileNameVersion) {
-	if (fileNameVersion.length() == 0) throw std::exception("Check-out: No file name given.\n");
-	if (querier.from(repo.core()).find("payLoad", sourceDirectory + fileNameVersion).eval().size() != 1)
+bool Checkout::canCheckout(const std::string& NSPfileNameVersion) {
+	if (NSPfileNameVersion.length() == 0) throw std::exception("Check-out: No file name given.\n");
+	std::cout << sourceDirectory + NSPfileNameVersion << std::endl;
+	if (querier.from(repo.core()).find("payLoad", sourceDirectory + NSPfileNameVersion).eval().size() != 1)
 		return false;
 	return true;
 }
@@ -57,9 +46,10 @@ bool test1() {
 	Utilities::title("Test1: Check-out single file.");
 	Utilities::putline();
 	Core repoCore("D:/test/");
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 	Checkout worker(repoCore);
-	worker.restore().checkout("test.txt.1");
-	worker.checkout("test.cpp.2");
+	worker.checkout("_test.txt.1");
+	worker.checkout("_test.cpp.2");
 	return false;
 }
 

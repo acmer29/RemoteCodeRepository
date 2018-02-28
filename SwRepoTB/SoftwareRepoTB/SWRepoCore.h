@@ -6,6 +6,8 @@
 #include <string>
 #include <regex>
 #include "../NoSqlDb/DbCore/DbCore.h"
+#include "../NoSqlDb/Persistence/Persisence.h"
+#include "../NoSqlDb/Query/Query.h"
 #include "../NoSqlDb/Utilities/StringUtilities/StringUtilities.h"
 #include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
 namespace SWRTB{
@@ -22,7 +24,7 @@ namespace SWRTB{
 		std::string& root() { return root_; }
 		std::string root() const { return root_; }
 
-		bool isClosed(const std::string& fileNameVersion);
+		bool isClosed(const std::string& NSNFileNameVersion);
 
 	private:
 		NoSqlDb::DbCore<std::string> repo_;
@@ -32,12 +34,21 @@ namespace SWRTB{
 	Core::Core(const std::string& targetDirectory) : root_(targetDirectory) {
 		if (FileSystem::Directory().exists(targetDirectory) == false)
 			FileSystem::Directory().create(targetDirectory);
+		else {
+			std::string heart = targetDirectory + "HeartOfRepo";
+			if (FileSystem::File(heart).exists(heart + ".xml")) {
+				std::cout << "Detected existing repo record file, restore from " << heart << ".xml" << std::endl;
+				std::vector<NoSqlDb::DbElement<std::string>> result = DbPersistence::persistence<std::string>().restore(heart + ".xml");
+				DbQuery::queryResult<std::string> querier(repo_);
+				for (auto item : result) querier.from(repo_).insert(item);
+			}
+		}
 	}
 
-	bool Core::isClosed(const std::string& fileNameVersion) {
-		std::regex expression(root_ + "open/" + Utilities::regexSafeFilter(fileNameVersion) + "\\.[0-9]*");
-		if (repo_.contains(fileNameVersion) == false) return false;
-		std::string location = repo_[fileNameVersion].payLoad();
+	bool Core::isClosed(const std::string& NSNFileNameVersion) {
+		if (repo_.contains(NSNFileNameVersion) == false) return false;
+		std::string location = repo_[NSNFileNameVersion].payLoad();
+		std::regex expression(root_ + "open/" + Utilities::regexSafeFilter(NSNFileNameVersion) + "\\.[0-9]*");
 		return !(std::regex_match(location, expression));
 	}
 }

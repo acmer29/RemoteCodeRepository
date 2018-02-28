@@ -83,7 +83,6 @@ void Checkin::pathSolver(const std::string& path) {
 }
 
 void Checkin::localPathSolver(const std::string& fileName) {
-	std::cout << "local file: " << fileName << std::endl;
 	querier.from(repo.core()).find("payLoad", 
 		"/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/");
 	if (querier.eval().size() != 1) throw std::exception("Check-in: Cannot locate local file by given fileName.\n");
@@ -188,18 +187,6 @@ void Checkin::cleanUp() {
 	filesForCheckin.clear();
 }
 
-bool Checkin::isFile(const std::string& path) {
-	DWORD dwAttrib = GetFileAttributesA(path.c_str());
-	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
-		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY) == 0);
-}
-
-bool Checkin::isDirectory(const std::string& path) {
-	DWORD dwAttrib = GetFileAttributesA(path.c_str());
-	return (dwAttrib != INVALID_FILE_ATTRIBUTES &&
-		(dwAttrib & FILE_ATTRIBUTE_DIRECTORY) != 0);
-}
-
 bool test1() {
 	Utilities::title("Test1: Checkin single file");
 	Utilities::putline();
@@ -215,7 +202,7 @@ bool test1() {
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	std::cout << "Experiment 3" << std::endl;
-	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/").setDependence("test.txt.1").setDescription("some packages").setCategory("has header, has source").checkin(false);
+	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/").setDependence("_test.txt.1").setDescription("some packages").setCategory("has header, has source").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	std::cout << "Experiment 4" << std::endl;
@@ -231,7 +218,7 @@ bool test1() {
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	std::cout << "Experiment 7" << std::endl;
-	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/test.cpp").setDependence("test.txt.1").setDescription("some packages").setCategory("has source").checkin(false);
+	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/test.cpp").setDependence("_test.txt.1").setDescription("some packages").setCategory("has source").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	/*worker.selectFile("$SurfacePro_BMR_15_2.177.0.zip").setDependence("$").setDescription("$").setCategory("$").checkin(true);

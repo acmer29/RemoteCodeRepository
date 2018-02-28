@@ -4,27 +4,18 @@
 #include <regex>
 #include "../SoftwareRepoTB/SWRepoCore.h"
 #include "../SWRTBUtilities/SWRTBUtilities.h"
-#include "../NoSqlDb/Persistence/Persisence.h"
-#include "../NoSqlDb/Query/Query.h"
-#include "../NoSqlDb/Utilities/StringUtilities/StringUtilities.h"
-#include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
 namespace SWRTB {
 	class Checkout {
 	public:
 		explicit Checkout(Core& target, const std::string& targetDirectory = "../repoCheckout/");
 
-		Checkout& restore(const std::string& pathFileName = "");
-
-		void checkout(const std::string& fileNameVersion);
+		void checkout(const std::string& NSPfileNameVersion);
 
 	private:
 		Core& repo;
 
 		// Query Helper
 		DbQuery::queryResult<std::string> querier;
-
-		// Restore Helper
-		DbPersistence::persistence<std::string> persistor;
 
 		// FileSystem helpers
 		FileSystem::Path pathHelper;
@@ -34,9 +25,10 @@ namespace SWRTB {
 		std::string sourceDirectory;
 		std::string targetDirectory;
 
+		// Helper functions
 		bool canCheckout(const std::string& fileNameVersion);
 		std::string removeVersion(const std::string& fileNameVersion);
 
 	};
 }
-#endif // !CHECKOUT_H
+#endif // CHECKOUT_H

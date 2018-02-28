@@ -3,10 +3,6 @@
 #define CHECKIN_H
 #include "../SoftwareRepoTB/SWRepoCore.h"
 #include "../SWRTBUtilities/SWRTBUtilities.h"
-#include "../NoSqlDb/Query/Query.h"
-#include "../NoSqlDb/Persistence/Persisence.h"
-#include "../NoSqlDb/Utilities/StringUtilities/StringUtilities.h"
-#include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
 namespace SWRTB {
 	class Checkin {
 	public:
@@ -16,12 +12,14 @@ namespace SWRTB {
 
 		explicit Checkin(Core& target);
 		
+		// The function mainly provided for frontend using.
 		void checkin(const std::string& path, \
 					 const std::string& dependency, \
 					 const std::string& description, \
 					 const std::string& category, \
 					 const std::string& nameSpace, \
 					 bool close = false);
+		// The function provided for cascade calling.
 		void checkin(bool close = false);
 
 		Checkin& selectFile(const std::string& path);
@@ -35,7 +33,6 @@ namespace SWRTB {
 		Checkin& setCategory(const std::string& categories = "");
 
 	private:
-
 		// Repo Core
 		Core& repo;
 
@@ -69,16 +66,14 @@ namespace SWRTB {
 		bool canClose(const std::string& key);
 		bool isNew(const std::string& fileName);
 		
+		// Checkin worker functions
 		void newCheckin(const std::string& pathFileName);
 		void resumeCheckin(const std::string& pathFileName);
 		void closeCheckin(const std::string& fileName);
 		
+		// Cleanup stage functions
 		void saveRepo();
-
 		void cleanUp();
-
-		bool isFile(const std::string& path);
-		bool isDirectory(const std::string& path);
 
 	};
 }
