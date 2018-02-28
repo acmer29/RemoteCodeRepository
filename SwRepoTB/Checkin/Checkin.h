@@ -2,6 +2,7 @@
 #ifndef CHECKIN_H
 #define CHECKIN_H
 #include "../SoftwareRepoTB/SWRepoCore.h"
+#include "../SWRTBUtilities/SWRTBUtilities.h"
 #include "../NoSqlDb/Query/Query.h"
 #include "../NoSqlDb/Persistence/Persisence.h"
 #include "../NoSqlDb/Utilities/StringUtilities/StringUtilities.h"
@@ -9,9 +10,18 @@
 namespace SWRTB {
 	class Checkin {
 	public:
+		// FileInfo: first member represents the NSNFileNameVersion
+		//			 second member represents the pathFileName
+		using FileInfo = std::pair<std::string, std::string>;
+
 		explicit Checkin(Core& target);
 		
-		void checkin(const std::string& path, const std::string& dependency, const std::string& description, const std::string& category, bool close = false);
+		void checkin(const std::string& path, \
+					 const std::string& dependency, \
+					 const std::string& description, \
+					 const std::string& category, \
+					 const std::string& nameSpace, \
+					 bool close = false);
 		void checkin(bool close = false);
 
 		Checkin& selectFile(const std::string& path);
@@ -58,9 +68,6 @@ namespace SWRTB {
 		int versionSetter(const std::string& fileName);
 		bool canClose(const std::string& key);
 		bool isNew(const std::string& fileName);
-		std::string nameCleaner(const std::string& NSFileName);
-
-		void copyFile(const std::string& fromPath, const std::string& toPath);
 		
 		void newCheckin(const std::string& pathFileName);
 		void resumeCheckin(const std::string& pathFileName);

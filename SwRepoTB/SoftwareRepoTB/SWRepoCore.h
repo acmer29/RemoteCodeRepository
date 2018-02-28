@@ -23,7 +23,6 @@ namespace SWRTB{
 		std::string root() const { return root_; }
 
 		bool isClosed(const std::string& fileNameVersion);
-		void init();
 
 	private:
 		NoSqlDb::DbCore<std::string> repo_;
@@ -33,26 +32,13 @@ namespace SWRTB{
 	Core::Core(const std::string& targetDirectory) : root_(targetDirectory) {
 		if (FileSystem::Directory().exists(targetDirectory) == false)
 			FileSystem::Directory().create(targetDirectory);
-		else init();
 	}
 
 	bool Core::isClosed(const std::string& fileNameVersion) {
-		std::regex expression(root_ + "open/" + fileNameVersion + "\\.[0-9]*");
+		std::regex expression(root_ + "open/" + Utilities::regexSafeFilter(fileNameVersion) + "\\.[0-9]*");
 		if (repo_.contains(fileNameVersion) == false) return false;
 		std::string location = repo_[fileNameVersion].payLoad();
 		return !(std::regex_match(location, expression));
-	}
-
-	// NOT COMPLETED
-	void Core::init() {
-		std::cout << "init invoked" << std::endl;
-		if (FileSystem::Directory().remove(root_) == false) {
-			
-			std::cout << "What the fuck" << std::endl;
-		}
-		if(FileSystem::Directory().exists(root_) == false) std::cout << root_ << " is not existed" << std::endl;
-		else std::cout << root_ << " is exist" << std::endl;
-		FileSystem::Directory().create(root_);
 	}
 }
 #endif // SWREPOCORE_H

@@ -1,0 +1,18 @@
+Explanations for variable name using in SWRTB:
+ - path / Path: The path of the file exists, does not include file name.
+	e.g: path/to/the/file/
+ 
+ - fileName / FileName: The name of the file, and its extend name.
+	e.g: fileName.ext
+ 
+ - Version: The version number, include prefix ".".
+	e.g: .1
+ 
+ - NSN: "NameSpace used for Name", namespace with a "::".
+	e.g: nameSpace::
+ 
+ - NSP: "NameSpace used for Path", namespace with a "_".
+	e.g: nameSpace_
+
+Combined sequence: for actual path: path -> NSP -> FileName -> Version, camlback principle.
+				   for name field of db: NSN -> FileName -> Version, camlback principle.

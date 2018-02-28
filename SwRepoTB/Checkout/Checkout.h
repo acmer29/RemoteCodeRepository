@@ -3,6 +3,7 @@
 #define CHECKOUT_H
 #include <regex>
 #include "../SoftwareRepoTB/SWRepoCore.h"
+#include "../SWRTBUtilities/SWRTBUtilities.h"
 #include "../NoSqlDb/Persistence/Persisence.h"
 #include "../NoSqlDb/Query/Query.h"
 #include "../NoSqlDb/Utilities/StringUtilities/StringUtilities.h"
@@ -34,7 +35,6 @@ namespace SWRTB {
 		std::string targetDirectory;
 
 		bool canCheckout(const std::string& fileNameVersion);
-		void copyFile(const std::string& fromPath, const std::string& toPath);
 		std::string removeVersion(const std::string& fileNameVersion);
 
 	};

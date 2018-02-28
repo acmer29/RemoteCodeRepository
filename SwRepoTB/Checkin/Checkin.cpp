@@ -12,17 +12,21 @@ Checkin::Checkin(Core& target) :
 	structurePathFileName = workDirectory + "HeartOfRepo.xml";
 }
 
+void Checkin::checkin(const std::string& path, const std::string& dependency, \
+					  const std::string& description, const std::string& category, \
+					  const std::string& nameSpace, bool close) {
+	selectFile(path).setNameSpace(nameSpace).setCategory(category).setDependence(dependency).setDescription(description).checkin(close);
+}
+
 void Checkin::checkin(bool close) {
 	if (filesForCheckin.size() == 0) throw std::exception("Check-in: No files for checkin.\n");
 	for (auto item : filesForCheckin) {
-		if (isNew(pathHelper.getName(item)) == true) {
+		if (isNew(item) == true) 
 			newCheckin(item);
-		}
-		else {
+		else 
 			resumeCheckin(item);
-		}
 		if (close == true) {
-			closeCheckin(pathHelper.getName(item));
+			closeCheckin(item);
 		}
 	}
 	saveRepo();
@@ -79,16 +83,17 @@ void Checkin::pathSolver(const std::string& path) {
 }
 
 void Checkin::localPathSolver(const std::string& fileName) {
-	querier.from(repo.core()).find("payLoad", "/" + openDirectory + fileName + "\\.[0-9]*/");
+	std::cout << "local file: " << fileName << std::endl;
+	querier.from(repo.core()).find("payLoad", 
+		"/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/");
 	if (querier.eval().size() != 1) throw std::exception("Check-in: Cannot locate local file by given fileName.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
 	filesForCheckin.push_back(fileCplx.payLoad());
 }
 
 int Checkin::versionSetter(const std::string& fileName) {
-	std::string value = "/" + closedDirectory + fileName + "\\.[0-9]*/";
+	std::string value = "/" + Utilities::regexSafeFilter(closedDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/";
 	querier.from(repo.core()).find("payLoad", value);
-	std::cout << "Has version " << querier.eval().size() << std::endl;
 	return querier.eval().size() + 1;
 }
 
@@ -108,18 +113,23 @@ bool Checkin::canClose(const std::string& key) {
 void Checkin::newCheckin(const std::string& pathFileName) {
 	if (pathFileName == "$" || description_ == "$" || dependencies_ == "$" || categories_ == "$")
 		throw std::exception("Check-in: New Checkin parameter cannot be $.\n");
+
+	// Get the file name from pathFileName and add version number on it the create fileNameAct
 	std::string fileNameAct = pathHelper.getName(pathFileName) + "." + std::to_string(versionSetter(pathHelper.getName(pathFileName)));
+	
+	std::string recordName = nameConcater(fileNameAct, nameSpace_, "::");
+	std::string recordPayLoadValue = openDirectory + nameConcater(fileNameAct, nameSpace_, "_");
 	std::string record = \
-		"\"" + nameSpace_ + "::" + fileNameAct + "\"" + ", " + \
+		"\"" + recordName + "\"" + ", " + \
 		"\"" + description_ + "\"" + ", " + \
 		"\"" + dependencies_ + "\"" + ", " + \
-		"\"" + openDirectory + fileNameAct + "\"" + ", " + \
+		"\"" + recordPayLoadValue + "\"" + ", " + \
 		"\"" + categories_ + "\"";
 	std::cout << "The record is: " << record << std::endl;
 	querier.from(repo.core()).insert(record);
-	if (querier.from(repo.core()).find("name", nameSpace_ + "::" + fileNameAct).eval().size() != 1)
+	if (querier.from(repo.core()).find("name", recordName).eval().size() != 1)
 		throw std::exception("Check-in: Check-in fails because of invalid parameter.\n");
-	copyFile(pathFileName, openDirectory + fileNameAct);
+	copyFile(pathFileName, recordPayLoadValue);
 	std::cout << "File: \"" << fileNameAct << "\" inserted into the database. Checkin type: New.\n";
 	return;
 }
@@ -127,8 +137,8 @@ void Checkin::newCheckin(const std::string& pathFileName) {
 // -----< resumeCheckin: Checkin a package which has an open version. >-----
 // -----< This is an OPEN check-in >----------------------------------------
 void Checkin::resumeCheckin(const std::string& pathFileName) {
-	std::string fileName = pathHelper.getName(pathFileName);
-	if (querier.from(repo.core()).find("payLoad", "/" + openDirectory + fileName + "\\.[0-9]*/").eval().size() != 1 && \
+	std::string fileNameAct = nameConcater(pathHelper.getName(pathFileName), nameSpace_, "_");
+	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileNameAct) + "\\.[0-9]*/").eval().size() != 1 && \
 		querier.from(repo.core()).find("payLoad", pathFileName).eval().size() != 1)
 		throw std::exception("This file has no open version.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
@@ -140,9 +150,11 @@ void Checkin::resumeCheckin(const std::string& pathFileName) {
 	return;
 }
 
-void Checkin::closeCheckin(const std::string& fileName) {
-	std::cout << "/" + openDirectory + fileName + "\\.*/" << std::endl;
-	if (querier.from(repo.core()).find("payLoad", "/" + openDirectory + fileName + ".*/").eval().size() != 1)
+void Checkin::closeCheckin(const std::string& pathFileName) {
+	std::string fileName = pathHelper.getName(pathFileName);
+	if (pathFileName.substr(0, openDirectory.length()) != openDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
+	std::cout << "/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.*/" << std::endl;
+	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.*/").eval().size() != 1)
 		throw std::exception("Check-in: No correct file for close checkin.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
 	std::string key = fileCplx.name();
@@ -150,52 +162,18 @@ void Checkin::closeCheckin(const std::string& fileName) {
 		std::cout << "File: \"" << fileName << "\" does not meet the requirement of close check-in, operation skipped.\n";
 		return;
 	}
-	copyFile(fileCplx.payLoad(), closedDirectory + nameCleaner(key));
+	std::string closedPathNSPFileNameVersion = closedDirectory + pathHelper.getName(fileCplx.payLoad());
+	copyFile(fileCplx.payLoad(), closedPathNSPFileNameVersion);
 	FileSystem::File(fileCplx.payLoad()).remove(fileCplx.payLoad());
-	fileCplx.payLoad(closedDirectory + nameCleaner(key));
+	fileCplx.payLoad(closedPathNSPFileNameVersion);
 	querier.from(repo.core()).update(fileCplx);
 	return;
 }
 
-bool Checkin::isNew(const std::string& fileName) {
-	return !(querier.from(repo.core()).find("payLoad", "/" + openDirectory + fileName + "\\.*/").eval().size());
-}
-
-std::string Checkin::nameCleaner(const std::string& NSFileName) {
-	size_t start = 0, end = NSFileName.length() - 1;
-	while (start != end) {
-		if (NSFileName[start] == ':' && NSFileName[start + 1] != ':') {
-			start += 1;
-			break;
-		}
-		else start += 1;
-	}
-	return NSFileName.substr(start, NSFileName.length());
-}
-
-// -----< copyFile: copy "path/to/source/file.ext" to "path/to/target/file.ext" >-----
-void Checkin::copyFile(const std::string& fromPath, const std::string& toPath) {
-	if (fromPath == toPath) return;
-	FileSystem::File me(fromPath);
-	me.open(FileSystem::File::in, FileSystem::File::binary);
-	if (!me.isGood()) 
-		throw std::exception("Check-in: Bad state of accepted file.\n");
-	FileSystem::File you(toPath);
-	you.open(FileSystem::File::out, FileSystem::File::binary);
-	if (you.isGood()) {
-		while (me.isGood()) {
-			FileSystem::Block filePiece = me.getBlock(1024);
-			you.putBlock(filePiece);
-		}
-		/*if (FileSystem::FileInfo(fromPath).size() != FileSystem::FileInfo(toPath).size()) {
-			std::cout << FileSystem::FileInfo(fromPath).size() << " " << FileSystem::FileInfo(toPath).size() << std::endl;
-			std::cout << toPath << std::endl;
-			you.remove(toPath);
-			throw std::exception("Check-in: Copy error.\n");
-		}
-		std::cout << "File \"" << fromPath << "\" has been copied as \"" << toPath << "\" \n";*/
-	}
-	else throw std::exception("Check-in: Bad state of target file.\n");
+bool Checkin::isNew(const std::string& pathFileName) {
+	std::string fileName = pathHelper.getName(pathFileName);
+	if (pathFileName.substr(0, openDirectory.length()) != openDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
+	return !(querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.*/").eval().size());
 }
 
 void Checkin::saveRepo() {
@@ -228,31 +206,35 @@ bool test1() {
 	Core repoCore("D:/test/");
 	Checkin worker(repoCore);
 
+	std::cout << "Experiment 1" << std::endl;
 	worker.selectFile("../test.txt").setDependence("").setCategory("").setDescription("this is something").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 	
-	worker.selectFile("$test.txt").setDependence("").setCategory("test, optional").setDescription("change it").checkin();
+	std::cout << "Experiment 2" << std::endl;
+	worker.selectFile("$_test.txt").setDependence("").setCategory("test, optional").setDescription("change it").checkin();
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
+	std::cout << "Experiment 3" << std::endl;
 	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/").setDependence("test.txt.1").setDescription("some packages").setCategory("has header, has source").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
-	worker.selectFile("$test.txt").setDescription("$").setCategory("$").setDependence("$").checkin(true);
+	std::cout << "Experiment 4" << std::endl;
+	worker.selectFile("$_test.txt").setDescription("$").setCategory("$").setDependence("$").checkin(true);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
-	worker.selectFile("$test.cpp").setDependence("$").setDescription("$").setCategory("$").checkin(true);
+	std::cout << "Experiment 5" << std::endl;
+	worker.selectFile("$_test.cpp").setDependence("$").setDescription("$").setCategory("$").checkin(true);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
-	worker.selectFile("$test.h").setDependence("$").setDescription("$").setCategory("$").checkin(true);
+	std::cout << "Experiment 6" << std::endl;
+	worker.selectFile("$_test.h").setDependence("$").setDescription("$").setCategory("$").checkin(true);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
+	std::cout << "Experiment 7" << std::endl;
 	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/test.cpp").setDependence("test.txt.1").setDescription("some packages").setCategory("has source").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
-	/*worker.selectFile("D:/tools/SurfacePro_BMR_15_2.177.0.zip").setDependence("test.txt.1").setDescription("some packages").setCategory("has source").checkin(false);
-	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
-
-	worker.selectFile("$SurfacePro_BMR_15_2.177.0.zip").setDependence("$").setDescription("$").setCategory("$").checkin(true);
+	/*worker.selectFile("$SurfacePro_BMR_15_2.177.0.zip").setDependence("$").setDescription("$").setCategory("$").checkin(true);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();*/
 
 	return false;

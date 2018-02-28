@@ -51,31 +51,6 @@ std::string Checkout::removeVersion(const std::string& fileNameVersion) {
 	return fileName;
 }
 
-// -----< copyFile: copy "path/to/source/file.ext" to "path/to/target/file.ext" >-----
-void Checkout::copyFile(const std::string& fromPath, const std::string& toPath) {
-	if (fromPath == toPath) return;
-	FileSystem::File me(fromPath);
-	me.open(FileSystem::File::in, FileSystem::File::binary);
-	if (!me.isGood())
-		throw std::exception("Check-in: Bad state of accepted file.\n");
-	FileSystem::File you(toPath);
-	you.open(FileSystem::File::out, FileSystem::File::binary);
-	if (you.isGood()) {
-		while (me.isGood()) {
-			FileSystem::Block filePiece = me.getBlock(1024);
-			you.putBlock(filePiece);
-		}
-		/*if (FileSystem::FileInfo(fromPath).size() != FileSystem::FileInfo(toPath).size()) {
-			std::cout << FileSystem::FileInfo(fromPath).size() << " " << FileSystem::FileInfo(toPath).size() << std::endl;
-			std::cout << toPath << std::endl;
-			you.remove(toPath);
-			throw std::exception("Check-in: Copy error.\n");
-		}*/
-		std::cout << "File \"" << fromPath << "\" has been copied as \"" << toPath << "\" \n";
-	}
-	else throw std::exception("Check-in: Bad state of target file.\n");
-}
-
 #ifdef TEST_CHECKOUT
 
 bool test1() {
