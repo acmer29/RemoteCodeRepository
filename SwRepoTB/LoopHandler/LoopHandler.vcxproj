@@ -20,17 +20,15 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>15.0</VCProjectVersion>
-    <ProjectGuid>{0B74195F-8993-4016-918E-205326D4CCAA}</ProjectGuid>
-    <RootNamespace>SoftwareRepoTB</RootNamespace>
+    <ProjectGuid>{AB560A55-572C-481A-999A-BD07BFE82B43}</ProjectGuid>
+    <RootNamespace>LoopHandler</RootNamespace>
     <WindowsTargetPlatformVersion>10.0.16299.0</WindowsTargetPlatformVersion>
-    <ProjectName>SWRepoCore</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -77,7 +75,7 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;TEST_SWREPOCORE;noDEBUG_PROJ2;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;TEST_LOOPHANDLER;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -120,21 +118,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="SWRepoCore.h" />
+    <ClInclude Include="LoopHandler.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="SWRepoCore.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\FileSystem-Windows\FileSystemDemo\FileSystemDemo.vcxproj">
-      <Project>{ef4a3188-ca93-45a2-ab52-7548669e3aa8}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\NoSqlDb\DateTime\DateTime.vcxproj">
-      <Project>{c1e1f450-b7e1-4796-84d5-7d3c831dff68}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\NoSqlDb\XmlDocument\XmlDocument\XmlDocument.vcxproj">
-      <Project>{0a82ecdc-7520-453a-8f2c-d813feee7537}</Project>
-    </ProjectReference>
+    <ClCompile Include="LoopHandler.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

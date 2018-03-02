@@ -16,6 +16,10 @@ namespace SWRTB {
 		worker.application(appPath);
 		worker.commandLine("/A " + pathFileNameVersion);
 		worker.create();
+		std::function<void(void)> callback = []() { std::cout << "\n  --- child process exited with this message ---"; };
+		worker.setCallBackProcessing(callback);
+		worker.registerCallback();
+		return;
 	}
 }
 #endif // !BROWSE_H

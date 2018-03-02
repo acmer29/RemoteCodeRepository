@@ -20,7 +20,6 @@ namespace SWRTB {
 	private:
 		std::vector<std::_Mem_fn<bool(testProj2::*) ()>> cases;
 		void check(bool result, std::ostream& out);
-		NoSqlDb::DbCore<std::string> db;
 	};
 }
 #endif // !TESTPROJ2_H

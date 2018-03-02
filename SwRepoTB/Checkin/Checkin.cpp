@@ -4,13 +4,7 @@
 using namespace SWRTB;
 
 Checkin::Checkin(Core& target) :
-	repo(target), querier(target.core()), workDirectory(target.root()) {
-	openDirectory = workDirectory + "open/";
-	if (dirHelper.exists(openDirectory) == false) dirHelper.create(openDirectory);
-	closedDirectory = workDirectory + "closed/";
-	if (dirHelper.exists(closedDirectory) == false) dirHelper.create(closedDirectory);
-	structurePathFileName = workDirectory + "HeartOfRepo.xml";
-}
+	repo(target), querier(target.core()), workDirectory(target.root()) {}
 
 void Checkin::checkin(const std::string& path, const std::string& dependency, \
 					  const std::string& description, const std::string& category, \
@@ -62,36 +56,35 @@ Checkin& Checkin::setCategory(const std::string& categories) {
 	return *this;
 }
 
-void Checkin::pathSolver(const std::string& path) {
-	std::vector<std::string> fileNames;
-	std::string pathAct = path;
-	if (isFile(path)) {
-		fileNames.push_back(pathHelper.getName(path));
-		pathAct = pathHelper.getPath(path);
+void Checkin::pathSolver(const std::string& pathFileName) {
+	if (isFile(pathFileName)) {
+		filesForCheckin.push_back(pathHelper.getPath(pathFileName) + pathHelper.getName(pathFileName));
 	}
-	else if (isDirectory(path)) {
-		fileNames = dirHelper.getFiles(path);
+	else if (isDirectory(pathFileName)) {
+		filesForCheckin = dirHelper.getFiles(pathFileName);
+		for (size_t i = 0; i < filesForCheckin.size(); ++i) {
+			filesForCheckin[i] = pathFileName + filesForCheckin[i];
+		}
 	}
 	else throw std::exception("Check-in: Invalid path given.\n");
 
-	if (fileNames.size() == 0) throw std::exception("Check-in: Cannot checkin no file.\n");
-	for (auto item : fileNames) {
-		int currentVersion = versionSetter(item);
-		filesForCheckin.push_back(pathHelper.toLower(pathAct + item));
-	}
+	if (filesForCheckin.size() == 0) throw std::exception("Check-in: Cannot checkin no file.\n");
 	return;
 }
 
 void Checkin::localPathSolver(const std::string& fileName) {
+	std::cout << fileName << std::endl;
 	querier.from(repo.core()).find("payLoad", 
-		"/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/");
+		"/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*\\$open*/");
 	if (querier.eval().size() != 1) throw std::exception("Check-in: Cannot locate local file by given fileName.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
-	filesForCheckin.push_back(fileCplx.payLoad());
+	filesForCheckin.push_back(pathNSPFileNameVersionOf(fileCplx.payLoad()));
+	std::cout << pathNSPFileNameVersionOf(fileCplx.payLoad()) << std::endl;
+	return;
 }
 
 int Checkin::versionSetter(const std::string& fileName) {
-	std::string value = "/" + Utilities::regexSafeFilter(closedDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/";
+	std::string value = "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(nameConcater(fileName, nameSpace_, "_")) + "\\.[0-9]*\\$clos(ed|ing)*/";
 	querier.from(repo.core()).find("payLoad", value);
 	return querier.eval().size() + 1;
 }
@@ -102,7 +95,16 @@ bool Checkin::canClose(const std::string& key) {
 	if (filesForCheckin.size() == 0) throw std::exception("Check-in: No file for closing.\n");
 	std::vector<NoSqlDb::DbElement<std::string>> dependencies = querier.from(repo.core()).find("name", key).childOf(true).eval();
 	for (auto item : dependencies) {
-		if (repo.isClosed(item.name()) == false) return false;
+		if (checkFileMode(item.payLoad(), "$closed") == true) continue;
+		else if (checkFileMode(item.payLoad(), "$closing") == true) {
+			querier.from(repo.core()).find("name", item.name()).update("payLoad", changeFileMode(item.payLoad(), "closed"));
+		}
+		else if (checkFileMode(item.payLoad(), "$open") == true) return false;
+		else {
+			std::cout << item.payLoad() << std::endl;
+			throw std::exception("Check-in: Detected bad mode in stored file.\n");
+			
+		}
 	}
 	return true;
 }
@@ -117,7 +119,8 @@ void Checkin::newCheckin(const std::string& pathFileName) {
 	std::string fileNameAct = pathHelper.getName(pathFileName) + "." + std::to_string(versionSetter(pathHelper.getName(pathFileName)));
 	
 	std::string recordName = nameConcater(fileNameAct, nameSpace_, "::");
-	std::string recordPayLoadValue = openDirectory + nameConcater(fileNameAct, nameSpace_, "_");
+	std::string recordPayLoadValue = workDirectory + nameConcater(fileNameAct, nameSpace_, "_");
+	recordPayLoadValue = changeFileMode(recordPayLoadValue, "open");
 	std::string record = \
 		"\"" + recordName + "\"" + ", " + \
 		"\"" + description_ + "\"" + ", " + \
@@ -128,7 +131,8 @@ void Checkin::newCheckin(const std::string& pathFileName) {
 	querier.from(repo.core()).insert(record);
 	if (querier.from(repo.core()).find("name", recordName).eval().size() != 1)
 		throw std::exception("Check-in: Check-in fails because of invalid parameter.\n");
-	copyFile(pathFileName, recordPayLoadValue);
+	std::cout << pathFileName << std::endl;
+	copyFile(pathFileName, pathNSPFileNameVersionOf(recordPayLoadValue));
 	std::cout << "File: \"" << fileNameAct << "\" inserted into the database. Checkin type: New.\n";
 	return;
 }
@@ -136,43 +140,47 @@ void Checkin::newCheckin(const std::string& pathFileName) {
 // -----< resumeCheckin: Checkin a package which has an open version. >-----
 // -----< This is an OPEN check-in >----------------------------------------
 void Checkin::resumeCheckin(const std::string& pathFileName) {
-	std::string fileNameAct = nameConcater(pathHelper.getName(pathFileName), nameSpace_, "_");
-	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileNameAct) + "\\.[0-9]*/").eval().size() != 1 && \
-		querier.from(repo.core()).find("payLoad", pathFileName).eval().size() != 1)
+	std::string fileName = pathHelper.getName(pathFileName);
+	if (pathFileName.substr(0, workDirectory.length()) != workDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
+	else fileName = fileName.substr(0, fileName.find_last_of('.'));
+	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*\\$open/").eval().size() != 1 && \
+		querier.from(repo.core()).find("payLoad", pathFileName + "$open").eval().size() != 1)
 		throw std::exception("This file has no open version.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
 	std::string key = fileCplx.name();
 	if (dependencies_ != "$") querier.update("children", dependencies_);
 	if (description_ != "$") querier.update("description", description_);
 	if (categories_ != "$") querier.update("category", categories_);
-	copyFile(pathFileName, fileCplx.payLoad());
 	return;
 }
 
 void Checkin::closeCheckin(const std::string& pathFileName) {
 	std::string fileName = pathHelper.getName(pathFileName);
-	if (pathFileName.substr(0, openDirectory.length()) != openDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
-	std::cout << "/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.*/" << std::endl;
-	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.*/").eval().size() != 1)
+	if (pathFileName.substr(0, workDirectory.length()) != workDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
+	else fileName = fileName.substr(0, fileName.find_last_of('.'));
+	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*\\$open/").eval().size() != 1)
 		throw std::exception("Check-in: No correct file for close checkin.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
 	std::string key = fileCplx.name();
 	if (canClose(key) == false) {
+		std::vector<NoSqlDb::DbElement<std::string>> suspects;
+		if (LoopHandler(suspects).isInLoop(fileCplx.name())) {
+			fileCplx.payLoad(changeFileMode(fileCplx.payLoad(), "closing"));
+			querier.from(repo.core()).update(fileCplx);
+		}
 		std::cout << "File: \"" << fileName << "\" does not meet the requirement of close check-in, operation skipped.\n";
 		return;
 	}
-	std::string closedPathNSPFileNameVersion = closedDirectory + pathHelper.getName(fileCplx.payLoad());
-	copyFile(fileCplx.payLoad(), closedPathNSPFileNameVersion);
-	FileSystem::File(fileCplx.payLoad()).remove(fileCplx.payLoad());
-	fileCplx.payLoad(closedPathNSPFileNameVersion);
+	fileCplx.payLoad(changeFileMode(fileCplx.payLoad(), "closed"));
 	querier.from(repo.core()).update(fileCplx);
 	return;
 }
 
 bool Checkin::isNew(const std::string& pathFileName) {
 	std::string fileName = pathHelper.getName(pathFileName);
-	if (pathFileName.substr(0, openDirectory.length()) != openDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
-	return !(querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(openDirectory) + Utilities::regexSafeFilter(fileName) + "\\.*/").eval().size());
+	if (pathFileName.substr(0, workDirectory.length()) != workDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
+	else fileName = fileName.substr(0, fileName.find_last_of('.'));
+	return !(querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*\\$open/").eval().size());
 }
 
 void Checkin::saveRepo() {
@@ -186,6 +194,8 @@ void Checkin::cleanUp() {
 	categories_ = "";
 	filesForCheckin.clear();
 }
+
+#ifdef TEST_CHECKIN
 
 bool test1() {
 	Utilities::title("Test1: Checkin single file");
@@ -202,7 +212,7 @@ bool test1() {
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	std::cout << "Experiment 3" << std::endl;
-	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/").setDependence("_test.txt.1").setDescription("some packages").setCategory("has header, has source").checkin(false);
+	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/PseudoPackages/").setDependence("::test.txt.1").setDescription("some packages").setCategory("has header, has source").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	std::cout << "Experiment 4" << std::endl;
@@ -210,15 +220,15 @@ bool test1() {
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	std::cout << "Experiment 5" << std::endl;
-	worker.selectFile("$_test.cpp").setDependence("$").setDescription("$").setCategory("$").checkin(true);
+	worker.selectFile("$_DbCore.cpp").setDependence("$").setDescription("$").setCategory("$").checkin(true);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	std::cout << "Experiment 6" << std::endl;
-	worker.selectFile("$_test.h").setDependence("$").setDescription("$").setCategory("$").checkin(true);
+	worker.selectFile("$_DbCore.h").setDependence("$").setDescription("$").setCategory("$").checkin(true);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	std::cout << "Experiment 7" << std::endl;
-	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/somepackage/test.cpp").setDependence("_test.txt.1").setDescription("some packages").setCategory("has source").checkin(false);
+	worker.selectFile("D:/Spring2018/cse687/SwRepoTB/PseudoPackages/DbCore.cpp").setDependence("::test.txt.1").setDescription("some packages").setCategory("has source").checkin(false);
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
 
 	/*worker.selectFile("$SurfacePro_BMR_15_2.177.0.zip").setDependence("$").setDescription("$").setCategory("$").checkin(true);
@@ -234,7 +244,6 @@ bool test2() {
 	return false;
 }
 
-#ifdef TEST_CHECKIN
 int main() {
 	DbTest::test tester;
 	tester.registerTest(test1, "Test1: Checkin single file");

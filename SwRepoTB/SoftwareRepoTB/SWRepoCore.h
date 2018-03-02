@@ -24,16 +24,15 @@ namespace SWRTB{
 		std::string& root() { return root_; }
 		std::string root() const { return root_; }
 
-		bool isClosed(const std::string& NSNFileNameVersion);
-
 	private:
 		NoSqlDb::DbCore<std::string> repo_;
 		std::string root_;
 	};
 
-	Core::Core(const std::string& targetDirectory) : root_(targetDirectory) {
+	inline Core::Core(const std::string& targetDirectory) : root_(targetDirectory) {
 		if (FileSystem::Directory().exists(targetDirectory) == false)
 			FileSystem::Directory().create(targetDirectory);
+#ifndef DEBUG_PROJ2
 		else {
 			std::string heart = targetDirectory + "HeartOfRepo";
 			if (FileSystem::File(heart).exists(heart + ".xml")) {
@@ -43,13 +42,7 @@ namespace SWRTB{
 				for (auto item : result) querier.from(repo_).insert(item);
 			}
 		}
-	}
-
-	bool Core::isClosed(const std::string& NSNFileNameVersion) {
-		if (repo_.contains(NSNFileNameVersion) == false) return false;
-		std::string location = repo_[NSNFileNameVersion].payLoad();
-		std::regex expression(root_ + "open/" + Utilities::regexSafeFilter(NSNFileNameVersion) + "\\.[0-9]*");
-		return !(std::regex_match(location, expression));
+#endif // !DEBUG_PROJ2
 	}
 }
 #endif // SWREPOCORE_H

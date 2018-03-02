@@ -2,7 +2,9 @@
 #ifndef SWRTBUTILITIES_H
 #define SWRTBUTILITIES_H
 #include <string>
+#include <vector>
 #include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
+#include "../NoSqlDb/DbCore/DbCore.h"
 namespace SWRTB {
 	inline bool isFile(const std::string& path) {
 		DWORD dwAttrib = GetFileAttributesA(path.c_str());
@@ -66,6 +68,34 @@ namespace SWRTB {
 			}
 		}
 		else throw std::exception("CopyFile: Bad state of target file.\n");
+	}
+
+	inline std::string pathNSPFileNameVersionOf(const std::string& payLoad) {
+		size_t index = payLoad.find('$');
+		if (index == std::string::npos) throw::std::exception("pathNSPFileNameVersionOf: Cannot find the $ seperator.\n");
+		return payLoad.substr(0, index);
+	}
+
+	inline std::string modeOf(const std::string& payLoad) {
+		size_t index = payLoad.find('$');
+		if (index == std::string::npos) throw::std::exception("modeOf: Cannot find the $ seperator.\n");
+		return payLoad.substr(index + 1, payLoad.length());
+	}
+
+	inline std::string changeFileMode(const std::string& payLoad, const std::string& newMode) {
+		size_t index = payLoad.find('$');
+		if (index != std::string::npos)
+			return pathNSPFileNameVersionOf(payLoad) + "$" + newMode;
+		else return payLoad + "$" + newMode;
+	}
+
+	inline bool checkFileMode(const std::string& payLoad, const std::string& toCheck) {
+		size_t i = payLoad.length() - 1, j = toCheck.length() - 1;
+		while (j != 0) {
+			if (payLoad[i] != toCheck[j]) return false;
+			i -= 1, j -= 1;
+		}
+		return true;
 	}
 }
 #endif

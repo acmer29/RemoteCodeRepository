@@ -3,6 +3,7 @@
 #define CHECKIN_H
 #include "../SoftwareRepoTB/SWRepoCore.h"
 #include "../SWRTBUtilities/SWRTBUtilities.h"
+#include "../LoopHandler/LoopHandler.h"
 namespace SWRTB {
 	class Checkin {
 	public:
@@ -22,7 +23,7 @@ namespace SWRTB {
 		// The function provided for cascade calling.
 		void checkin(bool close = false);
 
-		Checkin& selectFile(const std::string& path);
+		Checkin& selectFile(const std::string& pathFileName);
 
 		Checkin& setNameSpace(const std::string& nameSpace = "");
 
@@ -51,9 +52,6 @@ namespace SWRTB {
 
 		// Directories and files
 		std::string workDirectory;
-		std::string openDirectory;
-		std::string closedDirectory;
-		std::string structurePathFileName;
 
 		// FileSystem helpers
 		FileSystem::Path pathHelper;

@@ -1,7 +1,7 @@
 
                                       CodeAnalysis - Version 1.4
     ==============================================================================================
-     Tue Feb 27 14:55:02 2018
+     Wed Feb 28 20:04:44 2018
      Path: "D:\Spring2018\cse687\SwRepoTB\NoSqlDb\Utilities\StringUtilities"
      Args: *.h, *.cpp, *.cs, /m, /r, /f
                                                                                
@@ -14,7 +14,7 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-         StringUtilities.h   namespace                          Utilities      61     214      36
+         StringUtilities.h   namespace                          Utilities      61     215      36
          StringUtilities.h    function                              Title      68       4       1
          StringUtilities.h    function                              title      75       4       1
          StringUtilities.h    function                            putline      82       4       1
@@ -25,7 +25,7 @@
          StringUtilities.h    function                              split     177      20       4
          StringUtilities.h    function                          splitPlus     202      38       7
          StringUtilities.h    function                         showSplits     245      11       2
-         StringUtilities.h    function                    regexSafeFilter     257      17       4
+         StringUtilities.h    function                    regexSafeFilter     258      17       4
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------

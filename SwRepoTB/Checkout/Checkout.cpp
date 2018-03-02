@@ -4,14 +4,13 @@ using namespace SWRTB;
 
 Checkout::Checkout(Core& target, const std::string& targetDirectory) : 
 	repo(target), 
-	querier(target.core()), sourceDirectory(target.root() + "closed/"), 
+	querier(target.core()), sourceDirectory(target.root()), 
 	targetDirectory(targetDirectory) {
 	if (dirHelper.exists(sourceDirectory) == false) throw std::exception("Check-out: Cannot find the given source directory.\n");
 	if (dirHelper.exists(targetDirectory) == false) dirHelper.create(targetDirectory);
 }
 
 void Checkout::checkout(const std::string& NSPfileNameVersion) {
-	
 	if (canCheckout(NSPfileNameVersion) == false)
 		throw std::exception("Check-out: The file cannot be checken out.\n");
 	std::string NSPfileName = removeVersion(NSPfileNameVersion);
@@ -23,7 +22,7 @@ void Checkout::checkout(const std::string& NSPfileNameVersion) {
 bool Checkout::canCheckout(const std::string& NSPfileNameVersion) {
 	if (NSPfileNameVersion.length() == 0) throw std::exception("Check-out: No file name given.\n");
 	std::cout << sourceDirectory + NSPfileNameVersion << std::endl;
-	if (querier.from(repo.core()).find("payLoad", sourceDirectory + NSPfileNameVersion).eval().size() != 1)
+	if (querier.from(repo.core()).find("payLoad", sourceDirectory + NSPfileNameVersion + "$closed").eval().size() != 1)
 		return false;
 	return true;
 }
