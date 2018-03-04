@@ -10,7 +10,8 @@
 * This package provides one class - LoopHandler.
 * This class provides means to detect the loop, list loop components, and 
 * check if a record is in the loop.
-* This class provides 4 public functions
+*
+* The public interface function operations are as below:
 *  - remakeGraph: Provides when records for checking changes, remake the
 *	 directed graph and run loop detect algorithm
 *  - isLoopExists: Return there is a loop, it only check size of loop item vector

@@ -1,0 +1,1 @@
+devenv SoftwareRepoTB.sln /rebuild debug

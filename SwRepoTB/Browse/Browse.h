@@ -11,6 +11,9 @@
 * Browse class provides means to display a Db record's all metadata, 
 * include name, dateTime, description, category, dependecies, path, status, 
 * and uses notepad as application to display its content.
+* 
+* The public interface function operations are as below:
+*  - browse : Display file attributes, and uses notepad to display file content
 
 * Required Files:
 * ---------------
@@ -46,18 +49,18 @@ namespace SWRTB {
 	// -----< browse: Display file specs, and uses notepad to display file content >----------------
 	inline void Browse::browse(const NoSqlDb::DbElement<std::string>& toBrowse, std::ostream& out) {
 		
-		out << "The name of the file: " << toBrowse.name() << std::endl;
-		out << "Last modification time of the file" << std::string(toBrowse.dateTime()) << std::endl;
-		out << "The description of the file: " << toBrowse.descrip() << std::endl;
-		out << "The category of the file: " << std::endl;
+		out << "  Browse: The name of the file: " << toBrowse.name() << std::endl;
+		out << "  Browse: Last modification time of the file: " << std::string(toBrowse.dateTime()) << std::endl;
+		out << "  Browse: The description of the file: " << toBrowse.descrip() << std::endl;
+		out << "  Browse: The category of the file: " << std::endl;
 		for (auto item : toBrowse.category()) {
-			out << "     -" << item << std::endl;
+			out << "                                   -" << item << std::endl;
 		}
-		out << "The path of the file: " << pathNSPFileNameVersionOf(toBrowse.payLoad()) << std::endl;
-		out << "The current status of the file: " << modeOf(toBrowse.payLoad()) << std::endl;
-		out << "The dependencies of the file: " << std::endl;
+		out << "  Browse: The path of the file: " << pathNSPFileNameVersionOf(toBrowse.payLoad()) << std::endl;
+		out << "  Browse: The current status of the file: " << modeOf(toBrowse.payLoad()) << std::endl;
+		out << "  Browse: The dependencies of the file: " << std::endl;
 		for (auto item : toBrowse.children()) {
-			out << "     -" << item << std::endl;
+			out << "                                   -" << item << std::endl;
 		}
 
 		std::string appPath = "c:/windows/system32/notepad.exe";

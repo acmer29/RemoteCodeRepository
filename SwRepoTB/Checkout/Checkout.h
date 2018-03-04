@@ -9,7 +9,8 @@
 * -------------------
 * This package provides one class - Checkout
 * This class provides means to checkout files from checkin working directory.
-* This class provides two pulice functions: 
+*
+* The public interface function operations are as below:
 *  - relocateDirectory() : Change working directory of checkout
 *  - checkout() : Copy files to the checkout working directory
 

@@ -40,7 +40,7 @@ void Checkout::checkout(const std::string& NSPFileNameVersion, bool recursive) {
 			throw std::exception("Check-out: The file cannot be checken out.\n");
 		std::string target = NSNFileNameToNSPFileName(item.name());
 		if (checkFileMode(item.payLoad(), "open") == true)
-			std::cout << "  Check out: The file \"" + item.name() + "\" is currently in \"open\" status.\n";
+			std::cout << "  Check-out: The file \"" + item.name() + "\" is currently in \"open\" status.\n";
 		std::string NSPfileName = removeVersion(target);
 		copyFile(sourceDirectory + target, targetDirectory + NSPfileName);
 	}

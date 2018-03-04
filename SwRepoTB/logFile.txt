@@ -1,7 +1,7 @@
 
                                       CodeAnalysis - Version 1.4
     ==============================================================================================
-     Thu Mar  1 22:06:46 2018
+     Sun Mar  4 16:03:18 2018
      Path: "D:\Spring2018\cse687\SwRepoTB"
      Args: *.h, *.cpp, *.cs, /m, /r, /f
                                                                                
@@ -10,61 +10,59 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                             namespace                   Global Namespace       1       1     955
+                             namespace                   Global Namespace       1       1     988
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                  Browse.h   namespace                              SWRTB       6      19       4
-                  Browse.h       class                             Browse       7       6       3
-                  Browse.h    function                             browse      14      10       2
-                  Browse.h    function                               void      18       1       1
+                  Browse.h   namespace                              SWRTB      41      32       5
+                  Browse.h       class                             Browse      42       6       4
+                  Browse.h    function                             browse      50      22       3
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                Browse.cpp    function                               main       5       4       1
+                Browse.cpp    function                               main      10       4       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                 Checkin.h   namespace                              SWRTB       7      71      30
-                 Checkin.h       class                            Checkin       8      69      29
+                 Checkin.h   namespace                              SWRTB      44      71      33
+                 Checkin.h       class                            Checkin      45      69      32
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-               Checkin.cpp    function                            Checkin       6       2       1
-               Checkin.cpp    function                            checkin      11       3       1
-               Checkin.cpp    function                            checkin      15      15       3
-               Checkin.cpp    function                         selectFile      31       7       1
-               Checkin.cpp    function                       setNameSpace      39       4       1
-               Checkin.cpp    function                     setDescription      44       4       1
-               Checkin.cpp    function                      setDependence      49       4       1
-               Checkin.cpp    function                        setCategory      54       4       1
-               Checkin.cpp    function                         pathSolver      59      15       4
-               Checkin.cpp    function                    localPathSolver      75      10       1
-               Checkin.cpp    function                      versionSetter      86       5       1
-               Checkin.cpp    function                           canClose      94      17       4
-               Checkin.cpp    function                         newCheckin     114      25       1
-               Checkin.cpp    function                      resumeCheckin     142      14       1
-               Checkin.cpp    function                       closeCheckin     157      21       3
-               Checkin.cpp    function                              isNew     179       6       1
-               Checkin.cpp    function                           saveRepo     186       3       1
-               Checkin.cpp    function                            cleanUp     190       7       1
-               Checkin.cpp    function                              test1     200      39       1
-               Checkin.cpp    function                              test2     240       6       1
-               Checkin.cpp    function                               main     247       7       1
+               Checkin.cpp    function                            Checkin      12       2       1
+               Checkin.cpp    function                            checkin      17       4       1
+               Checkin.cpp    function                            checkin      23      15       3
+               Checkin.cpp    function                         selectFile      40       7       1
+               Checkin.cpp    function                       setNameSpace      49       4       1
+               Checkin.cpp    function                     setDescription      55       4       1
+               Checkin.cpp    function                      setDependence      61       4       1
+               Checkin.cpp    function                        setCategory      67       4       1
+               Checkin.cpp    function                         pathSolver      73      16       5
+               Checkin.cpp    function                    localPathSolver      91       8       1
+               Checkin.cpp    function                      versionSetter     101       5       1
+               Checkin.cpp    function                           canClose     109      20       5
+               Checkin.cpp    function                         newCheckin     132      24       1
+               Checkin.cpp    function                      resumeCheckin     159      14       1
+               Checkin.cpp    function                       closeCheckin     175      25       4
+               Checkin.cpp    function                              isNew     202       6       1
+               Checkin.cpp    function                           saveRepo     210       3       1
+               Checkin.cpp    function                            cleanUp     215       7       1
+               Checkin.cpp    function                              test1     225      39       1
+               Checkin.cpp    function                               main     266       7       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-                Checkout.h   namespace                              SWRTB       7      27       7
-                Checkout.h       class                           Checkout       8      25       6
+                Checkout.h   namespace                              SWRTB      38      28      10
+                Checkout.h       class                           Checkout      39      26       9
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-              Checkout.cpp    function                           Checkout       8       4       1
-              Checkout.cpp    function                           checkout      13       8       1
-              Checkout.cpp    function                        canCheckout      22       7       1
-              Checkout.cpp    function                      removeVersion      30      11       2
-              Checkout.cpp    function                              test1      44      10       1
-              Checkout.cpp    function                               main      55       7       1
+              Checkout.cpp    function                           Checkout      14       4       1
+              Checkout.cpp    function                  relocateDirectory      20       5       1
+              Checkout.cpp    function                           checkout      28      21       4
+              Checkout.cpp    function                      removeVersion      51      11       2
+              Checkout.cpp    function                              test1      65      10       1
+              Checkout.cpp    function                               main      77       7       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -187,6 +185,22 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
+           DbCore_DbCore.h    function           NSPFileNameToNSNFileName       2       6       1
+           DbCore_DbCore.h    function           NSNFileNameToNSPFileName       9       7       1
+           DbCore_DbCore.h    function                        isLoopExist      17      26       6
+           DbCore_DbCore.h    function                               main      44      30       6
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+         DbCore_DbCore.cpp    function                                         21       3       1
+         DbCore_DbCore.cpp    function                                         33       1       1
+         DbCore_DbCore.cpp    function                                         46       8       1
+         DbCore_DbCore.cpp    function                                         58       7       1
+         DbCore_DbCore.cpp    function                                         69      36       1
+         DbCore_DbCore.cpp    function                                        113      30       4
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
                Executive.h   namespace                        DbExecutive      39      14       3
                Executive.h       class                         dbExecutor      40       8       2
                Executive.h    function                               demo      49       3       1
@@ -282,20 +296,20 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-             LoopHandler.h   namespace                              SWRTB       8     120      23
-             LoopHandler.h       class                        LoopHandler       9      25      22
-             LoopHandler.h    function                        LoopHandler      35       4       1
-             LoopHandler.h    function                        remakeGraph      40       7       1
-             LoopHandler.h    function                       isLoopExists      48       3       1
-             LoopHandler.h    function                           isInLoop      52       6       2
-             LoopHandler.h    function                      listLoopItems      59       3       1
-             LoopHandler.h    function                          makeGraph      63      20       5
-             LoopHandler.h    function              ListAbstractLoopItems      86      28       6
-             LoopHandler.h    function                   abstractToActual     116      11       4
+             LoopHandler.h   namespace                              SWRTB      41     128      23
+             LoopHandler.h       class                        LoopHandler      42      27      22
+             LoopHandler.h    function                        LoopHandler      71       4       1
+             LoopHandler.h    function                        remakeGraph      77       7       1
+             LoopHandler.h    function                       isLoopExists      86       3       1
+             LoopHandler.h    function                           isInLoop      91       6       2
+             LoopHandler.h    function                      listLoopItems      99       3       1
+             LoopHandler.h    function                          makeGraph     104      20       5
+             LoopHandler.h    function              ListAbstractLoopItems     127      28       6
+             LoopHandler.h    function                   abstractToActual     157      11       4
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-           LoopHandler.cpp    function                               main       4       4       1
+           LoopHandler.cpp    function                               main       9       4       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -450,33 +464,37 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-          SWRTBUtilities.h   namespace                              SWRTB       8      93      17
-          SWRTBUtilities.h    function                             isFile       9       5       1
-          SWRTBUtilities.h    function                        isDirectory      15       5       1
-          SWRTBUtilities.h    function                        nameCleaner      21      11       3
-          SWRTBUtilities.h    function                       nameConcater      33       3       1
-          SWRTBUtilities.h    function           NSPFileNameToNSNFileName      38       7       1
-          SWRTBUtilities.h    function           NSNFileNameToNSPFileName      47       7       1
-          SWRTBUtilities.h    function                           copyFile      56      16       3
-          SWRTBUtilities.h    function           pathNSPFileNameVersionOf      73       5       1
-          SWRTBUtilities.h    function                             modeOf      79       5       1
-          SWRTBUtilities.h    function                     changeFileMode      85       6       1
-          SWRTBUtilities.h    function                      checkFileMode      92       8       2
+          SWRTBUtilities.h   namespace                              SWRTB      46     102      17
+          SWRTBUtilities.h    function                             isFile      49       5       1
+          SWRTBUtilities.h    function                        isDirectory      56       5       1
+          SWRTBUtilities.h    function                        nameCleaner      63      11       3
+          SWRTBUtilities.h    function                       nameConcater      76       3       1
+          SWRTBUtilities.h    function           NSPFileNameToNSNFileName      81       7       1
+          SWRTBUtilities.h    function           NSNFileNameToNSPFileName      90       7       1
+          SWRTBUtilities.h    function                           copyFile      99      16       3
+          SWRTBUtilities.h    function           pathNSPFileNameVersionOf     117       5       1
+          SWRTBUtilities.h    function                             modeOf     124       5       1
+          SWRTBUtilities.h    function                     changeFileMode     131       6       1
+          SWRTBUtilities.h    function                      checkFileMode     139       8       2
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-              SWRepoCore.h   namespace                              SWRTB      13      35      10
-              SWRepoCore.h       class                               Core      14      17       9
-              SWRepoCore.h    function                               core      19       2       1
-              SWRepoCore.h    function                               core      20       2       1
-              SWRepoCore.h    function                               core      21       2       1
-              SWRepoCore.h    function                               root      23       2       1
-              SWRepoCore.h    function                               root      24       2       1
-              SWRepoCore.h    function                               Core      32      15       3
+      SWRTB_SWRepoCore.cpp    function                               main      10       3       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-            SWRepoCore.cpp    function                               main       5       3       1
+              SWRepoCore.h   namespace                              SWRTB      47      38      10
+              SWRepoCore.h       class                               Core      48      17       9
+              SWRepoCore.h    function                               core      53       2       1
+              SWRepoCore.h    function                               core      54       2       1
+              SWRepoCore.h    function                               core      55       2       1
+              SWRepoCore.h    function                               root      57       2       1
+              SWRepoCore.h    function                               root      58       2       1
+              SWRepoCore.h    function                               Core      69      15       3
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+            SWRepoCore.cpp    function                               main      10       3       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -507,21 +525,23 @@
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-               TestProj2.h   namespace                              SWRTB       9      16      14
-               TestProj2.h       class                          testProj2      10      14      13
+               TestProj2.h   namespace                              SWRTB      41      18      16
+               TestProj2.h       class                          testProj2      42      16      15
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
-             TestProj2.cpp    function                             testR1       5       8       1
-             TestProj2.cpp    function                             testR2      15       7       1
-             TestProj2.cpp    function                             testR3      24      18       1
-             TestProj2.cpp    function                             testR4      44      33       1
-             TestProj2.cpp    function                             testR5      79      14       1
-             TestProj2.cpp    function                             testR6      95       9       1
-             TestProj2.cpp    function                             testR7     106       7       1
-             TestProj2.cpp    function                           casesRun     115      22       4
-             TestProj2.cpp    function                              check     139       6       1
-             TestProj2.cpp    function                               main     147       5       1
+             TestProj2.cpp    function                             testR1      10       8       1
+             TestProj2.cpp    function                             testR2      20       7       1
+             TestProj2.cpp    function                             testR3      29      18       1
+             TestProj2.cpp    function                            testR4a      49      33       1
+             TestProj2.cpp    function                            testR4b      84      32       1
+             TestProj2.cpp    function                            testR4c     118      23       1
+             TestProj2.cpp    function                             testR5     143      17       1
+             TestProj2.cpp    function                             testR6     162       9       1
+             TestProj2.cpp    function                             testR7     173       7       1
+             TestProj2.cpp    function                           casesRun     182      24       4
+             TestProj2.cpp    function                              check     208       6       1
+             TestProj2.cpp    function                               main     217       5       1
 
                  file name        type                               name    line    size    cplx
     -----------------------  ----------  ---------------------------------  ------  ------  ------
@@ -801,5 +821,5 @@
                 std :: string testName ; 
 
 
-    searched   173 dirs
-   processed    52 files
+    searched   159 dirs
+   processed    55 files

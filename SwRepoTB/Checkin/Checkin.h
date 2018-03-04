@@ -10,6 +10,8 @@
 * This package provides one class - Checkin
 * This class provides means to checkin files.
 * This class provides one public function, and a set of functions for cascade calling.
+*
+* The public interface function operations are as below:
 *  - checkin : One for cascade calling, and one requires all parameters, provide for 
 *			   frontend using.
 *  - selectFile : Provide for cascade calling, select a file or files in a folder.
