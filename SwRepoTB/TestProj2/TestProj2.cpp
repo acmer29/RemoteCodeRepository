@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////////////////////////
+// TestProj2.cpp - Implementation of TestProj2 package			   //
+// ver 1.0                                                         //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018         //
+/////////////////////////////////////////////////////////////////////
 #include "TestProj2.h"
 using namespace SWRTB;
 
@@ -40,9 +45,9 @@ bool testProj2::testR3() {
 	return true;
 }
 
-// ----< demo requirement #4 >-----
-bool testProj2::testR4() {
-	Utilities::Title("#4: Demostrate check-in function - Checkin files, update version, close the checkin.");
+// ----< demo requirement #4a >-----
+bool testProj2::testR4a() {
+	Utilities::Title("#4a: Demostrate check-in function - Checkin files, update version, close the checkin.");
 	Utilities::putline();
 	Core repoCore("../DemoCheckin/");
 	Checkin CIWorker(repoCore);
@@ -75,18 +80,80 @@ bool testProj2::testR4() {
 	return true;
 }
 
-// ----< demo requirement #5 >-----
-bool testProj2::testR5() {
-	Utilities::Title("#5: Demostrate check-in function - Checkin files, update version, close the checkin.");
+// -----< demo requirement #4b >-----
+bool testProj2::testR4b() {
+	Utilities::Title("#4b: Demostrate check-in function when check-in files exist dependency loop.");
 	Utilities::putline();
 
 	Core repoCore("../DemoCheckin/");
 
+	std::cout << "Display records currently in the database.\n";
+	Utilities::putline();
+
+	Checkin CIWorker(repoCore);
+	CIWorker.checkin("../SoftwareRepoTB/SWRepoCore.cpp", "", "Source file of repo core", "Project2, Core, source", "SWRTB");
+	CIWorker.checkin("../SoftwareRepoTB/SWRepoCore.h", "SWRTB::SWRepoCore.cpp.1", "Header file of repo core", "Project2, Core, header", "SWRTB");
+	CIWorker.checkin("$SWRTB_SWRepoCore.cpp", "SWRTB::SWRepoCore.h.1", "$", "$", "$");
+
+	std::cout << "  After checkin two files: \"SWRepoCore.cpp\" and \"SWRepoCore.h\" with open status, and they depend on each other.\n";
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find("name", "/SWRTB::.*/").resultDisplay();
+	Utilities::putline();
+
+	CIWorker.checkin("$SWRTB_SWRepoCore.cpp", "$", "$", "$", "$", true);
+	std::cout << "  After closing \"SWRTB_SWRepoCore.cpp.1\".\n";
+	std::cout << "  It will change its mode from open to closing.\n";
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find("name", "/SWRTB::.*/").resultDisplay();
+	Utilities::putline();
+
+	CIWorker.checkin("$SWRTB_SWRepoCore.h", "$", "$", "$", "$", true);
+	std::cout << "  After closing \"SWRTB_SWRepoCore.h.1\".\n";
+	std::cout << "  It will find \"SWRTB_SWRepoCore.cpp.1\" is closing, change its mode from \"closing\" to \"closed\", \n";
+	std::cout << "  and then change itself mode to \"closed\".\n";
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find("name", "/SWRTB::.*/").resultDisplay();
+
+	return true;
+}
+
+// -----< demo requirement #4c >-----
+bool testProj2::testR4c() {
+	Utilities::Title("#4c: Demostrate checkout function.");
+	Utilities::putline();
+	Core repoCore("../DemoCheckin/");
+	std::cout << "  The Records in current database are: \n";
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
+
+	Checkout COWorker(repoCore, "../DemoCheckout/");
+	COWorker.checkout("DbCore_DbCore.cpp.1");
+	std::cout << "  After checking out DbCore::DbCore.cpp.1, it will be copy to \"../DemoCheckout/\".\n";
+	std::cout << "  This is a default checkout, the dependency of DbCore::DbCore.cpp.1 is also checked out.\n";
+	std::cout << "  Which means DbCore::DbCore.h.1 is also in the check out directory.\n";
+	Utilities::putline();
+	COWorker.checkout("SWRTB_SWRepoCore.cpp.1", false);
+	std::cout << "  After checking out SWRTB::SWRepoCore.cpp.1, it will be copy to \"../DemoCheckout/\".\n";
+	std::cout << "  This is not default checkout, the dependency of it will not be checked out.\n";
+	std::cout << "  Which means only SWRTB::SWRepoCore.cpp.1 is in the check out directory.\n";
+	Utilities::putline();
+	std::cout << "  After checking out a open status file DbCore::DbCore.h.2, it will be copy to \"../DemoCheckout/\".\n\n";
+	std::cout << "  The message below will pop up, notice client this operation will check out a opening file.\n";
+	COWorker.checkout("DbCore_DbCore.h.2");
+	return true;
+}
+
+// ----< demo requirement #5 >-----
+bool testProj2::testR5() {
+	Utilities::Title("#5: Demostrate browsing - Using query find file and display its content and metadata.");
+	Utilities::putline();
+
+	Core repoCore("../DemoCheckin/");
+
+	std::cout << "After find file \"DbCore.cpp.1\" for browsing by using query.\n";
+	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find("name", "DbCore::DbCore.cpp.1").resultDisplay();
+	Utilities::putline();
+
 	std::cout << "Display content in DbCore.cpp.1" << std::endl;
 	std::vector<NoSqlDb::DbElement<std::string>> result = \
 		DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find("name", "DbCore::DbCore.cpp.1").eval();
-	std::string demoFile = pathNSPFileNameVersionOf(result[0].payLoad());
-	Browse().browse(demoFile);
+	Browse().browse(result[0]);
 
 	return true;
 }
@@ -95,9 +162,9 @@ bool testProj2::testR5() {
 bool testProj2::testR6() {
 	Utilities::Title("#6: Submit with several demo packages.");
 	Utilities::putline();
-	Core repoCore("../DemoCheckin");
+	Core repoCore("../DemoCheckin/");
 	DbQuery::queryResult<std::string>(repoCore.core()).from(repoCore.core()).find().resultDisplay();
-	std::cout << "All demo packages are saved in ../DemoCheckin/.\n";
+	std::cout << "All demo packages are saved in ../DemoCheckin/, and also persist in the \"HeartOfRepo.xml\".\n";
 
 	return true;
 }
@@ -107,7 +174,7 @@ bool testProj2::testR7() {
 	Utilities::Title("#7: TextExectuive clearly demonstrate project satisfied all requirements.");
 	Utilities::putline();
 
-	std::cout << "All above as well as this test function can be executed currently" << std::endl;
+	std::cout << "  All above as well as this test function can be executed correctly.\n";
 	return true;
 }
 
@@ -116,7 +183,9 @@ void testProj2::casesRun(std::ostream& out) {
 	cases.push_back(std::mem_fn(&testProj2::testR1));
 	cases.push_back(std::mem_fn(&testProj2::testR2));
 	cases.push_back(std::mem_fn(&testProj2::testR3));
-	cases.push_back(std::mem_fn(&testProj2::testR4));
+	cases.push_back(std::mem_fn(&testProj2::testR4a));
+	cases.push_back(std::mem_fn(&testProj2::testR4b));
+	cases.push_back(std::mem_fn(&testProj2::testR4c));
 	cases.push_back(std::mem_fn(&testProj2::testR5));
 	cases.push_back(std::mem_fn(&testProj2::testR6));
 	cases.push_back(std::mem_fn(&testProj2::testR7));
@@ -143,6 +212,7 @@ void testProj2::check(bool result, std::ostream& out) {
 		out << "\n  failed";
 }
 
+// -----< test stub >-----
 #ifdef TEST_TESTPROJ2
 int main() {
 	testProj2 tester;

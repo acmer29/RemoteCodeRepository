@@ -1,4 +1,35 @@
 #pragma once
+////////////////////////////////////////////////////////////////////////////
+// SWRTBUtilities.h - Contains all miscellaneous helper functions used    //
+//					  in the whole Project2								  //
+// ver 1.0																  //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018                //
+////////////////////////////////////////////////////////////////////////////
+/*
+* Package Operations:
+* -------------------
+* This package provides no class, used as miscellaneous package
+* This package provides all helper functions used in all other packages, includes:
+*  - isFile, isDirectory, copyFile,
+*  - nameCleaner, nameConcator
+*  - NSPFileNameToNSNFileName, NSNFileNameToNSPFileName
+*  - pathNSPFileNameVersionOf, modeOf, 
+*  - changeFileMode, checkFileMode
+
+* Required Files:
+* ---------------
+* DbCore.h, DbCore.cpp
+* FileSystem.h, FileSystem.cpp
+* string, vector
+*
+* Build Process:
+* --------------
+* devenv NoSqlDb.sln /rebuild debug
+*
+* Maintenance History:
+* --------------------
+* ver 1.0 : 28 Feb 2018 - First release
+*/
 #ifndef SWRTBUTILITIES_H
 #define SWRTBUTILITIES_H
 #include <string>
@@ -39,7 +70,7 @@ namespace SWRTB {
 		if (NSPFileName == "") return "";
 		std::string result = NSPFileName;
 		std::string::size_type toReplace = result.find_first_of("_");
-		if (toReplace = std::string::npos) throw std::exception("NSPFileNameToNSNFileName: Invalid NSPFileName given.\n");
+		if (toReplace == std::string::npos) throw std::exception("NSPFileNameToNSNFileName: Invalid NSPFileName given.\n");
 		return result.replace(toReplace, 1, "::");
 	}
 
@@ -48,7 +79,7 @@ namespace SWRTB {
 		if (NSNFileName == "") return "";
 		std::string result = NSNFileName;
 		std::string::size_type toReplace = result.find_first_of("::");
-		if (toReplace = std::string::npos) throw std::exception("NSNFileNameToNSPFileName: Invalid NSNFileName given.\n");
+		if (toReplace == std::string::npos) throw std::exception("NSNFileNameToNSPFileName: Invalid NSNFileName given.\n");
 		return result.replace(toReplace, 2, "_");
 	}
 

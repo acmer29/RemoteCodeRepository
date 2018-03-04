@@ -1,3 +1,8 @@
+/////////////////////////////////////////////////////////////////////
+// SWRepoCore.cpp - Test stub of SWRepoCore package			       //
+// ver 1.0                                                         //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018         //
+/////////////////////////////////////////////////////////////////////
 #include "SWRepoCore.h"
 using namespace SWRTB;
 
@@ -5,5 +10,5 @@ using namespace SWRTB;
 int main() {
 
 }
-#endif // SWREPOCORE_TEST
+#endif // TEST_SWREPOCORE
 

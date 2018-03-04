@@ -1,4 +1,39 @@
 #pragma once
+////////////////////////////////////////////////////////////////////////////
+// Checkin.h - Provide means for checkin files							  //
+// ver 1.1																  //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018                //
+////////////////////////////////////////////////////////////////////////////
+/*
+* Package Operations:
+* -------------------
+* This package provides one class - Checkin
+* This class provides means to checkin files.
+* This class provides one public function, and a set of functions for cascade calling.
+*  - checkin : One for cascade calling, and one requires all parameters, provide for 
+*			   frontend using.
+*  - selectFile : Provide for cascade calling, select a file or files in a folder.
+*  - setNameSpace : Provide for cascade calling, set the namespace for checkin files.
+*  - setDependence : Provide for cascade calling, set the dependencies for checkin files.
+*  - setDescription : Provide for cascade calling, set the description for checkin files.
+*  - setCategory : Provide for cascade calling, set the category for checkin files.
+
+* Required Files:
+* ---------------
+* SWRepoCore.h
+* SWRTBUtilities.h
+* FileSystem.h, FileSystem.cpp
+* DbCore.h, DbCore.cpp
+*
+* Build Process:
+* --------------
+* devenv NoSqlDb.sln /rebuild debug
+*
+* Maintenance History:
+* --------------------
+* ver 1.0 : 28 Feb 2018 - First release
+* ver 1.1 : 03 Mar 2018 - Add useful functions, remove useless functions
+*/
 #ifndef CHECKIN_H
 #define CHECKIN_H
 #include "../SoftwareRepoTB/SWRepoCore.h"

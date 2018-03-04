@@ -1,7 +1,13 @@
+/////////////////////////////////////////////////////////////////////
+// Checkout.cpp - Implementation and test stub of Checkout package //
+// ver 1.1                                                         //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018         //
+/////////////////////////////////////////////////////////////////////
 #include "Checkout.h"
 #include "../NoSqlDb/Test/Test.h"
 using namespace SWRTB;
 
+// -----< Constructor: Initialize the working directory of the checkout >-----
 Checkout::Checkout(Core& target, const std::string& targetDirectory) : 
 	repo(target), 
 	querier(target.core()), sourceDirectory(target.root()), 
@@ -10,23 +16,38 @@ Checkout::Checkout(Core& target, const std::string& targetDirectory) :
 	if (dirHelper.exists(targetDirectory) == false) dirHelper.create(targetDirectory);
 }
 
-void Checkout::checkout(const std::string& NSPfileNameVersion) {
-	if (canCheckout(NSPfileNameVersion) == false)
-		throw std::exception("Check-out: The file cannot be checken out.\n");
-	std::string NSPfileName = removeVersion(NSPfileNameVersion);
-	std::cout << NSPfileName << std::endl;
-	copyFile(sourceDirectory + NSPfileNameVersion, targetDirectory + NSPfileName);
+// -----< relocateDirectory: Reset the checkout working directory >-----
+Checkout& Checkout::relocateDirectory(const std::string& newDirectory) {
+	if (isDirectory(newDirectory) == false) throw std::exception("Check-out: New directory is not valid.\n");
+	targetDirectory = newDirectory;
+	return *this;
+}
+
+// -----< checkout: Provide means to checkout files >---------------------------
+// -----< By default checkout all fils as well as dependencies >----------------
+void Checkout::checkout(const std::string& NSPFileNameVersion, bool recursive) {
+	std::vector<NoSqlDb::DbElement<std::string>> result = 
+		querier.from(repo.core()).find("name", NSPFileNameToNSNFileName(NSPFileNameVersion)).eval();
+	if (recursive == true) {
+		std::vector<NoSqlDb::DbElement<std::string>> tmp = 
+			querier.from(repo.core()).find("name", NSPFileNameToNSNFileName(NSPFileNameVersion)).childOf().eval();
+		for (auto iter = tmp.begin(); iter != tmp.end(); iter++) {
+			result.push_back(*iter);
+		}
+	}
+	for (auto item : result) { 
+		if (isFile(pathNSPFileNameVersionOf(item.payLoad())) == false)
+			throw std::exception("Check-out: The file cannot be checken out.\n");
+		std::string target = NSNFileNameToNSPFileName(item.name());
+		if (checkFileMode(item.payLoad(), "open") == true)
+			std::cout << "  Check out: The file \"" + item.name() + "\" is currently in \"open\" status.\n";
+		std::string NSPfileName = removeVersion(target);
+		copyFile(sourceDirectory + target, targetDirectory + NSPfileName);
+	}
 	return;
 }
 
-bool Checkout::canCheckout(const std::string& NSPfileNameVersion) {
-	if (NSPfileNameVersion.length() == 0) throw std::exception("Check-out: No file name given.\n");
-	std::cout << sourceDirectory + NSPfileNameVersion << std::endl;
-	if (querier.from(repo.core()).find("payLoad", sourceDirectory + NSPfileNameVersion + "$closed").eval().size() != 1)
-		return false;
-	return true;
-}
-
+// -----< removeVersion: Remove the version number in the fileName >-----
 std::string Checkout::removeVersion(const std::string& fileNameVersion) {
 	std::string fileName = fileNameVersion;
 	size_t last = fileName.length() - 1;
@@ -52,6 +73,7 @@ bool test1() {
 	return false;
 }
 
+// -----< test stub >-----
 int main() {
 	DbTest::test tester;
 	tester.registerTest(test1, "Test1: Check-out single file.");

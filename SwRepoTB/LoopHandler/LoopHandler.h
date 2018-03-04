@@ -1,4 +1,36 @@
 #pragma once
+////////////////////////////////////////////////////////////////////////////
+// LoopHandler.h - Provide means for detect loops						  //
+// ver 1.0																  //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018                //
+////////////////////////////////////////////////////////////////////////////
+/*
+* Package Operations:
+* -------------------
+* This package provides one class - LoopHandler.
+* This class provides means to detect the loop, list loop components, and 
+* check if a record is in the loop.
+* This class provides 4 public functions
+*  - remakeGraph: Provides when records for checking changes, remake the
+*	 directed graph and run loop detect algorithm
+*  - isLoopExists: Return there is a loop, it only check size of loop item vector
+*	 so it is O(1) complexity.
+*  - isInloop: Return if the record for check is a component of the loop, 
+*    accepts the name field of the record.
+*  - listLoopItems: Return the loop item vector, which is a vector of string.
+
+* Required Files:
+* ---------------
+* DbCore.h, DbCore.cpp
+*
+* Build Process:
+* --------------
+* devenv NoSqlDb.sln /rebuild debug
+*
+* Maintenance History:
+* --------------------
+* ver 1.0 : 28 Feb 2018 - First release
+*/
 #ifndef LOOPHANDLER_H
 #define LOOPHANDLER_H
 #include "../NoSqlDb/DbCore/DbCore.h"
@@ -22,21 +54,25 @@ namespace SWRTB {
 
 	private:
 
+		// data members
 		std::unordered_map<std::string, int> hashHelper;
 		std::vector<std::vector<bool>> abstractGraph;
 		std::vector<std::string> loopRecords;
 
+		// helper functions
 		void makeGraph(const DbRecords& records);
 		void ListAbstractLoopItems();
 		void abstractToActual(const std::vector<int>& abstractItems);
 		
 	};
 
+	// -----< Constructor: make the graph and run loop detect algorithm >-----
 	inline LoopHandler::LoopHandler(const DbRecords& records) {
 		makeGraph(records);
 		ListAbstractLoopItems();
 	}
 
+	// -----< remakeGraph: remake the graph, use when test cases changes >-----
 	inline void LoopHandler::remakeGraph(const DbRecords& records) {
 		abstractGraph.clear();
 		hashHelper.clear();
@@ -45,10 +81,12 @@ namespace SWRTB {
 		return;
 	}
 
+	// -----< isLoopExists: Checkin if loop exists, O(1) complexity >-----
 	inline bool LoopHandler::isLoopExists() {
 		return loopRecords.size();
 	}
 
+	// -----< isInLoop: Accepts a DbElement.name() parameter, checkin if this record is a component of the loop >-----
 	inline bool LoopHandler::isInLoop(const std::string& NSNFileNameVersion) {
 		for (auto item : loopRecords) {
 			if (item == NSNFileNameVersion) return true;
@@ -56,10 +94,12 @@ namespace SWRTB {
 		return false;
 	}
 
+	// -----< listLoopItems: List all componments in the loop >-----
 	inline std::vector<std::string> LoopHandler::listLoopItems() {
 		return loopRecords;
 	}
 
+	// -----< makeGraph: Map the DbElements into numbers and use these numbers to make directed graph >-----
 	inline void LoopHandler::makeGraph(const DbRecords& records) {
 		int recordSize = records.size();
 		abstractGraph.resize(recordSize);
@@ -77,7 +117,7 @@ namespace SWRTB {
 				if (hashHelper.find(*childIter) != hashHelper.end())
 					abstractGraph[hashHelper[*childIter]][hashHelper[iter->name()]] = true;
 			}
-		}
+		}		
 		return;
 	}
 
