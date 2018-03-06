@@ -14,6 +14,7 @@
 * The public interface function operations are as below:
 *  - checkin : One for cascade calling, and one requires all parameters, provide for 
 *			   frontend using.
+*			   This function has two overloads.
 *  - selectFile : Provide for cascade calling, select a file or files in a folder.
 *  - setNameSpace : Provide for cascade calling, set the namespace for checkin files.
 *  - setDependence : Provide for cascade calling, set the dependencies for checkin files.
@@ -26,10 +27,12 @@
 * SWRTBUtilities.h
 * FileSystem.h, FileSystem.cpp
 * DbCore.h, DbCore.cpp
+* XmlDocument.h, XmlDocument.cpp
+* DateTime.h, DateTime.cpp
 *
 * Build Process:
 * --------------
-* devenv NoSqlDb.sln /rebuild debug
+* devenv SoftwareRepoTB.sln /rebuild debug
 *
 * Maintenance History:
 * --------------------

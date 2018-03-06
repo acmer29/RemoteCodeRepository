@@ -14,7 +14,7 @@
 * 
 * The public interface function operations are as below:
 *  - browse : Display file attributes, and uses notepad to display file content
-
+*
 * Required Files:
 * ---------------
 * DbCore.h, DbCore.cpp
@@ -23,9 +23,14 @@
 * FileSystem.h, FileSystem.cpp
 * SWRTBUtilities.h
 *
+* Notes:
+* ------
+* - Designed to provide all functionality in header file.
+* - Implementation file only needed for test and demo.
+*
 * Build Process:
 * --------------
-* devenv NoSqlDb.sln /rebuild debug
+* devenv SoftwareRepoTB.sln /rebuild debug
 *
 * Maintenance History:
 * --------------------

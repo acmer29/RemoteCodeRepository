@@ -123,6 +123,11 @@
   <ItemGroup>
     <ClCompile Include="LoopHandler.cpp" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NoSqlDb\DateTime\DateTime.vcxproj">
+      <Project>{c1e1f450-b7e1-4796-84d5-7d3c831dff68}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

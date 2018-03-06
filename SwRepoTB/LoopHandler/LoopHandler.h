@@ -19,14 +19,20 @@
 *  - isInloop: Return if the record for check is a component of the loop, 
 *    accepts the name field of the record.
 *  - listLoopItems: Return the loop item vector, which is a vector of string.
-
+*
+* Notes:
+* ------
+* - Designed to provide all functionality in header file.
+* - Implementation file only needed for test and demo.
+*
 * Required Files:
 * ---------------
 * DbCore.h, DbCore.cpp
+* DateTime.h, DateTime.cpp
 *
 * Build Process:
 * --------------
-* devenv NoSqlDb.sln /rebuild debug
+* devenv SoftwareRepoTB.sln /rebuild debug
 *
 * Maintenance History:
 * --------------------

@@ -11,8 +11,8 @@
 * This class provides means to checkout files from checkin working directory.
 *
 * The public interface function operations are as below:
-*  - relocateDirectory() : Change working directory of checkout
-*  - checkout() : Copy files to the checkout working directory
+*  - relocateDirectory : Change working directory of checkout
+*  - checkout : Copy files to the checkout working directory
 
 * Required Files:
 * ---------------
@@ -20,10 +20,11 @@
 * SWRTBUtilities.h
 * FileSystem.h, FileSystem.cpp
 * DbCore.h, DbCore.cpp
+* DateTime.h, DateTime.cpp
 *
 * Build Process:
 * --------------
-* devenv NoSqlDb.sln /rebuild debug
+* devenv SoftwareRepoTB.sln /rebuild debug
 *
 * Maintenance History:
 * --------------------

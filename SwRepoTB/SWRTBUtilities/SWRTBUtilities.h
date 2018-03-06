@@ -23,7 +23,12 @@
 *  - modeOf : Returns the mode / status of the payLoad of a DB record
 *  - changeFileMode : Changes the mode of a file from current mode to newMode
 *  - checkFileMode : Returns the mode of a file by accepting its Db record's payLoad
-
+*
+* Notes:
+* ------
+* - Designed to provide all functionality in header file.
+* - Implementation file only needed for test and demo.
+*
 * Required Files:
 * ---------------
 * DbCore.h, DbCore.cpp

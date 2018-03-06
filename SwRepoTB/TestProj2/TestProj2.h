@@ -10,7 +10,18 @@
 * This package provides one class - TestProj2.
 * This class provides means for demostrating requirement of Project2.
 * This class provides one testCase runner and several test functions.
-
+* The public interface function operations are as below:
+*  - testR1 : demo requirement #1
+*  - testR2 : demo requirement #2
+*  - testR3 : demo requirement #3
+*  - testR4a : demo requirement #4a
+*  - testR4b : demo requirement #4b
+*  - testR4c : demo requirement #4c
+*  - testR5 : demo requirement #5
+*  - testR6 : demo requirement #6
+*  - testR7 : demo requirement #7
+*  - casesRun : Load all requirement demos and provide a try-catch block to execute them
+*
 * Required Files:
 * ---------------
 * SWRepoCore.h
@@ -25,7 +36,7 @@
 *
 * Build Process:
 * --------------
-* devenv NoSqlDb.sln /rebuild debug
+* devenv SoftwareRepoTB.sln /rebuild debug
 *
 * Maintenance History:
 * --------------------

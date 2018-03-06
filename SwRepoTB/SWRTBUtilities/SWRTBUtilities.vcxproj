@@ -76,7 +76,11 @@
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
       <ConformanceMode>true</ConformanceMode>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;TEST_SWRTBUTILITIES;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+    </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
@@ -116,6 +120,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="SWRTBUtilities.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="SWRTBUtilities.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

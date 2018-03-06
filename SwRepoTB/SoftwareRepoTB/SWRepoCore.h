@@ -14,9 +14,16 @@
 * The public interface function operations are as below:
 *  - core : Provides reference as well as value access to the core - a NoSqlDb, 
 *			also provide means to change the core.
+*			This function has three overloads.
 *  - root : Provides reference as well as value access to the working directory
 *			of the core.
-
+*			This function has two overloads.
+*
+* Notes:
+* ------
+* - Designed to provide all functionality in header file.
+* - Implementation file only needed for test and demo.
+*
 * Required Files:
 * ---------------
 * DbCore.h, DbCore.cpp
@@ -27,7 +34,7 @@
 *
 * Build Process:
 * --------------
-* devenv NoSqlDb.sln /rebuild debug
+* devenv SoftwareRepoTB.sln /rebuild debug
 *
 * Maintenance History:
 * --------------------
