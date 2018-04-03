@@ -48,6 +48,7 @@ namespace MsgPassingCommunication
     CsMessage^ getMessage();
     CsMessage^ fromMessage(Message& msg);
     Message fromCsMessage(CsMessage^ csMsg);
+	
   private:
     CsEndPoint^ ep_;
     MsgPassingCommunication::CommFactory* pFactory;

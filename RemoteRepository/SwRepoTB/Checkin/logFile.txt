@@ -1,0 +1,50 @@
+
+                                      CodeAnalysis - Version 1.4
+    ==============================================================================================
+     Thu Feb 22 13:01:36 2018
+     Path: "D:\Spring2018\cse687\SwRepoTB\Checkin"
+     Args: *.h, *.cpp, *.cs, /m, /r, /f
+                                                                               
+           Code Metrics - Start Line, Size (lines/code), and Complexity (number of scopes)
+    ==============================================================================================
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+                             namespace                   Global Namespace       1       1      33
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+                 Checkin.h   namespace                              SWRTB       8      57      29
+                 Checkin.h       class                            Checkin       9      55      28
+
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+               Checkin.cpp    function                            Checkin       7       6       1
+               Checkin.cpp    function                            checkin      14      15       5
+               Checkin.cpp    function                         selectFile      30       5       1
+               Checkin.cpp    function                     setDescription      36       4       1
+               Checkin.cpp    function                      setDependence      41       4       1
+               Checkin.cpp    function                        setCategory      46       4       1
+               Checkin.cpp    function                         pathSolver      51      19       4
+               Checkin.cpp    function                      versionSetter      71       5       1
+               Checkin.cpp    function                           canClose      79       8       2
+               Checkin.cpp    function                         newCheckin      90      18       1
+               Checkin.cpp    function                      resumeCheckin     111      13       1
+               Checkin.cpp    function                       closeCheckin     125      15       2
+               Checkin.cpp    function                              isNew     141       3       1
+               Checkin.cpp    function                           copyFile     146      23       3
+               Checkin.cpp    function                             isFile     170       5       1
+               Checkin.cpp    function                        isDirectory     176       5       1
+               Checkin.cpp    function                              test1     182      11       1
+               Checkin.cpp    function                              test2     194       5       1
+               Checkin.cpp    function                               main     201       7       1
+
+                          Functions Exceeding Metric Limits and Public Data
+    ==============================================================================================
+                 file name        type                               name    line    size    cplx
+    -----------------------  ----------  ---------------------------------  ------  ------  ------
+
+
+
+    searched     3 dirs
+   processed     2 files

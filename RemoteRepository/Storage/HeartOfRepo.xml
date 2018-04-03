@@ -1,0 +1,148 @@
+
+  <Database>
+    <record>
+      <name>
+        DbCore::DbCore.h.1
+      </name>
+      <description>
+        Header file of DbCore
+      </description>
+      <dateTime>
+        Thu Mar 29 11:30:12 2018
+      </dateTime>
+      <children>
+      </children>
+      <payLoads>
+        <payLoad>
+          ../DemoCheckin/DbCore_DbCore.h.1$closed
+        </payLoad>
+        <categories>
+          <category>
+            DbCore
+          </category>
+          <category>
+            Project 1
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        DbCore::DbCore.cpp.1
+      </name>
+      <description>
+        Modified source file of DbCore
+      </description>
+      <dateTime>
+        Thu Mar 29 11:30:12 2018
+      </dateTime>
+      <children>
+        <childName>
+          DbCore::DbCore.h.1
+        </childName>
+      </children>
+      <payLoads>
+        <payLoad>
+          ../DemoCheckin/DbCore_DbCore.cpp.1$closed
+        </payLoad>
+        <categories>
+          <category>
+            DbCore
+          </category>
+          <category>
+            Project 1
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        SWRTB::SWRepoCore.h.1
+      </name>
+      <description>
+        Header file of repo core
+      </description>
+      <dateTime>
+        Thu Mar 29 11:30:13 2018
+      </dateTime>
+      <children>
+        <childName>
+          SWRTB::SWRepoCore.cpp.1
+        </childName>
+      </children>
+      <payLoads>
+        <payLoad>
+          ../DemoCheckin/SWRTB_SWRepoCore.h.1$closed
+        </payLoad>
+        <categories>
+          <category>
+            Core
+          </category>
+          <category>
+            Project2
+          </category>
+          <category>
+            header
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        DbCore::DbCore.h.2
+      </name>
+      <description>
+        Version 2 DbCore header
+      </description>
+      <dateTime>
+        Thu Mar 29 11:30:12 2018
+      </dateTime>
+      <children>
+      </children>
+      <payLoads>
+        <payLoad>
+          ../DemoCheckin/DbCore_DbCore.h.2$open
+        </payLoad>
+        <categories>
+          <category>
+            DbCore
+          </category>
+          <category>
+            Project 1
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        SWRTB::SWRepoCore.cpp.1
+      </name>
+      <description>
+        Source file of repo core
+      </description>
+      <dateTime>
+        Thu Mar 29 11:30:13 2018
+      </dateTime>
+      <children>
+        <childName>
+          SWRTB::SWRepoCore.h.1
+        </childName>
+      </children>
+      <payLoads>
+        <payLoad>
+          ../DemoCheckin/SWRTB_SWRepoCore.cpp.1$closed
+        </payLoad>
+        <categories>
+          <category>
+            Core
+          </category>
+          <category>
+            Project2
+          </category>
+          <category>
+            source
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+  </Database>

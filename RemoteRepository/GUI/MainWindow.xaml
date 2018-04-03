@@ -5,8 +5,130 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="MainWindow" Height="450" Width="800">
-    <Grid>
-        
-    </Grid>
+        Title="Gypsophila" Height="400" Width="567.5" Padding="20" Loaded="Window_Loaded" FontFamily="tahoma" Background="#ccc">
+	<Grid>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="*"/>
+			<RowDefinition Height="auto" />
+		</Grid.RowDefinitions>
+		<TabControl Grid.Row="0" Name="tabControl" Margin="10,10,10.5,10.5">
+			<TabItem Header="Check-In">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="40"/>
+						<RowDefinition Height="40"/>
+						<RowDefinition Height="40"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="40"/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="4*"/>
+					</Grid.ColumnDefinitions>
+					
+					<Label Grid.Row="0" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Select File</Label>
+					<Grid Grid.Row="0" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="4*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<TextBox Grid.Column="0" Margin="5,5,66.5,5" Name="pathFileName" Grid.ColumnSpan="2"/>
+						<Button  Grid.Column="1" Margin="5,5,0,5" Click="Open_FileForm">Browse</Button>
+					</Grid>
+					
+					<Label Grid.Row="1" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Description</Label>
+					<Grid Grid.Row="1" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="5*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<TextBox Grid.Column="0" Margin="5,5,0,5" Name="description" HorizontalAlignment="Stretch"/>
+					</Grid>
+
+					<Label Grid.Row="2" Grid.Column="0" Margin="5 5 5 5" HorizontalAlignment="Right">Category</Label>
+					<Grid Grid.Row="2" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="5*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<ComboBox Grid.Column="0" Margin="5,5,0,5" HorizontalAlignment="Stretch"></ComboBox>
+					</Grid>
+
+					<Label Grid.Row="3" Grid.Column="0" Margin="5 5 5 5" HorizontalAlignment="Right">Dependencies</Label>
+					<Grid Grid.Row="3" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="5*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<ListView Grid.Column="0" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+							<ListView.View>
+								<GridView>
+									<GridViewColumn Width="20">
+										<CheckBox />
+									</GridViewColumn>
+									<GridViewColumn Header="File Name" Width="100"/>
+									<GridViewColumn Header="Version" Width="60"/>
+									<GridViewColumn Header="Status" Width="60"/>
+								</GridView>
+							</ListView.View>
+						</ListView>
+					</Grid>
+					<Grid Grid.Row="4" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="3*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<Button Grid.Column="2" Margin="5,5,5,5" Click="Check_In_Click">Checkin</Button>
+						<Button Grid.Column="1" Margin="5,5,5,5" Click="Check_Out_Click">Cancel</Button>
+					</Grid>
+					
+				</Grid>
+			</TabItem>
+			<TabItem Header="Check-Out"></TabItem>
+
+			<TabItem Header="Browse">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="25"></RowDefinition>
+						<RowDefinition Height="*"></RowDefinition>
+					</Grid.RowDefinitions>
+					<TextBlock Grid.Row="0" Margin="5,5,5,5" Name="dirIndicator" Text=""></TextBlock>
+					<ListView Grid.Row="1" Margin="5,5,5,5" VerticalAlignment="Stretch" Name="browseList" MouseDoubleClick="browseList_DoubleClick"/>
+
+				</Grid>
+			</TabItem>
+			<TabItem Header="Connect">
+
+			</TabItem>
+			<TabItem Header="Debug Messages">
+				<Grid Margin="5,5,5,5">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="*"></RowDefinition>
+						<RowDefinition Height="5"></RowDefinition>
+						<RowDefinition Height="*"></RowDefinition>
+					</Grid.RowDefinitions>
+					<Grid Grid.Row="0">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="40"></RowDefinition>
+							<RowDefinition Height="*"></RowDefinition>
+						</Grid.RowDefinitions>
+						<Label Grid.Row="0"> Send to server</Label>
+						<ListBox Grid.Row="1" Name="SendMessageDebugView"></ListBox>
+					</Grid>
+					<GridSplitter Grid.Row="1" Grid.ColumnSpan="3" Height="5" HorizontalAlignment="Stretch" Background="#666"></GridSplitter>
+					<Grid Grid.Row="2">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="40"></RowDefinition>
+							<RowDefinition Height="*"></RowDefinition>
+						</Grid.RowDefinitions>
+						<Label Grid.Row="0">Receive from server</Label>
+						<ListBox Grid.Row="1" Name="ReceiveMessageDebugView"></ListBox>
+					</Grid>
+				</Grid>
+			</TabItem>
+		</TabControl>
+	</Grid>
 </Window>

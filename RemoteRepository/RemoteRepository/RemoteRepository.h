@@ -37,6 +37,23 @@
 #include <windows.h>
 #include <tchar.h>
 
+// Headers from project2 use for repository function
+#include "../SwRepoTB/SoftwareRepoTB/SWRepoCore.h"
+#include "../SwRepoTB/Checkin/Checkin.h"
+#include "../SwRepoTB/Checkout/Checkout.h"
+#include "../SwRepoTB/Browse/Browse.h"
+
+// Headers from project1 use for db function
+#include "../SwRepoTB/NoSqlDb/DbCore/DbCore.h"
+#include "../SwRepoTB/NoSqlDb/Query/Query.h"
+#include "../SwRepoTB/NoSqlDb/Persistence/Persisence.h"
+#include "../SwRepoTB/NoSqlDb/DateTime/DateTime.h"
+
+// Headers from Utilities use for helper function
+#include "../SwRepoTB/SWRTBUtilities/SWRTBUtilities.h"
+#include "../SwRepoTB/NoSqlDb/Utilities/StringUtilities/StringUtilities.h"
+#include "../FileSystem-Windows/FileSystemDemo/FileSystem.h"
+
 namespace Repository
 {
 	using File = std::string;
@@ -50,6 +67,7 @@ namespace Repository
 	using MsgDispatcher = std::unordered_map<Key, ServerProc>;
 
 	const SearchPath storageRoot = "../Storage";  // root for all server file storage
+	const std::string repoHeartPath = "../Storage/";
 	const MsgPassingCommunication::EndPoint serverEndPoint("localhost", 8080);  // listening endpoint
 
 	class Server
@@ -64,15 +82,28 @@ namespace Repository
 		MsgPassingCommunication::Message getMessage();
 		static Dirs getDirs(const SearchPath& path = storageRoot);
 		static Files getFiles(const SearchPath& path = storageRoot);
+
+		// helper function from project2
+		static std::string fileInfoAssembler(const std::string& NSPFileName);
+
 	private:
 		MsgPassingCommunication::Comm comm_;
 		MsgDispatcher dispatcher_;
 		std::thread msgProcThrd_;
+
+		// data member from project2
+		SWRTB::Core repoCore;
+		SWRTB::Checkin checkinWorker;
+		SWRTB::Checkout checkoutWorker;
+
+		// data member from project1
+		DbQuery::queryResult<std::string> querier;
+		DbPersistence::persistence<std::string> persistor;
 	};
 	//----< initialize server endpoint and give server a name >----------
 
 	inline Server::Server(MsgPassingCommunication::EndPoint ep, const std::string& name)
-		: comm_(ep, name) {}
+		: comm_(ep, name), repoCore("../Storage/"), checkinWorker(repoCore), checkoutWorker(repoCore), querier(repoCore.core()){}
 
 	//----< start server's instance of Comm >----------------------------
 
@@ -121,7 +152,11 @@ namespace Repository
 			while (true)
 			{
 				Msg msg = getMessage();
-				std::cout << "\n  received message: " << msg.command() << " from " << msg.from().toString();
+				std::cout << "\n receive message name: " << msg.name() << " from " << msg.from().toString();
+				std::cout << "\n  received message command: " << msg.command() << " from " << msg.from().toString();
+				if (msg.command() == "") {
+					continue;
+				}
 				if (msg.containsKey("verbose"))
 				{
 					std::cout << "\n";
@@ -129,6 +164,7 @@ namespace Repository
 				}
 				if (msg.command() == "serverQuit")
 					break;
+				std::cout << "Response to " << msg.command() << std::endl;
 				Msg reply = dispatcher_[msg.command()](msg);
 				if (msg.to().port != msg.from().port)  // avoid infinite message loop
 				{

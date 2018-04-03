@@ -125,6 +125,10 @@ namespace MsgPassingCommunication
       }
       return false;
     }
+	void overRide(Key^ key, Value^ value) {
+		remove(key);
+		add(key, value);
+	}
     property Attributes^ attributes;
 
     void show()

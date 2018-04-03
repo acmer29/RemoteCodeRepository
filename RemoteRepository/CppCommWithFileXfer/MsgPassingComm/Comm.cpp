@@ -147,10 +147,16 @@ void Sender::postMessage(Message msg)
 */
 bool Sender::sendFile(Message msg)
 {
-  if (!msg.containsKey("file"))
-    return false;
+	if (!msg.containsKey("file")) {
+		return false;
+    }
+    
   std::string fileSpec = sendFilePath + "/" + msg.file();
   std::ifstream sendFile(fileSpec, std::ios::binary);
+  std::cout << "ÎÒåøÆHÆUÆŸ" << fileSpec << std::endl;
+  std::cout << "ÎÒåøÆHÆUÆŸ" << sendFile.good() << std::endl;
+  std::ifstream test(sendFilePath + "/logger.cpp", std::ios::binary);
+  std::cout << "Fuck you " << test.good() << std::endl;
   if (!sendFile.good())
     return false;
   while (true)
@@ -165,6 +171,7 @@ bool Sender::sendFile(Message msg)
     connecter.send(blockSize, rwBuffer);
   }
   sendFile.close();
+  std::cout << "The file " << msg.file() << " has been sended" << std::endl;
   return true;
 }
 //----< callable object posts incoming message to rcvQ >-------------

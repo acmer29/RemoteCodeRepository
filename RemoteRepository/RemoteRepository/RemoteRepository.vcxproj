@@ -29,7 +29,7 @@
     <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v141</PlatformToolset>
-    <CharacterSet>MultiByte</CharacterSet>
+    <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>
@@ -135,6 +135,21 @@
     </ProjectReference>
     <ProjectReference Include="..\FileSystem-Windows\FileSystemDemo\FileSystemDemo.vcxproj">
       <Project>{ef4a3188-ca93-45a2-ab52-7548669e3aa8}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SwRepoTB\Checkin\Checkin.vcxproj">
+      <Project>{c73f526d-1e64-403d-8d0a-b23a14a9c7f3}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SwRepoTB\Checkout\Checkout.vcxproj">
+      <Project>{e6c815e2-b948-4cb7-872a-563f10077178}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SwRepoTB\NoSqlDb\DateTime\DateTime.vcxproj">
+      <Project>{c1e1f450-b7e1-4796-84d5-7d3c831dff68}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SwRepoTB\NoSqlDb\Persistence\Persistence.vcxproj">
+      <Project>{86e3d375-86ec-4399-833d-61bb562e5fd5}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\SwRepoTB\NoSqlDb\XmlDocument\XmlDocument\XmlDocument.vcxproj">
+      <Project>{0a82ecdc-7520-453a-8f2c-d813feee7537}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
