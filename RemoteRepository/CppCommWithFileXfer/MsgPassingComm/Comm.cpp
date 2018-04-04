@@ -153,10 +153,7 @@ bool Sender::sendFile(Message msg)
     
   std::string fileSpec = sendFilePath + "/" + msg.file();
   std::ifstream sendFile(fileSpec, std::ios::binary);
-  std::cout << "ÎÒåøÆHÆUÆŸ" << fileSpec << std::endl;
-  std::cout << "ÎÒåøÆHÆUÆŸ" << sendFile.good() << std::endl;
-  std::ifstream test(sendFilePath + "/logger.cpp", std::ios::binary);
-  std::cout << "Fuck you " << test.good() << std::endl;
+  std::cout << "Send file located at " << fileSpec << std::endl;
   if (!sendFile.good())
     return false;
   while (true)

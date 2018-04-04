@@ -100,7 +100,7 @@ namespace SWRTB {
 		return result.replace(toReplace, 2, "_");
 	}
 
-	// -----< copyFile: copy "path/to/source/file.ext" to "path/to/target/file.ext" >-----
+	// -----< copyFile: copy "path/from/source/file.ext" to "path/to/target/file.ext" >-----
 	inline void copyFile(const std::string& fromPathFileName, const std::string& toPathFileName) {
 		if (fromPathFileName == toPathFileName) return;
 		FileSystem::File me(fromPathFileName);

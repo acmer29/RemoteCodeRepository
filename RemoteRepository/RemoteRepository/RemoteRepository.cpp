@@ -14,6 +14,15 @@ using namespace Repository;
 using namespace FileSystem;
 using Msg = MsgPassingCommunication::Message;
 
+std::string vectorToString(const std::vector<std::string>& toConvert) {
+	std::string result = "";
+	for (auto item : toConvert) {
+		result = item + "$";
+	}
+	if (result != "") result.substr(0, result.length() - 1);
+	return result;
+}
+
 Files Server::getFiles(const Repository::SearchPath& path)
 {
 	return Directory::getFiles(path);
@@ -24,27 +33,88 @@ Dirs Server::getDirs(const Repository::SearchPath& path)
 	return Directory::getDirectories(path);
 }
 
-std::string Server::fileInfoAssembler(const std::string& NSPFileName) {
+std::string Server::getFilesPlus(const Repository::SearchPath& searchPath) {
+	Files files = getFiles(searchPath);
+	std::string fileComplex = "";
+	for (auto item : files) {
+		fileComplex += (item + "$");
+	}
+	if (fileComplex != "") fileComplex = fileComplex.substr(0, fileComplex.length() - 1);
+	return fileComplex;
+}
+
+std::string Server::getDirsPlus(const Repository::SearchPath& searchPath) {
+	Dirs dirs = getDirs(searchPath);
+	std::string dirComplex = "";
+	for (auto item : dirs) {
+		if (item != "." && item != "..")
+			dirComplex += (item + "$");
+	}
+	if (dirComplex != "") dirComplex = dirComplex.substr(0, dirComplex.length() - 1);
+	return dirComplex;
+}
+
+std::vector<std::string> Server::fileInfoAssembler(const std::string& NSPFileName) {
 	SWRTB::Core repo(Repository::repoHeartPath);
-	std::cout << "I need to find " << NSPFileName << std::endl;
+	std::vector<std::string> ans;
 	DbQuery::queryResult<std::string> querier(repo.core());
 	try{
 		SWRTB::NSPFileNameToNSNFileName(NSPFileName);
 	}
 	catch (std::exception &ex) {
-		return "";
+		return ans;
 	}
 	//std::cout << "I need to find " << SWRTB::NSPFileNameToNSNFileName(NSPFileName) << std::endl;
-	std::vector<NoSqlDb::DbElement<std::string>> result = querier.from(repo.core()).find("name", SWRTB::NSPFileNameToNSNFileName(NSPFileName)).eval();
+	std::vector<NoSqlDb::DbElement<std::string>> result = 
+		querier.from(repo.core()).find("name", SWRTB::NSPFileNameToNSNFileName(NSPFileName)).eval();
 	std::cout << "I find " << result.size() << "!" << std::endl;
-	if (result.size() == 0) return "";
+	if (result.size() == 0) return ans;
 	else {
-		std::string res = "";
-		res += SWRTB::nameCleaner(result[0].name()) + "$";
-		res += result[0].name() + "$" + result[0].descrip() + "$" + std::string(result[0].dateTime()) + "$";
-		res += SWRTB::modeOf(result[0].payLoad()) + "$";
-		return res;
+		ans.push_back(SWRTB::nameCleaner(result[0].name()));
+		ans.push_back(result[0].descrip());
+		ans.push_back(std::string(result[0].dateTime()));
+		ans.push_back(SWRTB::modeOf(result[0].payLoad()));
+		ans.push_back(vectorToString(result[0].children()));
+		ans.push_back(vectorToString(result[0].category()));
+		return ans;
 	}
+}
+
+Msg Server::listContentMessage(const std::string& path) {
+	Msg reply;
+	reply.command("listContent");
+	std::string searchPath = storageRoot;
+	if (path != ".") searchPath = searchPath + "\\" + path;
+	std::string dirComplex = Server::getDirsPlus(searchPath), fileComplex = Server::getFilesPlus(searchPath);
+	if (dirComplex != "") reply.attribute("dirs", dirComplex);
+	if (fileComplex != "") reply.attribute("files", fileComplex);
+	reply.attribute("path", path);
+	return reply;
+}
+
+Msg Server::showFileMessge(const std::string& path) {
+	Msg reply;
+	reply.command("showFile");
+	std::string searchPath = storageRoot + "\\" + path;
+	reply.attribute("file", FileSystem::Path::getName(searchPath));
+	reply.contentLength(FileSystem::FileInfo(searchPath).size());
+	try {
+		SWRTB::copyFile(searchPath, sendFilePath + FileSystem::Path::getName(searchPath));
+	}
+	catch (std::exception & ex) { std::cout << ex.what() << std::endl; }
+	std::vector<std::string> fileInfo = fileInfoAssembler(FileSystem::Path::getName(searchPath));
+	if (fileInfo.size()) {
+		reply.attribute("file-Name", fileInfo[0]);
+		reply.attribute("file-Description", fileInfo[1]);
+		reply.attribute("file-DateTime", fileInfo[2]);
+		reply.attribute("file-Status", fileInfo[3]);
+		reply.attribute("file-dependencies", fileInfo[4]);
+		reply.attribute("file-categories", fileInfo[5]);
+	}
+	else {
+		reply.attribute("error", "The file has no database record");
+	}
+	return reply;
 }
 
 template<typename T>
@@ -64,94 +134,30 @@ std::function<Msg(Msg)> echo = [](Msg msg) {
 	return reply;
 };
 
+std::function<Msg(Msg)> showFileCleanUp = [](Msg msg) {
+	Msg reply(serverEndPoint, serverEndPoint);
+	reply.command("echo");
+	std::string file = msg.value("fileName");
+	FileSystem::File("").remove(Repository::sendFilePath + file);
+	std::cout << "showFileCleanUp: " << Repository::sendFilePath + file << " has been cleaned up.\n";
+	return reply;
+};
+
 std::function<Msg(Msg)> listContent = [](Msg msg) {
 	Msg reply;
-	reply.to(msg.from());
-	reply.from(msg.to());
 	std::string path = msg.value("path");
 	if(path == "") std::cout << "listContent: message did not define a path attribute.\n";
 	else if (SWRTB::isDirectory(msg.value("path")) == true) {
-		reply.command("listContent");
-		std::string searchPath = storageRoot;
-		if (path != ".") searchPath = searchPath + "\\" + path;
-		Files files = Server::getFiles(searchPath);
-		Files dirs = Server::getDirs(searchPath);
-		std::string dirComplex = "", fileComplex = "";
-		for (auto item : dirs) {
-			if(item != "." && item != "..")
-				dirComplex += (item + "$");
-		}
-		if(dirComplex != "") reply.attribute("dirs", dirComplex.substr(0, dirComplex.length() - 1));
-		for (auto item : files) {
-			fileComplex += (item + "$");
-		}
-		if(fileComplex != "") reply.attribute("files", fileComplex.substr(0, fileComplex.length() - 1));
-		reply.attribute("path", path);
+		reply = Server::listContentMessage(path);
 	}
 	else if (SWRTB::isFile(msg.value("path")) == true) {
-		reply.command("showFile");
-		std::string searchPath = storageRoot + "\\" + path;
-		reply.attribute("file", searchPath);
-		reply.contentLength(FileSystem::FileInfo(searchPath).size());
+		reply = Server::showFileMessge(path);
 	}
 	else {
 		std::cout << "listContent: \"" << path << "\" did not represent a file or a directory.\n";
 	}
-	return reply;
-};
-
-std::function<Msg(Msg)> getFiles = [](Msg msg) {
-	Msg reply;
 	reply.to(msg.from());
 	reply.from(msg.to());
-	reply.command("getFiles");
-	std::string path = msg.value("path");
-	if (path != "")
-	{
-		std::string searchPath = storageRoot;
-		if (path != ".")
-			searchPath = searchPath + "\\" + path;
-		Files files = Server::getFiles(searchPath);
-		size_t count = 0;
-		for (auto item : files)
-		{
-			std::string countStr = Utilities::Converter<size_t>::toString(++count);
-			reply.attribute("file" + countStr, item);
-		}
-	}
-	else
-	{
-		std::cout << "\n  getFiles message did not define a path attribute";
-	}
-	return reply;
-};
-
-std::function<Msg(Msg)> getDirs = [](Msg msg) {
-	Msg reply;
-	reply.to(msg.from());
-	reply.from(msg.to());
-	reply.command("getDirs");
-	std::string path = msg.value("path");
-	if (path != "")
-	{
-		std::string searchPath = storageRoot;
-		if (path != ".")
-			searchPath = searchPath + "\\" + path;
-		Files dirs = Server::getDirs(searchPath);
-		size_t count = 0;
-		for (auto item : dirs)
-		{
-			if (item != ".." && item != ".")
-			{
-				std::string countStr = Utilities::Converter<size_t>::toString(++count);
-				reply.attribute("dir" + countStr, item);
-			}
-		}
-	}
-	else
-	{
-		std::cout << "\n  getDirs message did not define a path attribute";
-	}
 	return reply;
 };
 
@@ -170,8 +176,8 @@ std::function<Msg(Msg)> fileCheckout = [](Msg msg) {
 	reply.from(msg.to());
 	reply.name("File sended");
 	reply.command("checkoutCallback");
-	reply.file("package.json");
-	reply.contentLength(FileSystem::FileInfo("../package.json").size());
+	reply.file("server.js");
+	reply.contentLength(FileSystem::FileInfo("../server.js").size());
 	return reply;
 };
 
@@ -199,11 +205,10 @@ int main()
 	std::cout << "\n  testing message processing";
 	std::cout << "\n ----------------------------";
 	server.addMsgProc("echo", echo);
-	server.addMsgProc("getFiles", getFiles);
-	server.addMsgProc("getDirs", getDirs);
 	server.addMsgProc("listContent", listContent);
 	server.addMsgProc("fileCheckin", fileCheckin);
 	server.addMsgProc("fileCheckout", fileCheckout);
+	server.addMsgProc("showFileCleanUp", showFileCleanUp);
 	server.addMsgProc("serverQuit", echo);
 	server.processMessages();
 
@@ -211,17 +216,6 @@ int main()
 	msg.name("msgToSelf");
 	msg.command("echo");
 	msg.attribute("verbose", "show me");
-	server.postMessage(msg);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-	msg.command("getFiles");
-	msg.remove("verbose");
-	msg.attributes()["path"] = storageRoot;
-	server.postMessage(msg);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
-
-	msg.command("getDirs");
-	msg.attributes()["path"] = storageRoot;
 	server.postMessage(msg);
 	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 

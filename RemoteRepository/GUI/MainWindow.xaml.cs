@@ -136,6 +136,24 @@ namespace GUI
             browseList.Items.Clear();
         }
 
+        private void showFileWindowPopup(CsMessage msg)
+        {
+            fileWindow popUp = new fileWindow();
+            var enumer = msg.attributes.GetEnumerator();
+            string path = "";
+            while (enumer.MoveNext())
+            {
+                if (enumer.Current.Key == "content-length" && enumer.Current.Value == "0") return;
+                else if (enumer.Current.Key == "file") path = "../SaveFiles/" + enumer.Current.Value;
+            }
+            if (path == "") return;
+            string fileContent = File.ReadAllText(path);
+            Paragraph paragraph = new Paragraph();
+            paragraph.Inlines.Add(new Run(fileContent));
+            popUp.Show();
+            popUp.fileCode.Blocks.Add(paragraph);
+        }
+
         //----< add client processing for message with key >---------------
         private void registerHandler(string key, Action<CsMessage> clientProc)
         {
@@ -205,12 +223,32 @@ namespace GUI
             Action<CsMessage> showFile = (CsMessage receiveMessage) =>
             {
                 var enumer = receiveMessage.attributes.GetEnumerator();
+                string fileName = "";
                 while (enumer.MoveNext())
                 {
                     string key = enumer.Current.Key;
                     string value = enumer.Current.Value;
-                    Console.WriteLine("\n" + key + ": " + value);
+                    if (key == "file") fileName = value; 
                 }
+                CsEndPoint serverEndPoint = new CsEndPoint();
+                serverEndPoint.machineAddress = "localhost";
+                serverEndPoint.port = 8080;
+                CsMessage message = new CsMessage();
+                message.add("to", CsEndPoint.toString(serverEndPoint));
+                message.add("from", CsEndPoint.toString(endPoint_));
+                message.add("command", "showFileCleanUp");
+                message.add("fileName", fileName);
+                Action<CsMessage> debug = (CsMessage msg) =>
+                {
+                    debugDisplay(msg, "send");
+                };
+                Dispatcher.Invoke(debug, new Object[] { message });
+                translater.postMessage(message);
+                Action<CsMessage> showFileInPopup = (CsMessage msg) =>
+                {
+                    showFileWindowPopup(msg);
+                };
+                Dispatcher.Invoke(showFileInPopup, receiveMessage);
             };
             registerHandler("showFile", showFile);
         }

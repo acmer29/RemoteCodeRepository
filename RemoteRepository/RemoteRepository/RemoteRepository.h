@@ -68,6 +68,8 @@ namespace Repository
 
 	const SearchPath storageRoot = "../Storage";  // root for all server file storage
 	const std::string repoHeartPath = "../Storage/";
+	const std::string sendFilePath = "../SendFiles/";
+	const std::string saveFilePath = "../SaveFiles/";
 	const MsgPassingCommunication::EndPoint serverEndPoint("localhost", 8080);  // listening endpoint
 
 	class Server
@@ -82,28 +84,25 @@ namespace Repository
 		MsgPassingCommunication::Message getMessage();
 		static Dirs getDirs(const SearchPath& path = storageRoot);
 		static Files getFiles(const SearchPath& path = storageRoot);
+		static std::string getFilesPlus(const Repository::SearchPath& searchPath);
+		static std::string getDirsPlus(const Repository::SearchPath& searchPath);
 
 		// helper function from project2
-		static std::string fileInfoAssembler(const std::string& NSPFileName);
+		static std::vector<std::string> fileInfoAssembler(const std::string& NSPFileName);
+
+		// message helpers
+		static Msg listContentMessage(const std::string& path);
+		static Msg showFileMessge(const std::string& path);
 
 	private:
 		MsgPassingCommunication::Comm comm_;
 		MsgDispatcher dispatcher_;
 		std::thread msgProcThrd_;
-
-		// data member from project2
-		SWRTB::Core repoCore;
-		SWRTB::Checkin checkinWorker;
-		SWRTB::Checkout checkoutWorker;
-
-		// data member from project1
-		DbQuery::queryResult<std::string> querier;
-		DbPersistence::persistence<std::string> persistor;
 	};
 	//----< initialize server endpoint and give server a name >----------
 
 	inline Server::Server(MsgPassingCommunication::EndPoint ep, const std::string& name)
-		: comm_(ep, name), repoCore("../Storage/"), checkinWorker(repoCore), checkoutWorker(repoCore), querier(repoCore.core()){}
+		: comm_(ep, name){}
 
 	//----< start server's instance of Comm >----------------------------
 
