@@ -5,7 +5,7 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="fileWindow" Height="600" Width="800">
+        Title="fileWindow" Height="600" Width="800" Loaded="Window_Loaded" FontFamily="tahoma">
     <Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="1*"></ColumnDefinition>
@@ -26,11 +26,11 @@
 						<RowDefinition Height="9*"></RowDefinition>
 						<RowDefinition Height="1*"></RowDefinition>
 					</Grid.RowDefinitions>
-					<ListView Grid.Row="1">
+					<ListView Name="basicDataList" Grid.Row="1">
 						<ListView.View>
 							<GridView>
-								<GridViewColumn Header="Property" Width="60"></GridViewColumn>
-								<GridViewColumn Header="Value" Width="240"></GridViewColumn>
+								<GridViewColumn Header="Property" Width="60" DisplayMemberBinding="{Binding Path=Key}"></GridViewColumn>
+								<GridViewColumn Header="Value" Width="240" DisplayMemberBinding="{Binding Path=Value}"></GridViewColumn>
 							</GridView>
 						</ListView.View>
 					</ListView>
@@ -52,12 +52,21 @@
 						<RowDefinition Height="9*"></RowDefinition>
 						<RowDefinition Height="1*"></RowDefinition>
 					</Grid.RowDefinitions>
-					<ListView Grid.Row="1">
+					<ListView Grid.Row="1" Name="allRecordBriefList">
 						<ListView.View>
 							<GridView>
-								<GridViewColumn Header="Name" Width="60"></GridViewColumn>
-								<GridViewColumn Header="Namespace" Width="60"></GridViewColumn>
-								<GridViewColumn Header="Version" Width="60"></GridViewColumn>
+								<GridViewColumn Width="20">
+									<CheckBox/>
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<CheckBox/>
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+								<GridViewColumn Header="Name" Width="60" DisplayMemberBinding="{Binding Path=NameSpace}"></GridViewColumn>
+								<GridViewColumn Header="Namespace" Width="60" DisplayMemberBinding="{Binding Path=Name}"></GridViewColumn>
+								<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"></GridViewColumn>
+								<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"></GridViewColumn>								
 							</GridView>
 						</ListView.View>
 					</ListView>
@@ -89,10 +98,14 @@
 						</ListBox>
 						<Grid Grid.Row="2">
 							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="2*"></ColumnDefinition>
 								<ColumnDefinition Width="1*"></ColumnDefinition>
+								<ColumnDefinition Width="1*"></ColumnDefinition>
+								<ColumnDefinition Width="3*"></ColumnDefinition>
+								<ColumnDefinition Width="2*"></ColumnDefinition>
 							</Grid.ColumnDefinitions>
-							<Button Grid.Column="1" Margin="5,5,0,5">New Category</Button>
+							<Button Grid.Column="0" Margin="0,5,10,5">+</Button>
+								<Button Grid.Column="1" Margin="5,5,5,5">-</Button>
+							<Button Grid.Column="3" Margin="5,5,0,5">New Category</Button>
 						</Grid>
 					</Grid>
 					<Grid Grid.Row="2">

@@ -61,15 +61,21 @@
 							<ColumnDefinition Width="5*"></ColumnDefinition>
 							<ColumnDefinition Width="1*"></ColumnDefinition>
 						</Grid.ColumnDefinitions>
-						<ListView Grid.Column="0" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" >
+						<ListView Grid.Column="0" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="checkInDependencyList">
 							<ListView.View>
 								<GridView>
 									<GridViewColumn Width="20">
-										<CheckBox />
+										<CheckBox/>
+										<GridViewColumn.CellTemplate>
+											<DataTemplate>
+												<CheckBox/>
+											</DataTemplate>
+										</GridViewColumn.CellTemplate>
 									</GridViewColumn>
-									<GridViewColumn Header="File Name" Width="100"/>
-									<GridViewColumn Header="Version" Width="60"/>
-									<GridViewColumn Header="Status" Width="60"/>
+									<GridViewColumn Header="Namespace" Width="100" DisplayMemberBinding="{Binding Path=NameSpace}"/>
+									<GridViewColumn Header="File Name" Width="100" DisplayMemberBinding="{Binding Path=Name}"/>
+									<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"/>
+									<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"/>
 								</GridView>
 							</ListView.View>
 						</ListView>

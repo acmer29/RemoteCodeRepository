@@ -3,6 +3,7 @@ using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -35,6 +36,7 @@ namespace GUI
         private Thread rcvThrd = null;
         private Dictionary<string, Action<CsMessage>> dispatcher_
           = new Dictionary<string, Action<CsMessage>>();
+        private List<FileComplex> repoRecords = new List<FileComplex>();
 
         //----< process incoming messages on child thread >--------------------
         //----< This function process the message coming from server side >----
@@ -66,10 +68,9 @@ namespace GUI
         {
             checkinCallbackHandler();
             checkoutCallbackHandler();
-            getDirsHandler();
-            getFilesHandler();
             listContentsHandler();
             showFileHandler();
+            trackAllRecordsCallbackHandler();
         }
 
         private void debugDisplay(CsMessage msg, String direction)
@@ -84,6 +85,25 @@ namespace GUI
             }
             if (direction == "send") SendMessageDebugView.Items.Insert(0, toDisplay);
             else if (direction == "receive") ReceiveMessageDebugView.Items.Insert(0, toDisplay);
+        }
+
+        private FileComplex fileInfoBriefAssembler(string recordBrief)
+        {
+            FileComplex result = new FileComplex();
+            string[] infoBriefComplex = recordBrief.Split('$');
+            result.NameSpace = infoBriefComplex[0];
+            result.Name = infoBriefComplex[1];
+            result.Version = infoBriefComplex[2];
+            result.Status = infoBriefComplex[3];
+            return result;
+        }
+
+        private void populateCheckInDependencyListView()
+        {
+            foreach(FileComplex item in repoRecords)
+            {
+                checkInDependencyList.Items.Add(item);
+            }
         }
 
         private string lastFilter(string path)
@@ -140,82 +160,19 @@ namespace GUI
         {
             fileWindow popUp = new fileWindow();
             var enumer = msg.attributes.GetEnumerator();
-            string path = "";
-            while (enumer.MoveNext())
-            {
-                if (enumer.Current.Key == "content-length" && enumer.Current.Value == "0") return;
-                else if (enumer.Current.Key == "file") path = "../SaveFiles/" + enumer.Current.Value;
-            }
-            if (path == "") return;
-            string fileContent = File.ReadAllText(path);
-            Paragraph paragraph = new Paragraph();
-            paragraph.Inlines.Add(new Run(fileContent));
+            popUp.getFileInfo(msg);
+            popUp.getAllRecordInfo(repoRecords);
+            Console.Write("\n I want to pop up !");
             popUp.Show();
-            popUp.fileCode.Blocks.Add(paragraph);
+
+            //popUp.fileCode.Blocks.Add(paragraph);
+            
         }
 
         //----< add client processing for message with key >---------------
         private void registerHandler(string key, Action<CsMessage> clientProc)
         {
             dispatcher_[key] = clientProc;
-        }
-
-        private void getDirsHandler()
-        {
-            Action<CsMessage> getDirs = (CsMessage rcvMsg) =>
-            {
-                Action clrDirs = () =>
-                {
-                    clearDirs();
-                };
-                Dispatcher.Invoke(clrDirs, new Object[] { });
-                var enumer = rcvMsg.attributes.GetEnumerator();
-                while (enumer.MoveNext())
-                {
-                    string key = enumer.Current.Key;
-                    if (key.Contains("dir"))
-                    {
-                        Action<string> doDir = (string dir) =>
-                        {
-                            addDir(dir);
-                        };
-                        Dispatcher.Invoke(doDir, new Object[] { enumer.Current.Value });
-                    }
-                }
-                Action insertUp = () =>
-                {
-                    addParent();
-                };
-                Dispatcher.Invoke(insertUp, new Object[] { });
-            };
-            registerHandler("getDirs", getDirs);
-        }
-        //----< load getFiles processing into dispatcher dictionary >------
-
-        private void getFilesHandler()
-        {
-            Action<CsMessage> getFiles = (CsMessage rcvMsg) =>
-            {
-                Action clrFiles = () =>
-                {
-                    clearFiles();
-                };
-                Dispatcher.Invoke(clrFiles, new Object[] { });
-                var enumer = rcvMsg.attributes.GetEnumerator();
-                while (enumer.MoveNext())
-                {
-                    string key = enumer.Current.Key;
-                    if (key.Contains("file"))
-                    {
-                        Action<string> doFile = (string file) =>
-                        {
-                            addFile(file);
-                        };
-                        Dispatcher.Invoke(doFile, new Object[] { enumer.Current.Value });
-                    }
-                }
-            };
-            registerHandler("getFiles", getFiles);
         }
 
         private void showFileHandler()
@@ -228,7 +185,8 @@ namespace GUI
                 {
                     string key = enumer.Current.Key;
                     string value = enumer.Current.Value;
-                    if (key == "file") fileName = value; 
+                    if (key == "file") fileName = value;
+                    if (key == "content-length" && value == "0") return;
                 }
                 CsEndPoint serverEndPoint = new CsEndPoint();
                 serverEndPoint.machineAddress = "localhost";
@@ -379,6 +337,45 @@ namespace GUI
             translater.postMessage(message);
         }
 
+        private void trackAllRecordsCallbackHandler()
+        {
+            Action<CsMessage> trackAllRecordsCallback = (CsMessage receiveMessage) =>
+            {
+                repoRecords.Clear();
+                var enumer = receiveMessage.attributes.GetEnumerator();
+                while (enumer.MoveNext())
+                {
+                    if(enumer.Current.Key.Contains("record"))
+                    {
+                        repoRecords.Add(fileInfoBriefAssembler(enumer.Current.Value));
+                    }
+                }
+                Action updateCheckInDependencyList = () =>
+                {
+                    populateCheckInDependencyListView();
+                };
+                Dispatcher.Invoke(updateCheckInDependencyList, new Object[] { });
+            };
+            registerHandler("trackAllRecordsCallback", trackAllRecordsCallback);
+        }
+
+        private void trackFiles()
+        {
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "trackAllRecords");
+            Action<CsMessage> debug = (CsMessage msg) =>
+            {
+                debugDisplay(msg, "send");
+            };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+        }
+
         private void Open_FileForm(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog();
@@ -417,6 +414,9 @@ namespace GUI
             {
                 debugDisplay(msg, "send");
             };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            message.overRide("command", "trackAllRecords");
+            translater.postMessage(message);
             Dispatcher.Invoke(debug, new Object[] { message });
         }
     }

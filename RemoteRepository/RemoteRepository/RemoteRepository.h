@@ -93,6 +93,7 @@ namespace Repository
 		// message helpers
 		static Msg listContentMessage(const std::string& path);
 		static Msg showFileMessge(const std::string& path);
+		static Msg trackAllRecordsMessage();
 
 	private:
 		MsgPassingCommunication::Comm comm_;
@@ -163,7 +164,6 @@ namespace Repository
 				}
 				if (msg.command() == "serverQuit")
 					break;
-				std::cout << "Response to " << msg.command() << std::endl;
 				Msg reply = dispatcher_[msg.command()](msg);
 				if (msg.to().port != msg.from().port)  // avoid infinite message loop
 				{

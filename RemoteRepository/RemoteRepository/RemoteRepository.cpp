@@ -70,7 +70,9 @@ std::vector<std::string> Server::fileInfoAssembler(const std::string& NSPFileNam
 	std::cout << "I find " << result.size() << "!" << std::endl;
 	if (result.size() == 0) return ans;
 	else {
-		ans.push_back(SWRTB::nameCleaner(result[0].name()));
+		ans.push_back(SWRTB::namespaceOf(result[0].name()));
+		ans.push_back(SWRTB::nameCleanerPlus(result[0].name()));
+		ans.push_back(SWRTB::versionOf(result[0].name()));
 		ans.push_back(result[0].descrip());
 		ans.push_back(std::string(result[0].dateTime()));
 		ans.push_back(SWRTB::modeOf(result[0].payLoad()));
@@ -104,15 +106,35 @@ Msg Server::showFileMessge(const std::string& path) {
 	catch (std::exception & ex) { std::cout << ex.what() << std::endl; }
 	std::vector<std::string> fileInfo = fileInfoAssembler(FileSystem::Path::getName(searchPath));
 	if (fileInfo.size()) {
-		reply.attribute("file-Name", fileInfo[0]);
-		reply.attribute("file-Description", fileInfo[1]);
-		reply.attribute("file-DateTime", fileInfo[2]);
-		reply.attribute("file-Status", fileInfo[3]);
-		reply.attribute("file-dependencies", fileInfo[4]);
-		reply.attribute("file-categories", fileInfo[5]);
+		reply.attribute("file-Namespace", fileInfo[0]);
+		reply.attribute("file-Name", fileInfo[1]);
+		reply.attribute("file-Version", fileInfo[2]);
+		reply.attribute("file-Description", fileInfo[3]);
+		reply.attribute("file-DateTime", fileInfo[4]);
+		reply.attribute("file-Status", fileInfo[5]);
+		reply.attribute("file-Dependencies", fileInfo[6]);
+		reply.attribute("file-Categories", fileInfo[7]);
 	}
 	else {
 		reply.attribute("error", "The file has no database record");
+	}
+	return reply;
+}
+
+Msg Server::trackAllRecordsMessage() {
+	Msg reply;
+	reply.attribute("command", "trackAllRecordsCallback");
+	SWRTB::Core repo(Repository::repoHeartPath);
+	DbQuery::queryResult<std::string> querier(repo.core());
+	std::vector<NoSqlDb::DbElement<std::string>> result = 
+		querier.from(repo.core()).find().eval();
+	size_t count = 0;
+	for (auto item : result) {
+		std::string recordBrief = SWRTB::namespaceOf(item.name()) + "$" 
+			+ SWRTB::nameCleanerPlus(item.name()) + "$" 
+			+ SWRTB::versionOf(item.name()) + "$" 
+			+ SWRTB::modeOf(item.payLoad());
+		reply.attribute("record" + Utilities::Converter<size_t>::toString(count++), recordBrief);
 	}
 	return reply;
 }
@@ -131,6 +153,14 @@ std::function<Msg(Msg)> echo = [](Msg msg) {
 	Msg reply = msg;
 	reply.to(msg.from());
 	reply.from(msg.to());
+	return reply;
+};
+
+std::function<Msg(Msg)> trackAllRecords = [](Msg msg) {
+	Msg reply = Server::trackAllRecordsMessage();
+	reply.to(msg.from());
+	reply.from(msg.to());
+	std::cout << "Ready to reply--------------------------------------------------------" << std::endl;
 	return reply;
 };
 
@@ -209,6 +239,7 @@ int main()
 	server.addMsgProc("fileCheckin", fileCheckin);
 	server.addMsgProc("fileCheckout", fileCheckout);
 	server.addMsgProc("showFileCleanUp", showFileCleanUp);
+	server.addMsgProc("trackAllRecords", trackAllRecords);
 	server.addMsgProc("serverQuit", echo);
 	server.processMessages();
 

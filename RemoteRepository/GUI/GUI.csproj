@@ -70,9 +70,11 @@
       <DependentUpon>App.xaml</DependentUpon>
       <SubType>Code</SubType>
     </Compile>
+    <Compile Include="FileComplex.cs" />
     <Compile Include="fileWindow.xaml.cs">
       <DependentUpon>fileWindow.xaml</DependentUpon>
     </Compile>
+    <Compile Include="KeyValuePair.cs" />
     <Compile Include="MainWindow.xaml.cs">
       <DependentUpon>MainWindow.xaml</DependentUpon>
       <SubType>Code</SubType>

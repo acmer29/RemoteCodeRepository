@@ -75,6 +75,32 @@ namespace SWRTB {
 			else start += 1;
 		}
 		return NSNFileName.substr(start, NSNFileName.length());
+	} 
+
+	// -----< nameCleanerPlus: Remove the "nameSpace::" as well as ".version" from the nameSpace::fileName.version >-----
+	inline std::string nameCleanerPlus(const std::string& NSNFileNameVersion) {
+		std::string intermediate = nameCleaner(NSNFileNameVersion);
+		size_t last = intermediate.length() - 1;
+		while (last >= 0) {
+			if (intermediate[last] == '.') {
+				break;
+			}
+			last -= 1;
+		}
+		return intermediate.substr(0, last);
+	}
+
+	// -----< namespaceOf: Return the "nameSpace" from the nameSpace::fileName >-----
+	inline std::string namespaceOf(const std::string& NSNFileName) {
+		size_t start = 0, end = NSNFileName.length() - 1;
+		while (start != end) {
+			if (NSNFileName[start] == ':' && NSNFileName[start + 1] != ':') {
+				break;
+			}
+			else start += 1;
+		}
+		if (start == 0) return "";
+		return NSNFileName.substr(0, start - 1);
 	}
 
 	// -----< nameConcater: Concate the nameSpace with fileName by seperator >------------------------------------------------
@@ -123,6 +149,18 @@ namespace SWRTB {
 		size_t index = payLoad.find('$');
 		if (index == std::string::npos) throw::std::exception("pathNSPFileNameVersionOf: Cannot find the $ seperator.\n");
 		return payLoad.substr(0, index);
+	}
+
+	// -----< versionOf: Returns the version part of the name of a DB record >-----
+	inline std::string versionOf(const std::string& NSFileNameVersion) {
+		size_t last = NSFileNameVersion.length() - 1;
+		while (last >= 0) {
+			if (NSFileNameVersion[last] == '.') {
+				break;
+			}
+			last -= 1;
+		}
+		return NSFileNameVersion.substr(last + 1, NSFileNameVersion.length());
 	}
 
 	// -----< modeOf: Returns the mode / status of the payLoad of a DB record >-----
