@@ -14,22 +14,22 @@
 #include "../DbCore/DbCore.h"
 #include "../Query/Query.h"
 #include "../Test/Test.h"
-using namespace DbPersistence;
+using namespace NoSqlDb;
 #ifdef TEST_PERSISTENCE
 
 bool test1() {
 	Utilities::title("#1: Testing persist operation:");
 	std::cout << "Persist the query results.";
 	NoSqlDb::DbCore<std::string> db;
-	DbQuery::queryResult<std::string> querier(db);
-	persistence<std::string> persistor;
+	NoSqlDb::DbQuery<std::string> querier(db);
+	DbPersist<std::string> persistor;
 
-	querier.from(db).insert("\"齐天宇\", \"Loser\", \"\", \"砍口垒,哈吉马路呦\", \"没实习, 没钱, 没女朋友\"", false);
-	querier.from(db).insert("\"Tianyu Qi2\", \"Loser2\", \"\", \"Really a loser\", \"\"");
-	querier.from(db).insert("\"Tianyu Qi3\", \"Loser3\", \"\", \"He has no intenship\", \"\"");
-	querier.from(db).insert("\"Tianyu Qi4\", \"Loser4\", \"Tianyu Qi1, Tianyu Qi2\", \"And he has no child\", \"\"", false);
-	querier.from(db).insert("\"Tianyu Qi5\", \"Loser5\", \"Tianyu Qi3, Tianyu Qi4\", \"Really cannot do anything\", \"\"", false);
-	querier.from(db).insert("\"Tianyu Qi6\", \"Loser6\", \"\", \"Really cannot do anything\", \"some category1, same category2\"");
+	querier.from(db).insert("\"齐天宇\", \"Loser\", \"\", \"砍口垒,哈吉马路呦\", \"没实习, 没钱, 没女朋友\", \"\", \"\", \"\"", false);
+	querier.from(db).insert("\"Tianyu Qi2\", \"Loser2\", \"\", \"Really a loser\", \"\", \"\", \"\", \"\"");
+	querier.from(db).insert("\"Tianyu Qi3\", \"Loser3\", \"\", \"He has no intenship\", \"\", \"\", \"\", \"\"");
+	querier.from(db).insert("\"Tianyu Qi4\", \"Loser4\", \"Tianyu Qi1, Tianyu Qi2\", \"And he has no child\", \"\", \"\", \"\", \"\"", false);
+	querier.from(db).insert("\"Tianyu Qi5\", \"Loser5\", \"Tianyu Qi3, Tianyu Qi4\", \"Really cannot do anything\", \"\", \"\", \"\", \"\"", false);
+	querier.from(db).insert("\"Tianyu Qi6\", \"Loser6\", \"\", \"Really cannot do anything\", \"some category1, same category2\", \"\", \"\", \"\"");
 
 	std::cout << "\n Records in datebase" << std::endl;
 	querier.from(db).find().resultDisplay();
@@ -45,12 +45,12 @@ bool test2() {
 	Utilities::title("#2: Testing restore operation:");
 	std::cout << "Parse the XML document persist by test1";
 	NoSqlDb::DbCore<std::string> db;
-	DbQuery::queryResult<std::string> querier(db);
+	NoSqlDb::DbQuery<std::string> querier(db);
 
-	persistence<std::string> persistor;
+	DbPersist<std::string> persistor;
 	
-	persistence<std::string>::Content result = persistor.restore("sample.xml");
-	for (persistence<std::string>::Content::iterator iter = result.begin(); iter != result.end(); iter++) {
+	DbPersist<std::string>::Content result = persistor.restore("sample.xml");
+	for (DbPersist<std::string>::Content::iterator iter = result.begin(); iter != result.end(); iter++) {
 		querier.from(db).insert(*iter, false);
 	}
 
@@ -67,9 +67,9 @@ bool test3() {
 	Utilities::title("#3: Testing restore broken XML file:");
 	std::cout << "Parse the modified XML document persist by test1, which is broken in format";
 	NoSqlDb::DbCore<std::string> db;
-	DbQuery::queryResult<std::string> querier(db);
+	NoSqlDb::DbQuery<std::string> querier(db);
 
-	persistence<std::string> persistor;
+	DbPersist<std::string> persistor;
 
 	try {
 		persistor.restore("sample - broken.xml");
@@ -85,7 +85,7 @@ bool test3() {
 //----< test stub >----------------------------------------------------
 
 int main() {
-	DbTest::test tester;
+	NoSqlDb::test tester;
 	tester.registerTest(test1, "Test1: persist operation");
 	tester.registerTest(test2, "Test2: restore operation");
 	tester.registerTest(test3, "Test3: restore operation with broken XML file");

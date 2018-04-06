@@ -50,9 +50,24 @@ namespace NoSqlDb
 		T payLoad() const { return payLoad_; }
 		void payLoad(const T& payLoad) { payLoad_ = payLoad; }
 
+		std::string& nameSpace() { return nameSpace_; }
+		std::string nameSpace() const { return nameSpace_; };
+		void nameSpace(const std::string& nameSpace) { nameSpace_ = nameSpace; }
+
+		std::string& status() { return status_; }
+		std::string status() const { return status_; };
+		void status(const std::string& status) { status_ = status; }
+
+		std::string& owner() { return owner_; }
+		std::string owner() const { return owner_; };
+		void owner(const std::string& owner) { owner_ = owner; }
+
 	private:
 		Children category_;
 		T payLoad_;
+		std::string nameSpace_;
+		std::string status_;
+		std::string owner_;
 	};
   /////////////////////////////////////////////////////////////////////
   // DbElement class
@@ -92,11 +107,26 @@ namespace NoSqlDb
     T payLoad() const { return payLoads_.payLoad(); }
     void payLoad(const T& payLoad) { payLoads_.payLoad(payLoad); }
 
+	std::string& nameSpace() { return payLoads_.nameSpace(); }
+	std::string nameSpace() const { return payLoads_.nameSpace(); };
+	void nameSpace(const std::string& nameSpace) { payLoads_.nameSpace(nameSpace); }
+
+	std::string& status() { return payLoads_.status(); }
+	std::string status() const { return payLoads_.status(); };
+	void status(const std::string& status) { payLoads_.status(status); }
+
+	std::string& owner() { return payLoads_.owner(); }
+	std::string owner() const { return payLoads_.owner(); };
+	void owner(const std::string& owner) { payLoads_.owner(owner); }
+
 	payLoadComplex& payLoads() { return payLoads_; }
 	payLoadComplex payLoads() const { return payLoads_; }
 	void payLoads(const payLoadComplex& another) {
 		payLoads_.category(another.category());
-		payLoads_.payLoad(another.payLoad);
+		payLoads_.payLoad(another.payLoad());
+		payLoads_.nameSpace(another.nameSpace());
+		payLoads_.status(another.status());
+		payLoads_.owner(another.owner());
 	}
 
   private:
@@ -224,12 +254,18 @@ namespace NoSqlDb
     out << std::setw(26) << std::left << "DateTime";
     out << std::setw(10) << std::left << "Name";
     out << std::setw(25) << std::left << "Description";
+	out << std::setw(25) << std::left << "Namespace";
+	out << std::setw(25) << std::left << "Status";
+	out << std::setw(25) << std::left << "Owner";
     out << std::setw(25) << std::left << "Payload";
     out << "\n  ";
     out << std::setw(26) << std::left << "------------------------";
     out << std::setw(10) << std::left << "--------";
     out << std::setw(25) << std::left << "-----------------------";
     out << std::setw(25) << std::left << "-----------------------";
+	out << std::setw(25) << std::left << "-----------------------";
+	out << std::setw(25) << std::left << "-----------------------";
+	out << std::setw(25) << std::left << "-----------------------";
   }
   //----< display DbElements >-----------------------------------------
 

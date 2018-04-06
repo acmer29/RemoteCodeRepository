@@ -7,6 +7,8 @@
 // Application: Most Projects, CSE687 - Object Oriented Design       //
 // Author:      Jim Fawcett, Syracuse University, CST 4-187          //
 //              jfawcett@twcny.rr.com                                //
+//				Tianyu Qi (modified this package and added functions)//
+//				tqi100@syr.edu										 //
 ///////////////////////////////////////////////////////////////////////
 /*
 * Package Operations:
@@ -18,6 +20,11 @@
 * - trim(str)             remove leading and trailing whitespace
 * - split(str, 'delim')   break string into vector of strings separated by delim char 
 * - showSplit(vector)     display splits
+* - splitPlus(toSplit, splitOn) modified split function, skip splitOn inside '[]'
+* - unwrapper(toWrap)	  return string without wrapper
+* - wrapperPlus(toUnwrap, wrapper) modified unwrapper function, integrated checking 
+* - checkWrapper(toCheck, wrapper) check if string is wrapped correctly
+* - regexSafeFilter(toFilter) Escape all metacharacter in regex string.
 *
 * Required Files:
 * ---------------
@@ -28,6 +35,11 @@
 * ver 1.0 : 12 Jan 2018
 * - first release
 * - refactored from earlier Utilities.h
+* ver 1.1 : 01 Feb 2018
+* - add showSplit, unwrapper, wrapperPlus, checkWrapper
+* - considered useful in Project 1.
+* ver 1.2 : 27 Feb 2018
+* - add regexSafeFileter
 *
 * Notes:
 * ------
@@ -107,16 +119,6 @@ namespace Utilities
     if (0 <= pos && pos < temp.size())
       temp.erase(++pos);
     return temp;
-  }
-
-  // Check if the string is wrapped correctly.
-  template <typename T>
-  inline bool isUnwrappable(const std::basic_string<T>& toTest, const char wrapper) 
-  {
-	  if (toTest.length() == 0) return false;
-	  typename std::basic_string<T>::const_iterator front, last;
-	  front = toTest.begin(), last = toTest.end() - 1;
-	  return ((*front == *last) && (*front == wrapper));
   }
 
   // Remove the customed wrapping character at head and tail of the string.
@@ -250,6 +252,25 @@ namespace Utilities
         out << "\n--" << item;
     }
     out << "\n";
+  }
+
+  // Escape all metacharacters in regular expressions, used in Project2.
+  inline std::string regexSafeFilter(const std::string& toFilter) {
+	  if (toFilter.length() == 0) return toFilter;
+	  std::string result = "";
+	  auto index = toFilter.begin();
+	  while (index != toFilter.end()) {
+		  if (*index == '^' || *index == '$' || *index == '*' || *index == '+' ||
+			  *index == '?' || *index == '(' || *index == ')' || *index == '{' ||
+			  *index == '}' || *index == '.' || *index == '[' || *index == ']') {
+			  result = result + "\\" + (*index);
+		  }
+		  else {
+			  result = result + (*index);
+		  }
+		  index++;
+	  }
+	  return result;
   }
 }
 #endif

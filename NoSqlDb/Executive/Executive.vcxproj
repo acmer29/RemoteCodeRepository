@@ -128,8 +128,8 @@
     <ProjectReference Include="..\DateTime\DateTime.vcxproj">
       <Project>{c1e1f450-b7e1-4796-84d5-7d3c831dff68}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Test\Test.vcxproj">
-      <Project>{cb873c78-980c-4d39-ab9d-0ff0e6acd01a}</Project>
+    <ProjectReference Include="..\TestProj1\TestProj1.vcxproj">
+      <Project>{6b436e6a-64c5-4f7e-beaf-c4daf6a8d711}</Project>
     </ProjectReference>
     <ProjectReference Include="..\XmlDocument\XmlDocument\XmlDocument.vcxproj">
       <Project>{0a82ecdc-7520-453a-8f2c-d813feee7537}</Project>

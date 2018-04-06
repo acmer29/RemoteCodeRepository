@@ -8,8 +8,8 @@
 /*
 * Package Operations:
 * -------------------
-* This package provides one class - persistence
-* persistence class provides two functions, persist and restore
+* This package provides one class - DbPersist
+* DbPersist class provides two functions, persist and restore
 * persist saves results from query into a XML file
 * restore retrieves records in the XML file into a std::vector, which can use query + insert load them into the database
 *
@@ -39,9 +39,9 @@
 #include "../XmlDocument/XmlDocument/XmlDocument.h"
 #include "../XmlDocument/XmlElement/XmlElement.h"
 #include "../XmlDocument/XmlParser/XmlParser.h"
-namespace DbPersistence {
+namespace NoSqlDb {
 	template<typename T>
-	class persistence {
+	class DbPersist {
 	public:
 
 		using Content = std::vector<NoSqlDb::DbElement<T>>;
@@ -63,41 +63,31 @@ namespace DbPersistence {
 
 	// -----< persist: Persist a vector of DbElement into "fileName".xml >------
 	template<typename T>
-	void persistence<T>::persist(Content toPersist, const std::string& fileName) {
+	void DbPersist<T>::persist(Content toPersist, const std::string& fileName) {
 		sPtr root = XmlProcessing::makeTaggedElement("Database");
 		Document file(XmlProcessing::makeDocElement(root));
 		Content::iterator iter;
 		for (iter = toPersist.begin(); iter != toPersist.end(); iter++) {
 			sPtr record = XmlProcessing::makeTaggedElement("record");
-			sPtr name = XmlProcessing::makeTaggedElement("name");
-			name->addChild(XmlProcessing::makeTextElement((*iter).name()));
-			record->addChild(name);
-			sPtr description = XmlProcessing::makeTaggedElement("description");
-			description->addChild(XmlProcessing::makeTextElement((*iter).descrip()));
-			record->addChild(description);
-			sPtr dateTime = XmlProcessing::makeTaggedElement("dateTime");
-			dateTime->addChild(XmlProcessing::makeTextElement(std::string((*iter).dateTime())));
-			record->addChild(dateTime);
+			sPtr name = XmlProcessing::makeTaggedElement("name"); name->addChild(XmlProcessing::makeTextElement((*iter).name())); record->addChild(name);
+			sPtr description = XmlProcessing::makeTaggedElement("description"); description->addChild(XmlProcessing::makeTextElement((*iter).descrip())); record->addChild(description);
+			sPtr dateTime = XmlProcessing::makeTaggedElement("dateTime"); dateTime->addChild(XmlProcessing::makeTextElement(std::string((*iter).dateTime()))); record->addChild(dateTime);
 			sPtr children = XmlProcessing::makeTaggedElement("children");
-			std::vector<std::string> childrenName = (*iter).children();
-			std::vector<std::string>::iterator childIter;
+			std::vector<std::string> childrenName = (*iter).children(); std::vector<std::string>::iterator childIter;
 			for (childIter = childrenName.begin(); childIter != childrenName.end(); childIter++) {
-				sPtr childName = XmlProcessing::makeTaggedElement("childName");
-				childName->addChild(XmlProcessing::makeTextElement(*childIter));
-				children->addChild(childName);
+				sPtr childName = XmlProcessing::makeTaggedElement("childName"); childName->addChild(XmlProcessing::makeTextElement(*childIter)); children->addChild(childName);
 			}
 			record->addChild(children);
 			sPtr payLoad = XmlProcessing::makeTaggedElement("payLoads");
-			sPtr payLoadValue = XmlProcessing::makeTaggedElement("payLoad");
-			payLoadValue->addChild(XmlProcessing::makeTextElement((*iter).payLoad()));
-			payLoad->addChild(payLoadValue);
+			sPtr payLoadValue = XmlProcessing::makeTaggedElement("payLoad"); payLoadValue->addChild(XmlProcessing::makeTextElement((*iter).payLoad())); payLoad->addChild(payLoadValue);
+			sPtr status = XmlProcessing::makeTaggedElement("status"); status->addChild(XmlProcessing::makeTextElement((*iter).status())); payLoad->addChild(status);
+			sPtr owner = XmlProcessing::makeTaggedElement("owner"); owner->addChild(XmlProcessing::makeTextElement((*iter).owner())); payLoad->addChild(owner);
+			sPtr nameSpace = XmlProcessing::makeTaggedElement("nameSpace"); nameSpace->addChild(XmlProcessing::makeTextElement((*iter).nameSpace())); payLoad->addChild(nameSpace);
 			sPtr categories = XmlProcessing::makeTaggedElement("categories");
 			std::vector<std::string> categoryName = (*iter).category();
 			std::vector<std::string>::iterator cateIter;
 			for (cateIter = categoryName.begin(); cateIter != categoryName.end(); cateIter++) {
-				sPtr category = XmlProcessing::makeTaggedElement("category");
-				category->addChild(XmlProcessing::makeTextElement(*cateIter));
-				categories->addChild(category);
+				sPtr category = XmlProcessing::makeTaggedElement("category"); category->addChild(XmlProcessing::makeTextElement(*cateIter)); categories->addChild(category);
 			}
 			payLoad->addChild(categories);
 			record->addChild(payLoad);
@@ -110,7 +100,7 @@ namespace DbPersistence {
 
 	// -----< restore: Restore all records from "fileName" into a vector of DbElement >-----
 	template<typename T>
-	typename persistence<T>::Content persistence<T>::restore(const std::string& fileName) {
+	typename DbPersist<T>::Content DbPersist<T>::restore(const std::string& fileName) {
 		Content collection;
 		Document file(fileName, XmlProcessing::XmlDocument::file);
 		std::vector<sPtr> records = file.elements("Database").select();
@@ -132,7 +122,7 @@ namespace DbPersistence {
 
 	// -----< restoreName: Resotre the name of the record >--------------------------
 	template<typename T>
-	void persistence<T>::restoreName(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
+	void DbPersist<T>::restoreName(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
 		if (rData->children().size() == 0) 
 			throw std::exception("Bad XML content detected, at least one record has no name metadata. Restore terminates.\n");
 		auto nameString = rData->children()[0];
@@ -142,7 +132,7 @@ namespace DbPersistence {
 
 	// -----< restoreDescription: Resotre the description of the record >--------------------------
 	template<typename T>
-	void persistence<T>::restoreDescription(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
+	void DbPersist<T>::restoreDescription(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
 		if (rData->children().size() == 0) return;
 		auto descriptionString = rData->children()[0];
 		record.descrip(descriptionString->value());
@@ -151,7 +141,7 @@ namespace DbPersistence {
 
 	// -----< restoreDateTime: Resotre the dateTime of the record >--------------------------
 	template<typename T>
-	void persistence<T>::restoreDateTime(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
+	void DbPersist<T>::restoreDateTime(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
 		if (rData->children().size() == 0) return;
 		auto dateTimeString = rData->children()[0];
 		record.dateTime(dateTimeString->value());
@@ -160,7 +150,7 @@ namespace DbPersistence {
 
 	// -----< restoreChildren: Resotre the children of the record >--------------------------
 	template<typename T>
-	void persistence<T>::restoreChildren(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
+	void DbPersist<T>::restoreChildren(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
 		std::vector<sPtr> childrenName = rData->children();
 		if (childrenName.size() == 0) return;
 		for (std::vector<sPtr>::iterator childIter = childrenName.begin(); childIter != childrenName.end(); childIter++) {
@@ -173,14 +163,25 @@ namespace DbPersistence {
 
 	// -----< restorePayLoads: Resotre the payloads of the record, includes payload value and category >-----
 	template<typename T>
-	void persistence<T>::restorePayLoads(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
+	void DbPersist<T>::restorePayLoads(NoSqlDb::DbElement<T>& record, const sPtr& rData) {
 		std::vector<sPtr> payLoads = rData->children();
-		if (payLoads.size() != 2) throw std::exception("Bad XML format detected, restore terminate.\n");
+		if (payLoads.size() != 5) throw std::exception("Bad XML format detected, restore terminate.\n");
 		auto payLoadValue = (*(payLoads[0])).children()[0];
 		record.payLoad(payLoadValue->value());
 		if ((*(payLoads[1])).children().size() != 0) {
-			auto categories = (*(payLoads[1])).children()[0];
-			std::vector<sPtr> categoriesName = categories->children();
+			auto status = (*(payLoads[1])).children()[0];
+			record.status(status->value());
+		}
+		if ((*(payLoads[2])).children().size() != 0) {
+			auto owner = (*(payLoads[2])).children()[0];
+			record.owner(owner->value());
+		}
+		if ((*(payLoads[3])).children().size() != 0) {
+			auto nameSpace = (*(payLoads[3])).children()[0];
+			record.nameSpace(nameSpace->value());
+		}
+		if ((*(payLoads[4])).children().size() != 0) {
+			std::vector<sPtr> categoriesName = (*(payLoads[4])).children();
 			for (std::vector<sPtr>::iterator cateIter = categoriesName.begin(); cateIter != categoriesName.end(); cateIter++) {
 				if ((*cateIter)->children().size() == 0) break;
 				auto categoryName = (*cateIter)->children()[0];

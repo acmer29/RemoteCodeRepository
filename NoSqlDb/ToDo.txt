@@ -1,4 +1,0 @@
-  ToDo
-=========================
-1. Add not filter
-3. Add and test protection of persistence
