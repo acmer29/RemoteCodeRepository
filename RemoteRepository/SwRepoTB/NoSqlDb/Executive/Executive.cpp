@@ -7,7 +7,7 @@
 
 #include "Executive.h"
 
-using namespace DbExecutive;
+using namespace NoSqlDb;
 #ifdef TEST_EXECUTIVE
 int main() {
 	dbExecutor executor;

@@ -16,15 +16,6 @@
         <payLoad>
           ../DemoCheckin/DbCore_DbCore.h.1$closed
         </payLoad>
-        <status>
-          
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          
-        </nameSpace>
         <categories>
           <category>
             DbCore
@@ -54,15 +45,6 @@
         <payLoad>
           ../DemoCheckin/DbCore_DbCore.cpp.1$closed
         </payLoad>
-        <status>
-          
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          
-        </nameSpace>
         <categories>
           <category>
             DbCore
@@ -92,15 +74,6 @@
         <payLoad>
           ../DemoCheckin/SWRTB_SWRepoCore.h.1$closed
         </payLoad>
-        <status>
-          
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          
-        </nameSpace>
         <categories>
           <category>
             Core
@@ -130,15 +103,6 @@
         <payLoad>
           ../DemoCheckin/DbCore_DbCore.h.2$open
         </payLoad>
-        <status>
-          
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          
-        </nameSpace>
         <categories>
           <category>
             DbCore
@@ -168,15 +132,6 @@
         <payLoad>
           ../DemoCheckin/SWRTB_SWRepoCore.cpp.1$closed
         </payLoad>
-        <status>
-          
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          
-        </nameSpace>
         <categories>
           <category>
             Core

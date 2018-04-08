@@ -20,7 +20,7 @@ bool test1() {
 }
 
 int main() {
-	DbTest::test tester;
+	NoSqlDb::test tester;
 	tester.registerTest(test1, "Test1: Basic feature of SWRTBUtilities.");
 	tester.testsRun();
 	tester.testsSummary();

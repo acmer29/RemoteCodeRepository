@@ -81,8 +81,8 @@ namespace SWRTB{
 			std::string heart = targetDirectory + "HeartOfRepo";
 			if (FileSystem::File(heart).exists(heart + ".xml")) {
 				std::cout << "RepoCore initialization: Detected existing repo record file, restore from " << heart << ".xml" << std::endl;
-				std::vector<NoSqlDb::DbElement<std::string>> result = DbPersistence::persistence<std::string>().restore(heart + ".xml");
-				DbQuery::queryResult<std::string> querier(repo_);
+				std::vector<NoSqlDb::DbElement<std::string>> result = NoSqlDb::DbPersist<std::string>().restore(heart + ".xml");
+				NoSqlDb::DbQuery<std::string> querier(repo_);
 				for (auto item : result) querier.from(repo_).insert(item);
 			}
 		}

@@ -39,17 +39,22 @@
 namespace SWRTB {
 	class Checkout {
 	public:
-		explicit Checkout(Core& target, const std::string& targetDirectory = "../repoCheckout/");
+		explicit Checkout(Core& target, const std::string&  = "Anonymous", const std::string& targetDirectory = "../repoCheckout/");
 
 		Checkout& relocateDirectory(const std::string& newDirectory);
+
+		Checkout& setRequestor(const std::string& requestor);
 
 		void checkout(const std::string& NSPfileNameVersion, bool recursive = true);
 
 	private:
 		Core& repo;
 
+		// Checkout requestor
+		std::string requestor_;
+
 		// Query Helper
-		DbQuery::queryResult<std::string> querier;
+		NoSqlDb::DbQuery<std::string> querier;
 
 		// FileSystem helpers
 		FileSystem::Path pathHelper;

@@ -14,8 +14,8 @@ Checkin::Checkin(Core& target) :
 
 void Checkin::checkin(const std::string& path, const std::string& dependency, \
 					  const std::string& description, const std::string& category, \
-					  const std::string& nameSpace, bool close) {
-	selectFile(path).setNameSpace(nameSpace).setCategory(category).setDependence(dependency).setDescription(description).checkin(close);
+					  const std::string& nameSpace, const std::string& owner, bool close) {
+	selectFile(path).setNameSpace(nameSpace).setCategory(category).setDependence(dependency).setDescription(description).setOwner(owner).checkin(close);
 	return;
 }
 
@@ -69,6 +69,12 @@ Checkin& Checkin::setCategory(const std::string& categories) {
 	return *this;
 }
 
+Checkin& Checkin::setOwner(const std::string& owner) {
+	if (owner == "") owner_ = "Anonymous";
+	else owner_ = owner;
+	return *this;
+}
+
 // -----< pathSolver: Solve the path indicated, fills the filesForCheckin vector >-----
 void Checkin::pathSolver(const std::string& pathFileName) {
 	if (isFile(pathFileName)) {
@@ -90,17 +96,17 @@ void Checkin::pathSolver(const std::string& pathFileName) {
 // -----< localPathSolver: Solve the path appears to be the working directory >-----
 void Checkin::localPathSolver(const std::string& fileName) {
 	querier.from(repo.core()).find("payLoad", 
-		"/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*\\$open/");
+		"/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/").find("status", "open");
 	if (querier.eval().size() != 1) throw std::exception("Check-in: Cannot locate local file by given fileName.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
-	filesForCheckin.push_back(pathNSPFileNameVersionOf(fileCplx.payLoad()));
+	filesForCheckin.push_back(fileCplx.payLoad());
 	return;
 }
 
 // -----< versionSetter: Determine the version number of a file >-----
 int Checkin::versionSetter(const std::string& fileName) {
-	std::string value = "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(nameConcater(fileName, nameSpace_, "_")) + "\\.[0-9]*\\$clos(ed|ing)*/";
-	querier.from(repo.core()).find("payLoad", value);
+	std::string value = "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(nameConcater(fileName, nameSpace_, "_")) + "\\.[0-9]*/";
+	querier.from(repo.core()).find("payLoad", value).find("status", "/clos(ed|ing)/");
 	return querier.eval().size() + 1;
 }
 
@@ -111,14 +117,14 @@ bool Checkin::canClose(const std::string& key) {
 	std::vector<NoSqlDb::DbElement<std::string>> dependencies = querier.from(repo.core()).find("name", key).childOf(true).eval();
 	for (auto item : dependencies) {
 		if (item.name() == key) {
-			querier.from(repo.core()).find("name", item.name()).update("payLoad", changeFileMode(item.payLoad(), "closed"));
+			querier.from(repo.core()).find("name", item.name()).update("status", "closed");
 			continue;
 		}
-		if (checkFileMode(item.payLoad(), "$closed") == true) continue;
-		else if (checkFileMode(item.payLoad(), "$closing") == true) {
-			querier.from(repo.core()).find("name", item.name()).update("payLoad", changeFileMode(item.payLoad(), "closed"));
+		if (item.status() == "closed") continue;
+		else if (item.status() == "closing") {
+			querier.from(repo.core()).find("name", item.name()).update("status", "closed");
 		}
-		else if (checkFileMode(item.payLoad(), "$open") == true) return false;
+		else if (item.status() == "open") return false;
 		else {
 			// std::cout << item.payLoad() << std::endl;
 			throw std::exception("Check-in: Detected bad mode in stored file.\n");
@@ -132,24 +138,25 @@ bool Checkin::canClose(const std::string& key) {
 void Checkin::newCheckin(const std::string& pathFileName) {
 	if (pathFileName == "$" || description_ == "$" || dependencies_ == "$" || categories_ == "$")
 		throw std::exception("Check-in: New Checkin parameter cannot be $.\n");
-
 	// Get the file name from pathFileName and add version number on it the create fileNameAct
 	std::string fileNameAct = pathHelper.getName(pathFileName) + "." + std::to_string(versionSetter(pathHelper.getName(pathFileName)));
-	
 	std::string recordName = nameConcater(fileNameAct, nameSpace_, "::");
 	std::string recordPayLoadValue = workDirectory + nameConcater(fileNameAct, nameSpace_, "_");
-	recordPayLoadValue = changeFileMode(recordPayLoadValue, "open");
+	std::string status = "open";
 	std::string record = \
 		"\"" + recordName + "\"" + ", " + \
 		"\"" + description_ + "\"" + ", " + \
 		"\"" + dependencies_ + "\"" + ", " + \
 		"\"" + recordPayLoadValue + "\"" + ", " + \
-		"\"" + categories_ + "\"";
-	// std::cout << "The record is: " << record << std::endl;
+		"\"" + categories_ + "\"" + ", " + \
+		"\"" + status + "\"" + ", " + \
+		"\"" + owner_ + "\"" + ", " + \
+		"\"" + nameSpace_ + "\"";
+	std::cout << "The record is: " << record << std::endl;
 	querier.from(repo.core()).insert(record);
 	if (querier.from(repo.core()).find("name", recordName).eval().size() != 1)
 		throw std::exception("Check-in: Check-in fails because of invalid parameter.\n");
-	copyFile(pathFileName, pathNSPFileNameVersionOf(recordPayLoadValue));
+	copyFile(pathFileName, recordPayLoadValue);
 	// std::cout << "File: \"" << fileNameAct << "\" inserted into the database. Checkin type: New.\n";
 	return;
 }
@@ -160,11 +167,12 @@ void Checkin::resumeCheckin(const std::string& pathFileName) {
 	std::string fileName = pathHelper.getName(pathFileName);
 	if (pathFileName.substr(0, workDirectory.length()) != workDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
 	else fileName = fileName.substr(0, fileName.find_last_of('.'));
-	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*\\$open/").eval().size() != 1 && \
-		querier.from(repo.core()).find("payLoad", pathFileName + "$open").eval().size() != 1)
+	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/").find("status", "open").eval().size() != 1 && \
+		querier.from(repo.core()).find("payLoad", pathFileName).find("status", "open").eval().size() != 1)
 		throw std::exception("This file has no open version.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
-	std::string key = fileCplx.name();
+	if (canTouch(fileCplx.owner(), owner_) == false) 
+		throw std::exception("Checkin: This file is not owned by you!\n");
 	if (dependencies_ != "$") querier.update("children", dependencies_);
 	if (description_ != "$") querier.update("description", description_);
 	if (categories_ != "$") querier.update("category", categories_);
@@ -176,15 +184,17 @@ void Checkin::closeCheckin(const std::string& pathFileName) {
 	std::string fileName = pathHelper.getName(pathFileName);
 	if (pathFileName.substr(0, workDirectory.length()) != workDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
 	else fileName = fileName.substr(0, fileName.find_last_of('.'));
-	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*\\$open/").eval().size() != 1)
+	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/").find("status", "open").eval().size() != 1)
 		throw std::exception("Check-in: No correct file for close checkin.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
+	if (canTouch(fileCplx.owner(), owner_) == false) 
+		throw std::exception("Checkin: This file is not owned by you!\n");
 	std::string key = fileCplx.name();
 	if (canClose(key) == false) {
 		std::vector<NoSqlDb::DbElement<std::string>> suspects = 
-			querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + ".*\\.[0-9]*\\$open/").eval();
+			querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + ".*\\.[0-9]*/").find("status", "open").eval();
 		if (LoopHandler(suspects).isInLoop(fileCplx.name())) {
-			fileCplx.payLoad(changeFileMode(fileCplx.payLoad(), "closing"));
+			fileCplx.status("closing");
 			querier.from(repo.core()).update(fileCplx);
 			return;
 		}
@@ -193,7 +203,7 @@ void Checkin::closeCheckin(const std::string& pathFileName) {
 			return;
 		}
 	}
-	fileCplx.payLoad(changeFileMode(fileCplx.payLoad(), "closed"));
+	fileCplx.status("closed");
 	querier.from(repo.core()).update(fileCplx);
 	return;
 }
@@ -203,7 +213,7 @@ bool Checkin::isNew(const std::string& pathFileName) {
 	std::string fileName = pathHelper.getName(pathFileName);
 	if (pathFileName.substr(0, workDirectory.length()) != workDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
 	else fileName = fileName.substr(0, fileName.find_last_of('.'));
-	return !(querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*\\$open/").eval().size());
+	return !(querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/").find("status", "open").eval().size());
 }
 
 // -----< saveRepo: Persist the current DB into XML file >-----
@@ -217,6 +227,7 @@ void Checkin::cleanUp() {
 	dependencies_ = "";
 	description_ = "";
 	categories_ = "";
+	owner_ = "";
 	filesForCheckin.clear();
 }
 

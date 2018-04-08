@@ -59,6 +59,7 @@ namespace SWRTB {
 					 const std::string& description, \
 					 const std::string& category, \
 					 const std::string& nameSpace, \
+					 const std::string& owner = "Anonymous", \
 					 bool close = false);
 		// The function provided for cascade calling.
 		void checkin(bool close = false);
@@ -73,6 +74,8 @@ namespace SWRTB {
 
 		Checkin& setCategory(const std::string& categories = "");
 
+		Checkin& setOwner(const std::string& owner = "");
+
 	private:
 		// Repo Core
 		Core& repo;
@@ -82,13 +85,14 @@ namespace SWRTB {
 		std::string dependencies_;
 		std::string description_;
 		std::string categories_;
+		std::string owner_;
 		std::vector<std::string> filesForCheckin;
 
 		// Query Helper
-		DbQuery::queryResult<std::string> querier;
+		NoSqlDb::DbQuery<std::string> querier;
 
 		// Persistance Helper
-		DbPersistence::persistence<std::string> persistor;
+		NoSqlDb::DbPersist<std::string> persistor;
 
 		// Directories and files
 		std::string workDirectory;

@@ -43,6 +43,11 @@ namespace GUI
             get { return status; }
             set { status = value; }
         }
+        public string Owner
+        {
+            get { return owner; }
+            set { owner = value; }
+        }
         public string[] Dependencies
         {
             get { return dependencies; }
@@ -53,13 +58,26 @@ namespace GUI
             get { return categories; }
             set { categories = value; }
         }
+        public bool IsChecked
+        {
+            get { return isChecked; }
+            set { isChecked = value; }
+        }
+        public string Key
+        {
+            get { return key; }
+            set { key = value; }
+        }
         private string nameSpace;
         private string name;
         private string description;
         private string dateTime;
         private string version;
         private string status;
+        private string owner;
         private string[] dependencies;
         private string[] categories;
+        private bool isChecked;
+        private string key;
     }
 }

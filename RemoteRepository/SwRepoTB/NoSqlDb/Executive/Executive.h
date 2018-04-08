@@ -36,14 +36,15 @@
 #include "../Persistence/Persisence.h"
 #include "../Query/Query.h"
 #include "../Test/Test.h"
-namespace DbExecutive {
+#include "../TestProj1/TestProj1.h"
+namespace NoSqlDb {
 	class dbExecutor {
 	public:
 		void demo();
 	private:
 		NoSqlDb::DbCore<std::string> db;
-		DbTest::test tester;
-		DbTest::testCase presenter;
+		NoSqlDb::test tester;
+		NoSqlDb::testCase presenter;
 	};
 
 	void dbExecutor::demo() {

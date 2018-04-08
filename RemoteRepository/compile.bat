@@ -1,0 +1,1 @@
+devenv RemoteRepository.sln /rebuild debug

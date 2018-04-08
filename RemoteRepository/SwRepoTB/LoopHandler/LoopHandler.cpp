@@ -20,7 +20,7 @@ bool test1() {
 
 // ----< test stub >-----
 int main() {
-	DbTest::test tester;
+	NoSqlDb::test tester;
 	tester.registerTest(test1, "Test1: Basic feature of LoopHandler");
 	return 0;
 }

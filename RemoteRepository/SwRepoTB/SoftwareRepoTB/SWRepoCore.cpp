@@ -18,7 +18,7 @@ bool test1() {
 
 // ----< test stub >-----
 int main() {
-	DbTest::test tester;
+	NoSqlDb::test tester;
 	tester.registerTest(test1, "Basic feature of repo core.");
 	return 0;
 }

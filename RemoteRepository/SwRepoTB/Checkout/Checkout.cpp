@@ -8,12 +8,13 @@
 using namespace SWRTB;
 
 // -----< Constructor: Initialize the working directory of the checkout >-----
-Checkout::Checkout(Core& target, const std::string& targetDirectory) : 
+Checkout::Checkout(Core& target, const std::string& requestor, const std::string& targetDirectory) : 
 	repo(target), 
 	querier(target.core()), sourceDirectory(target.root()), 
 	targetDirectory(targetDirectory) {
 	if (dirHelper.exists(sourceDirectory) == false) throw std::exception("Check-out: Cannot find the given source directory.\n");
 	if (dirHelper.exists(targetDirectory) == false) dirHelper.create(targetDirectory);
+	requestor_ = requestor;
 }
 
 // -----< relocateDirectory: Reset the checkout working directory >-----
@@ -23,11 +24,17 @@ Checkout& Checkout::relocateDirectory(const std::string& newDirectory) {
 	return *this;
 }
 
+Checkout& Checkout::setRequestor(const std::string& requestor) {
+	requestor_ = requestor;
+	return *this;
+}
+
 // -----< checkout: Provide means to checkout files >---------------------------
 // -----< By default checkout all fils as well as dependencies >----------------
 void Checkout::checkout(const std::string& NSPFileNameVersion, bool recursive) {
 	std::vector<NoSqlDb::DbElement<std::string>> result = 
 		querier.from(repo.core()).find("name", NSPFileNameToNSNFileName(NSPFileNameVersion)).eval();
+	if (canTouch(result[0].owner(), requestor_) == false) throw std::exception("Checkout: This file is not owned by you!\n");
 	if (recursive == true) {
 		std::vector<NoSqlDb::DbElement<std::string>> tmp = 
 			querier.from(repo.core()).find("name", NSPFileNameToNSNFileName(NSPFileNameVersion)).childOf().eval();
@@ -36,10 +43,14 @@ void Checkout::checkout(const std::string& NSPFileNameVersion, bool recursive) {
 		}
 	}
 	for (auto item : result) { 
-		if (isFile(pathNSPFileNameVersionOf(item.payLoad())) == false)
+		if (isFile(item.payLoad()) == false)
 			throw std::exception("Check-out: The file cannot be checken out.\n");
+		if (canTouch(item.owner(), requestor_)) {
+			std::cout << "Check out " << item.name() << " failed because this file is not owned by you.\n";
+			continue;
+		}
 		std::string target = NSNFileNameToNSPFileName(item.name());
-		if (checkFileMode(item.payLoad(), "open") == true)
+		if (item.status() == "open")
 			std::cout << "  Check-out: The file \"" + item.name() + "\" is currently in \"open\" status.\n";
 		std::string NSPfileName = removeVersion(target);
 		copyFile(sourceDirectory + target, targetDirectory + NSPfileName);

@@ -29,6 +29,13 @@ namespace GUI
         {
             InitializeComponent();
         }
+        private FileComplex theFile = new FileComplex();
+        private string filePath;
+        private string errorInformation;
+        private HashSet<FileComplex> allRecords = new HashSet<FileComplex>();
+        private HashSet<string> allCategories = new HashSet<string>();
+        private HashSet<string> selectedDependencies = new HashSet<string>();
+        private HashSet<string> selectedCategories = new HashSet<string>();
 
         public void getFileInfo(CsMessage receiveMessage)
         {
@@ -45,26 +52,30 @@ namespace GUI
                 else if (enumer.Current.Key == "file-Dependencies") theFile.Dependencies = stringToArray(enumer.Current.Value);
                 else if (enumer.Current.Key == "file-Categories") theFile.Categories = stringToArray(enumer.Current.Value);
                 else if (enumer.Current.Key == "file-Status") theFile.Status = enumer.Current.Value;
+                else if (enumer.Current.Key == "file-Owner") theFile.Owner = enumer.Current.Value;
                 else if (enumer.Current.Key == "error") errorInformation = enumer.Current.Value;
             }
+            theFile.Key = theFile.NameSpace + "::" + theFile.Name + "." + theFile.Version;
         }
 
-        public void getAllRecordInfo(List<FileComplex> repoRecords)
+        public void getAllRecordInfo(HashSet<FileComplex> repoRecords)
         {
             allRecords = repoRecords;
         }
-        public void Window_Loaded(object sender, RoutedEventArgs e)
+
+        public void getAllCategories(HashSet<string> repoCategories)
+        {
+            allCategories = repoCategories;
+        }
+        private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             loadFileCode();
             loadFileInformation();
             loadFileDependencies();
             loadFileCategories();
-            
+            applyChanges.IsEnabled = false;
         }
-        private FileComplex theFile = new FileComplex();
-        private string filePath;
-        private string errorInformation;
-        private List<FileComplex> allRecords;
+        
 
         private string[] stringToArray(string toConvert)
         {
@@ -81,12 +92,13 @@ namespace GUI
 
         private void loadFileInformation()
         {
-            basicDataList.Items.Add(new KeyValuePair("Namespace", theFile.NameSpace));
-            basicDataList.Items.Add(new KeyValuePair("Name", theFile.Name));
-            basicDataList.Items.Add(new KeyValuePair("Version", theFile.Version));
-            basicDataList.Items.Add(new KeyValuePair("Description", theFile.Description));
-            basicDataList.Items.Add(new KeyValuePair("Last Modified", theFile.DateTime));
-            basicDataList.Items.Add(new KeyValuePair("Status", theFile.Status));
+            basicDataList.Items.Add(new KeyValuePair("Namespace", theFile.NameSpace, false));
+            basicDataList.Items.Add(new KeyValuePair("Name", theFile.Name, false));
+            basicDataList.Items.Add(new KeyValuePair("Status", theFile.Status, false));
+            basicDataList.Items.Add(new KeyValuePair("Owner", theFile.Owner, false));
+            basicDataList.Items.Add(new KeyValuePair("Version", theFile.Version, false));
+            basicDataList.Items.Add(new KeyValuePair("Last Modified", theFile.DateTime, false));
+            description.Text = theFile.Description;
         }
 
         private void loadFileDependencies()
@@ -94,11 +106,103 @@ namespace GUI
             foreach(FileComplex item in allRecords)
             {
                 if (item.NameSpace == theFile.NameSpace && item.Name == theFile.Name) continue;
+                item.IsChecked = false;
+                foreach (string dependencies in theFile.Dependencies)
+                {
+                    if (dependencies == item.NameSpace + "::" + item.Name + "." + item.Version) { item.IsChecked = true; }
+                }
                 allRecordBriefList.Items.Add(item);
             }
         }
 
         private void loadFileCategories()
+        {
+            foreach(string item in allCategories)
+            {
+                KeyValuePair toAdd = new KeyValuePair("", item);
+                foreach(string category in theFile.Categories)
+                {
+                    if(category == item)
+                    {
+                        toAdd.IsChecked = true;
+                    }
+                }
+                allCategoryList.Items.Add(toAdd);
+            }
+        }
+
+        private void addDependency(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = sender as CheckBox;
+            string toAdd = selected.Tag.ToString();
+            selectedDependencies.Add(toAdd);
+            applyChanges.IsEnabled = true;
+        }
+
+        private void removeDependency(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = sender as CheckBox;
+            string toRemove= selected.Tag.ToString();
+            selectedCategories.Remove(toRemove);
+            applyChanges.IsEnabled = true;
+        }
+
+        private void addCategory(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = sender as CheckBox;
+            string toAdd = selected.Tag.ToString();
+            selectedCategories.Add(toAdd);
+            applyChanges.IsEnabled = true;
+        }
+
+        private void removeCategory(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = sender as CheckBox;
+            string toRemove = selected.Tag.ToString();
+            selectedCategories.Remove(toRemove);
+            applyChanges.IsEnabled = true;
+        }
+
+        private void applyDependencies_Click(object sender, RoutedEventArgs e)
+        {
+            List<string> result = new List<string>();
+            foreach (string item in selectedDependencies)
+            {
+                result.Add(item);
+            }
+            theFile.Dependencies = result.ToArray();
+        }
+
+        private void applyCategories_Click(object sender, RoutedEventArgs e)
+        {
+            List<string> result = new List<string>();
+            foreach (string item in selectedCategories)
+            {
+                result.Add(item);
+            }
+            theFile.Dependencies = result.ToArray();
+        }
+
+        //private void basicDataListItem_DoubleClick(object sender, RoutedEventArgs e)
+        //{
+        //    //ListViewItem selected = sender as ListViewItem;
+        //    KeyValuePair selected = basicDataList.SelectedItem as KeyValuePair;
+        //    string theKey = selected.Key;
+        //    string theValue = selected.Value;
+        //    if (theKey == "Name" || theKey == "Namespace") return;
+        //    KeyValuePopup editPopup = new KeyValuePopup();
+        //    editPopup.getKey(theKey);
+        //    editPopup.getValue(theValue);
+        //    editPopup.submitResult += submission =>
+        //    {
+        //        selected = submission;
+        //        Console.Write(selected.Key + ": " + selected.Value);
+        //    };
+        //    editPopup.Owner = this;
+        //    editPopup.Show();
+        //}
+
+        private void submitFileComplex(object sender, RoutedEventArgs e)
         {
 
         }

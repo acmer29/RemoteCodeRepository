@@ -64,43 +64,36 @@ namespace SWRTB {
 			(dwAttrib & FILE_ATTRIBUTE_DIRECTORY) != 0);
 	}
 
-	// -----< nameCleaner: Remove the "nameSpace::" from the nameSpace::fileName >-----
-	inline std::string nameCleaner(const std::string& NSNFileName) {
-		size_t start = 0, end = NSNFileName.length() - 1;
-		while (start != end) {
-			if (NSNFileName[start] == ':' && NSNFileName[start + 1] != ':') {
-				start += 1;
-				break;
-			}
-			else start += 1;
-		}
-		return NSNFileName.substr(start, NSNFileName.length());
-	} 
-
-	// -----< nameCleanerPlus: Remove the "nameSpace::" as well as ".version" from the nameSpace::fileName.version >-----
-	inline std::string nameCleanerPlus(const std::string& NSNFileNameVersion) {
-		std::string intermediate = nameCleaner(NSNFileNameVersion);
-		size_t last = intermediate.length() - 1;
-		while (last >= 0) {
-			if (intermediate[last] == '.') {
-				break;
-			}
-			last -= 1;
-		}
-		return intermediate.substr(0, last);
+	// -----< canTouch: Check if the person wants to checkin / checkout is the owner of the file >-----
+	// -----< This function is the ownership policy >--------------------------------------------------
+	inline bool canTouch(const std::string& fileOwner, const std::string& requestor) {
+		if (requestor == "$") return true;
+		if (fileOwner == "Anonymous") return true;
+		if (requestor == "Administrator") return true;
+		else return (fileOwner == requestor);
 	}
 
-	// -----< namespaceOf: Return the "nameSpace" from the nameSpace::fileName >-----
-	inline std::string namespaceOf(const std::string& NSNFileName) {
-		size_t start = 0, end = NSNFileName.length() - 1;
-		while (start != end) {
-			if (NSNFileName[start] == ':' && NSNFileName[start + 1] != ':') {
-				break;
+	inline std::string nameOf(const std::string& NSFileNameVersion, const std::string& NS = "") {
+		if (NSFileNameVersion.length() == 0) return NSFileNameVersion;
+		size_t index = 0;
+		std::string result = "";
+		if(NS != "") while (NS[index] == NSFileNameVersion[index]) { index++; }
+		if (NSFileNameVersion[0] == '_') result = NSFileNameVersion.substr(index + 1, NSFileNameVersion.length());
+		else if (NSFileNameVersion[0] == ':') result = NSFileNameVersion.substr(index + 2, NSFileNameVersion.length());
+		else return NSFileNameVersion;
+		for (index = result.length() - 1; index >= 1; --index) {
+			if (result[index] >= '0' && result[index] <= '9' && result[index - 1] == '.') {
+				return result.substr(0, index - 1);
 			}
-			else start += 1;
 		}
-		if (start == 0) return "";
-		return NSNFileName.substr(0, start - 1);
+		return result;
+	}
+
+	inline std::string versionOf(const std::string& NSFileNameVersion) {
+		std::string::size_type toReplace = NSFileNameVersion.find_last_of(".");
+		if (toReplace == std::string::npos) return "";
+		else if (NSFileNameVersion[toReplace + 1] > '9' || NSFileNameVersion[toReplace + 1] < '0') return "";
+		else return NSFileNameVersion.substr(toReplace + 1, NSFileNameVersion.length());
 	}
 
 	// -----< nameConcater: Concate the nameSpace with fileName by seperator >------------------------------------------------
@@ -126,7 +119,7 @@ namespace SWRTB {
 		return result.replace(toReplace, 2, "_");
 	}
 
-	// -----< copyFile: copy "path/from/source/file.ext" to "path/to/target/file.ext" >-----
+	// -----< copyFile: copy "path/to/source/file.ext" to "path/to/target/file.ext" >-----
 	inline void copyFile(const std::string& fromPathFileName, const std::string& toPathFileName) {
 		if (fromPathFileName == toPathFileName) return;
 		FileSystem::File me(fromPathFileName);
@@ -144,50 +137,6 @@ namespace SWRTB {
 		else throw std::exception("CopyFile: Bad state of target file.\n");
 	}
 
-	// -----< pathNSPFileNameVersionOf: Returns the path part of the payLoad of a DB record >-----
-	inline std::string pathNSPFileNameVersionOf(const std::string& payLoad) {
-		size_t index = payLoad.find('$');
-		if (index == std::string::npos) throw::std::exception("pathNSPFileNameVersionOf: Cannot find the $ seperator.\n");
-		return payLoad.substr(0, index);
-	}
-
-	// -----< versionOf: Returns the version part of the name of a DB record >-----
-	inline std::string versionOf(const std::string& NSFileNameVersion) {
-		size_t last = NSFileNameVersion.length() - 1;
-		while (last >= 0) {
-			if (NSFileNameVersion[last] == '.') {
-				break;
-			}
-			last -= 1;
-		}
-		return NSFileNameVersion.substr(last + 1, NSFileNameVersion.length());
-	}
-
-	// -----< modeOf: Returns the mode / status of the payLoad of a DB record >-----
-	inline std::string modeOf(const std::string& payLoad) {
-		size_t index = payLoad.find('$');
-		if (index == std::string::npos) throw::std::exception("modeOf: Cannot find the $ seperator.\n");
-		return payLoad.substr(index + 1, payLoad.length());
-	}
-
-	// -----< changeFileMode: Changes the mode of a file from current mode to newMode >--------
-	inline std::string changeFileMode(const std::string& payLoad, const std::string& newMode) {
-		size_t index = payLoad.find('$');
-		if (index != std::string::npos)
-			return pathNSPFileNameVersionOf(payLoad) + "$" + newMode;
-		else return payLoad + "$" + newMode;
-	}
-
-	// -----< checkFileMode: Returns the mode of a file by accepting its Db record's payLoad >-----
-	inline bool checkFileMode(const std::string& payLoad, const std::string& toCheck) {
-		size_t i = payLoad.length() - 1, j = toCheck.length() - 1;
-		while (j != 0) {
-			if (payLoad[i] != toCheck[j]) return false;
-			i -= 1, j -= 1;
-		}
-		return true;
-	}
-
 	inline void displayCore(const std::vector<NoSqlDb::DbElement<std::string>>& result, std::ostream& out = std::cout) {
 		NoSqlDb::showHeader();
 		for (auto iter = result.begin(); iter != result.end(); iter++) {
@@ -195,7 +144,10 @@ namespace SWRTB {
 			out << std::setw(26) << std::left << std::string((*iter).dateTime());
 			out << std::setw(10) << std::left << (*iter).name();
 			out << std::setw(25) << std::left << (*iter).descrip();
-			out << std::setw(25) << std::left << pathNSPFileNameVersionOf((*iter).payLoad());
+			out << std::setw(25) << std::left << (*iter).nameSpace();
+			out << std::setw(25) << std::left << (*iter).status();
+			out << std::setw(25) << std::left << (*iter).owner();
+			out << std::setw(25) << std::left << (*iter).payLoad();
 			if ((*iter).children().size() > 0)
 			{
 				out << "\n    dependencies: ";
@@ -208,7 +160,6 @@ namespace SWRTB {
 				for (auto key : (*iter).category())
 					out << " " << key;
 			}
-			out << "\n    status: " << modeOf((*iter).payLoad());
 		}
 		out << std::endl;
 		return;

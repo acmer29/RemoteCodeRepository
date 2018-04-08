@@ -31,12 +31,16 @@ namespace GUI
         }
 
         private Stack<string> pathStack_ = new Stack<string>();
-        private Translater translater;
-        private CsEndPoint endPoint_;
+        private Translater translater = new Translater();
+        private CsEndPoint endPoint_ = new CsEndPoint();
+        private CsEndPoint serverEndPoint = new CsEndPoint();
         private Thread rcvThrd = null;
         private Dictionary<string, Action<CsMessage>> dispatcher_
           = new Dictionary<string, Action<CsMessage>>();
-        private List<FileComplex> repoRecords = new List<FileComplex>();
+        private HashSet<FileComplex> repoRecords = new HashSet<FileComplex>();
+        private HashSet<string> repoCategories = new HashSet<string>();
+        private HashSet<string> checkInDependencies = new HashSet<string>();
+        private HashSet<string> checkInCategories = new HashSet<string>();
 
         //----< process incoming messages on child thread >--------------------
         //----< This function process the message coming from server side >----
@@ -71,6 +75,7 @@ namespace GUI
             listContentsHandler();
             showFileHandler();
             trackAllRecordsCallbackHandler();
+            trackAllCategoriesCallbackHandler();
         }
 
         private void debugDisplay(CsMessage msg, String direction)
@@ -95,7 +100,46 @@ namespace GUI
             result.Name = infoBriefComplex[1];
             result.Version = infoBriefComplex[2];
             result.Status = infoBriefComplex[3];
+            result.Key = result.NameSpace + "::" + result.Name + "." + result.Version;
             return result;
+        }
+
+        private string hashSetToString(HashSet<string> toConvert)
+        {
+            string result = "";
+            foreach (string item in toConvert)
+            {
+                result += item + ",";
+            }
+            return result.Substring(0, result.Length - 1); 
+        }
+
+        private void addDependency(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = sender as CheckBox;
+            string toAdd = selected.Tag.ToString();
+            checkInDependencies.Add(toAdd);
+        }
+
+        private void removeDependency(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = sender as CheckBox;
+            string toRemove = selected.Tag.ToString();
+            checkInDependencies.Remove(toRemove);
+        }
+
+        private void addCategory(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = sender as CheckBox;
+            string toAdd = selected.Tag.ToString();
+            checkInCategories.Add(toAdd);
+        }
+
+        private void removeCategory(object sender, RoutedEventArgs e)
+        {
+            CheckBox selected = sender as CheckBox;
+            string toRemove = selected.Tag.ToString();
+            checkInCategories.Remove(toRemove);
         }
 
         private void populateCheckInDependencyListView()
@@ -103,6 +147,15 @@ namespace GUI
             foreach(FileComplex item in repoRecords)
             {
                 checkInDependencyList.Items.Add(item);
+            }
+        }
+
+        private void populateCheckInCategoryListView()
+        {
+            foreach (string item in repoCategories)
+            {
+                KeyValuePair toAdd = new KeyValuePair("", item);
+                checkinCategoryList.Items.Add(toAdd);
             }
         }
 
@@ -159,14 +212,11 @@ namespace GUI
         private void showFileWindowPopup(CsMessage msg)
         {
             fileWindow popUp = new fileWindow();
-            var enumer = msg.attributes.GetEnumerator();
             popUp.getFileInfo(msg);
             popUp.getAllRecordInfo(repoRecords);
-            Console.Write("\n I want to pop up !");
+            popUp.getAllCategories(repoCategories);
+            popUp.Owner = this;
             popUp.Show();
-
-            //popUp.fileCode.Blocks.Add(paragraph);
-            
         }
 
         //----< add client processing for message with key >---------------
@@ -280,7 +330,13 @@ namespace GUI
         {
             Action<CsMessage> checkinCallback = (CsMessage receiveMessage) =>
             {
-                receiveMessage.show();
+                string errorInfo = "Your file has been successfully checked in";
+                var enumer = receiveMessage.attributes.GetEnumerator();
+                while (enumer.MoveNext())
+                {
+                    if (enumer.Current.Key == "errorInfo") errorInfo = enumer.Current.Value;
+                }
+                MessageBoxResult result = MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
             };
             registerHandler("checkinCallback", checkinCallback);
         }
@@ -289,20 +345,47 @@ namespace GUI
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = "localhost";
             serverEndPoint.port = 8080;
+            System.IO.FileInfo sourceFileInfo = new System.IO.FileInfo(pathFileName.Text);
+            string fileName = pathFileName.Text.Substring(pathFileName.Text.LastIndexOf("\\") + 1);
+            System.IO.File.Copy(pathFileName.Text, "../SendFiles/" + fileName, true);
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
-            message.add("file", "server.js");
+            message.add("file", fileName);
             message.add("name", "Checkin File");
             message.add("command", "fileCheckin");
-            System.IO.FileInfo file = new System.IO.FileInfo("D:/Spring2018/cse687/RemoteRepository/server.js");
-            message.add("content-length", file.Length.ToString());
+            message.add("content-length", sourceFileInfo.Length.ToString());
+            message.add("description", description.Text);
+            message.add("dependencies", hashSetToString(checkInDependencies));
+            message.add("categories", hashSetToString(checkInCategories));
+            message.add("nameSpace", nameSpace.Text);
+            message.add("owner", theUser.Text);
+            message.add("close", closeCheckIn.IsChecked.ToString().ToLower());
             Action<CsMessage> debug = (CsMessage msg) =>
             {
                 debugDisplay(msg, "send");
             };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
+        }
+
+        private void Check_In_Cancel_Click(object sender, RoutedEventArgs e)
+        {
+            pathFileName.Text = "";
+            description.Text = "";
+            checkinCategoryList.Items.Clear();
+            checkInDependencyList.Items.Clear();
+            Action updateCheckInCategoryList = () =>
+            {
+                populateCheckInCategoryListView();
+            };
+            Dispatcher.Invoke(updateCheckInCategoryList, new Object[] { });
+            Action updateCheckInDependencyList = () =>
+            {
+                populateCheckInDependencyListView();
+            };
+            Dispatcher.Invoke(updateCheckInDependencyList, new Object[] { });
+            closeCheckIn.IsChecked = false;
         }
 
         private void checkoutCallbackHandler()
@@ -329,6 +412,45 @@ namespace GUI
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
             message.add("command", "fileCheckout");
+            Action<CsMessage> debug = (CsMessage msg) =>
+            {
+                debugDisplay(msg, "send");
+            };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+        }
+
+        private void trackAllCategoriesCallbackHandler()
+        {
+            Action<CsMessage> trackAllCategoriesCallback = (CsMessage receiveMessage) =>
+            {
+                repoCategories.Clear();
+                var enumer = receiveMessage.attributes.GetEnumerator();
+                while (enumer.MoveNext())
+                {
+                    if (enumer.Current.Key.Contains("category"))
+                    {
+                        repoCategories.Add(enumer.Current.Value);
+                    }
+                }
+                Action updateCheckInCategoryList = () =>
+                {
+                    populateCheckInCategoryListView();
+                };
+                Dispatcher.Invoke(updateCheckInCategoryList, new Object[] { });
+            };
+            registerHandler("trackAllCategoriesCallback", trackAllCategoriesCallback);
+        }
+
+        private void trackAllCategoriesHandler()
+        {
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "trackAllCategories");
             Action<CsMessage> debug = (CsMessage msg) =>
             {
                 debugDisplay(msg, "send");
@@ -388,11 +510,15 @@ namespace GUI
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
-            endPoint_ = new CsEndPoint();
             endPoint_.machineAddress = "localhost";
             endPoint_.port = 8082;
-            translater = new Translater();
             translater.listen(endPoint_);
+
+            userName.Text = "Administrator";
+            theUser.Text = "Administrator";
+            serverAddress.Text = "localhost";
+            sendPort.Text = "8080";
+            receivePort.Text = "8082";
 
             processMessages();
 
@@ -416,6 +542,9 @@ namespace GUI
             };
             Dispatcher.Invoke(debug, new Object[] { message });
             message.overRide("command", "trackAllRecords");
+            translater.postMessage(message);
+            Dispatcher.Invoke(debug, new Object[] { message });
+            message.overRide("command", "trackAllCategories");
             translater.postMessage(message);
             Dispatcher.Invoke(debug, new Object[] { message });
         }

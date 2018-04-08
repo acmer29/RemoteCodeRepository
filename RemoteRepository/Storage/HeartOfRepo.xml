@@ -14,8 +14,17 @@
       </children>
       <payLoads>
         <payLoad>
-          ../DemoCheckin/DbCore_DbCore.h.1$closed
+          ../DemoCheckin/DbCore_DbCore.h.1
         </payLoad>
+        <status>
+          closed
+        </status>
+        <owner>
+          Tianyu
+        </owner>
+        <nameSpace>
+          DbCore
+        </nameSpace>
         <categories>
           <category>
             DbCore
@@ -43,14 +52,58 @@
       </children>
       <payLoads>
         <payLoad>
-          ../DemoCheckin/DbCore_DbCore.cpp.1$closed
+          ../DemoCheckin/DbCore_DbCore.cpp.1
         </payLoad>
+        <status>
+          closed
+        </status>
+        <owner>
+          Tianyu
+        </owner>
+        <nameSpace>
+          DbCore
+        </nameSpace>
         <categories>
           <category>
             DbCore
           </category>
           <category>
             Project 1
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        Server::RemoteRepository.h.1
+      </name>
+      <description>
+        Header file of project 4
+      </description>
+      <dateTime>
+        Sat Apr  7 23:53:27 2018
+      </dateTime>
+      <children>
+        <childName>
+          DbCore::DbCore::DbCore.h.1.1
+        </childName>
+      </children>
+      <payLoads>
+        <payLoad>
+          ../Storage/Server_RemoteRepository.h.1
+        </payLoad>
+        <status>
+          open
+        </status>
+        <owner>
+          Administrator
+        </owner>
+        <nameSpace>
+          Server
+        </nameSpace>
+        <categories>
+          <category>
+            header
           </category>
         </categories>
       </payLoads>
@@ -72,8 +125,17 @@
       </children>
       <payLoads>
         <payLoad>
-          ../DemoCheckin/SWRTB_SWRepoCore.h.1$closed
+          ../DemoCheckin/SWRTB_SWRepoCore.h.1
         </payLoad>
+        <status>
+          closed
+        </status>
+        <owner>
+          Administrator
+        </owner>
+        <nameSpace>
+          SWRTB
+        </nameSpace>
         <categories>
           <category>
             Core
@@ -101,8 +163,17 @@
       </children>
       <payLoads>
         <payLoad>
-          ../DemoCheckin/DbCore_DbCore.h.2$open
+          ../DemoCheckin/DbCore_DbCore.h.2
         </payLoad>
+        <status>
+          open
+        </status>
+        <owner>
+          Tianyu
+        </owner>
+        <nameSpace>
+          DbCore
+        </nameSpace>
         <categories>
           <category>
             DbCore
@@ -130,8 +201,17 @@
       </children>
       <payLoads>
         <payLoad>
-          ../DemoCheckin/SWRTB_SWRepoCore.cpp.1$closed
+          ../DemoCheckin/SWRTB_SWRepoCore.cpp.1
         </payLoad>
+        <status>
+          closed
+        </status>
+        <owner>
+          Administrator
+        </owner>
+        <nameSpace>
+          SWRTB
+        </nameSpace>
         <categories>
           <category>
             Core
@@ -141,6 +221,41 @@
           </category>
           <category>
             source
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        Server::RemoteRepository.cpp.1
+      </name>
+      <description>
+        source file of project 4
+      </description>
+      <dateTime>
+        Sat Apr  7 22:31:00 2018
+      </dateTime>
+      <children>
+        <childName>
+          DbCore::DbCore::DbCore.h.1.1
+        </childName>
+      </children>
+      <payLoads>
+        <payLoad>
+          ../Storage/Server_RemoteRepository.cpp.1
+        </payLoad>
+        <status>
+          open
+        </status>
+        <owner>
+          Administrator
+        </owner>
+        <nameSpace>
+          Server
+        </nameSpace>
+        <categories>
+          <category>
+            Project2
           </category>
         </categories>
       </payLoads>

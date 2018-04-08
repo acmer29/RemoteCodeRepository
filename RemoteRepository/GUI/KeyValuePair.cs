@@ -6,13 +6,20 @@ using System.Threading.Tasks;
 
 namespace GUI
 {
-    class KeyValuePair
+    public class KeyValuePair
     {
-        public KeyValuePair() { }
+        public KeyValuePair() { isChecked = false; }
         public KeyValuePair(string key, string val)
         {
             this.key = key;
             this.val = val;
+            this.isChecked = false;
+        }
+        public KeyValuePair(string key, string val, bool isChecked)
+        {
+            this.key = key;
+            this.val = val;
+            this.isChecked = isChecked;
         }
         public string Key
         {
@@ -24,7 +31,13 @@ namespace GUI
             get { return val; }
             set { val = value; }
         }
+        public bool IsChecked
+        {
+            get { return isChecked; }
+            set { isChecked = value; }
+        }
         private string key;
         private string val;
+        private bool isChecked;
     }
 }
