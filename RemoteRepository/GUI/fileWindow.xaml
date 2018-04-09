@@ -6,7 +6,14 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Title="fileWindow" Height="600" Width="800" Loaded="Window_Loaded" FontFamily="tahoma">
-    <Grid>
+	<!-- 
+    ///////////////////////////////////////////////////////////////////////
+    // fileWindow.xaml - GUI for popup fileWindow                        //
+    // ver 1.0                                                           //
+    // Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018           //
+    ///////////////////////////////////////////////////////////////////////
+    -->
+	<Grid>
 		<Grid.ColumnDefinitions>
 			<ColumnDefinition Width="1*"></ColumnDefinition>
 			<ColumnDefinition Width="5"></ColumnDefinition>

@@ -1,4 +1,37 @@
-﻿using System;
+﻿///////////////////////////////////////////////////////////////////////
+// MainWindow.xaml.cs - GUI for RemoteRepository                     //
+// ver 1.0                                                           //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018           //
+///////////////////////////////////////////////////////////////////////
+/*
+ * Package Operations:
+ * -------------------
+ * This package provides a WPF-based GUI for Project3HelpWPF demo.  It's 
+ * responsibilities are to:
+ * - Provide a display of directory contents of a remote ServerPrototype.
+ * - It provides a subdirectory list and a filelist for the selected directory.
+ * - You can navigate into subdirectories by double-clicking on subdirectory
+ *   or the parent directory, indicated by the name "..".
+ *   
+ * Required Files:
+ * ---------------
+ * Mainwindow.xaml, MainWindow.xaml.cs
+ * FileComplex.cs
+ * KeyValuePair.cs
+ * fileWindow.xaml, fileWindow.xaml.cs
+ * Translater.dll
+ * 
+ * Maintenance History:
+ * --------------------
+ * ver 1.0 : 30 Mar 2018
+ * - first release
+ * 
+ */
+
+// Translater has to be statically linked with CommLibWrapper
+// - loader can't find Translater.dll dependent CommLibWrapper.dll
+
+using System;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,15 +52,15 @@ using MsgPassingCommunication;
 
 namespace GUI
 {
-    /// <summary>
-    /// Interaction logic for MainWindow.xaml
-    /// </summary>
     public partial class MainWindow : Window
     {
         public MainWindow()
         {
             InitializeComponent();
-            Console.Title = "Client Console";
+            string[] args = Environment.GetCommandLineArgs();
+            argPort = args[2];
+            argUser = args[4];
+            Console.Title = "Client Console - User: " + argUser + " - Port: " + argPort;
         }
 
         private Stack<string> pathStack_ = new Stack<string>();
@@ -43,6 +76,8 @@ namespace GUI
         private HashSet<string> checkInCategories = new HashSet<string>();
         private List<string> successCheckouts = new List<string>();
         private List<string> failCheckouts = new List<string>();
+        private string argPort;
+        private string argUser;
 
         //----< process incoming messages on child thread >--------------------
         //----< This function process the message coming from server side >----
@@ -69,7 +104,7 @@ namespace GUI
             rcvThrd.Start();
         }
 
-        // Register
+        // -----< eventRegisterInitialization: Register the callback handler Actions >-----
         private void eventRegisterInitialization()
         {
             checkinCallbackHandler();
@@ -83,6 +118,7 @@ namespace GUI
             browseDescriptionCallbackHandler();
         }
 
+        // -----< debugDisply: Display messages in the debug message tab >-----
         private void debugDisplay(CsMessage msg, String direction)
         {
             String toDisplay = "";
@@ -97,6 +133,7 @@ namespace GUI
             else if (direction == "receive") ReceiveMessageDebugView.Items.Insert(0, toDisplay);
         }
 
+        // -----< fileInfoBriefAssembler: Assemble the file brief >-----
         private FileComplex fileInfoBriefAssembler(string recordBrief)
         {
             FileComplex result = new FileComplex();
@@ -110,6 +147,7 @@ namespace GUI
             return result;
         }
 
+        // -----< hashSetToString: Convert hashSet to string >-----
         private string hashSetToString(HashSet<string> toConvert)
         {
             string result = "";
@@ -120,6 +158,7 @@ namespace GUI
             return result.Substring(0, result.Length - 1); 
         }
 
+        // -----< addDependency: Add dependency to checkin item >-----
         private void addDependency(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
@@ -127,6 +166,7 @@ namespace GUI
             checkInDependencies.Add(toAdd);
         }
 
+        // -----< removeDependency: Remove dependency from checkin item >-----
         private void removeDependency(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
@@ -134,6 +174,7 @@ namespace GUI
             checkInDependencies.Remove(toRemove);
         }
 
+        // -----< addCategory: Add category to checkin item >-----
         private void addCategory(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
@@ -141,6 +182,7 @@ namespace GUI
             checkInCategories.Add(toAdd);
         }
 
+        // -----< removeCategory: Remove category from checkin item >-----
         private void removeCategory(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
@@ -148,6 +190,7 @@ namespace GUI
             checkInCategories.Remove(toRemove);
         }
 
+        // -----< populateCheckInDependencyListView: Populate checkin dependency ListView >-----
         private void populateCheckInDependencyListView()
         {
             foreach(FileComplex item in repoRecords)
@@ -157,6 +200,7 @@ namespace GUI
             }
         }
 
+        // -----< populateCheckInCategoryListView: Populate checkin category ListView >-----
         private void populateCheckInCategoryListView()
         {
             foreach (string item in repoCategories)
@@ -166,12 +210,14 @@ namespace GUI
             }
         }
 
+        // -----< lastFilter: Remove "/" from the last of the string >----- 
         private string lastFilter(string path)
         {
             if (path[path.Length - 1] == '/') return path.Substring(0, path.Length - 1);
             else return path;
         }
 
+        // -----< changeDir: Change directory according to the path value >-----
         private string changeDir(string path)
         {
             string modifiedPath = path;
@@ -180,12 +226,13 @@ namespace GUI
             return modifiedPath;
         }
 
+        // -----< clearDirs: Clear out the directory value >-----
         private void clearDirs()
         {
             browseList.Items.Clear();
         }
 
-        //----< function dispatched by child thread to main thread >-------
+        // ----< addDir: Function dispatched by child thread to main thread >-----
         private void addDir(string dirComplex)
         {
             string[] dirs = dirComplex.Split('$');
@@ -195,7 +242,7 @@ namespace GUI
                 
         }
 
-        //----< function dispatched by child thread to main thread >-------
+        // ----< addFile: Function dispatched by child thread to main thread >-----
         private void addFile(string fileComplex)
         {
             string[] files = fileComplex.Split('$');
@@ -204,18 +251,19 @@ namespace GUI
             }
         }
 
-        //----< function dispatched by child thread to main thread >-------
+        // -----< addParent: Function dispatched by child thread to main thread >-----
         private void addParent()
         {
             browseList.Items.Insert(0, "..");
         }
 
-        //----< function dispatched by child thread to main thread >-------
+        // -----< clearFiles: Function dispatched by child thread to main thread >-----
         private void clearFiles()
         {
             browseList.Items.Clear();
         }
 
+        // -----< showFileWindowPopup: Popup the fileWindow >-----
         private void showFileWindowPopup(CsMessage msg)
         {
             fileWindow popUp = new fileWindow();
@@ -226,12 +274,13 @@ namespace GUI
             popUp.Show();
         }
 
-        //----< add client processing for message with key >---------------
+        // -----< registerHandler: Add client processing for message with key >-----
         private void registerHandler(string key, Action<CsMessage> clientProc)
         {
             dispatcher_[key] = clientProc;
         }
 
+        // -----< showFileHandler: Callback handler of showFile >-----
         private void showFileHandler()
         {
             Action<CsMessage> showFile = (CsMessage receiveMessage) =>
@@ -269,6 +318,7 @@ namespace GUI
             registerHandler("showFile", showFile);
         }
 
+        // -----< doDirs: Helper function of add directory >-----
         private void doDirs(string toDo)
         {
             Action<string> doDir = (string toAdd) => {
@@ -277,6 +327,7 @@ namespace GUI
             Dispatcher.Invoke(doDir, new Object[] { toDo });
         }
 
+        // -----< doFiles: Helper function of add files >-----
         private void doFiles(string toDo)
         {
             Action<string> doFile = (string toAdd) => {
@@ -285,6 +336,7 @@ namespace GUI
             Dispatcher.Invoke(doFile, new Object[] { toDo });
         }
 
+        // -----< doPathes: Helper function of add pathes >-----
         private void doPathes(string toDo)
         {
             Action<string> changeCurrentDir = (string path) =>
@@ -296,6 +348,7 @@ namespace GUI
             Dispatcher.Invoke(changeCurrentDir, new Object[] { toDo });
         }
 
+        // -----< listContentsHandler: Callback handler of listContents >-----
         private void listContentsHandler()
         {
             Action<CsMessage> listContent = (CsMessage receiveMessage) => {
@@ -316,6 +369,7 @@ namespace GUI
             registerHandler("listContent", listContent);
         }
 
+        // -----< browseList_DoubleClick: DoubleClick handler of browseList >-----
         private void browseList_DoubleClick(object sender, MouseButtonEventArgs e) {
             string selectedItem = (string)browseList.SelectedItem;
             Console.Write(selectedItem);
@@ -342,7 +396,7 @@ namespace GUI
             translater.postMessage(message);
         }
 
-        // -----< Receive checkin result from the server >-----
+        // -----< checkinCallbackHandler: Receive checkin result from the server >-----
         private void checkinCallbackHandler()
         {
             Action<CsMessage> checkinCallback = (CsMessage receiveMessage) =>
@@ -358,6 +412,8 @@ namespace GUI
             };
             registerHandler("checkinCallback", checkinCallback);
         }
+
+        // -----< Check_In_Click: Click handler of checkIn Button >-----
         private void Check_In_Click(object sender, RoutedEventArgs e)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -388,6 +444,7 @@ namespace GUI
             translater.postMessage(message);
         }
 
+        // -----< Check_In_Cancel_Click: Click handler of checkInCancel Button >-----
         private void Check_In_Cancel_Click(object sender, RoutedEventArgs e)
         {
             pathFileName.Text = "";
@@ -407,6 +464,7 @@ namespace GUI
             closeCheckIn.IsChecked = false;
         }
 
+        // -----< checkoutReceiveFileCallbackHandler: Callback handler of checkoutReceiveFileCallback >-----
         private void checkoutReceiveFileCallbackHandler()
         {
             Action<CsMessage> checkoutReceiveFilesCallback = (CsMessage receiveMessage) =>
@@ -423,6 +481,7 @@ namespace GUI
             registerHandler("checkoutReceiveFilesCallback", checkoutReceiveFilesCallback);
         }
 
+        // -----< checkoutReceiveFile: Send files for checking out >-----
         private void checkoutReceiveFile(List<string> toReceive)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -445,6 +504,7 @@ namespace GUI
             translater.postMessage(message);
         }
 
+        // -----< checkoutCallbackHandler: Callback handler of checkout >-----
         private void checkoutCallbackHandler()
         {
             Action<CsMessage> checkoutCallback = (CsMessage receiveMessage) =>
@@ -476,6 +536,7 @@ namespace GUI
             registerHandler("checkoutCallback", checkoutCallback);
         }
 
+        // -----< Check_Out_Click: Click handler of checkOut Button >-----
         private void Check_Out_Click(object sender, RoutedEventArgs e)
         {
             if (checkOutList.SelectedItems.Count == 0) return;
@@ -498,12 +559,14 @@ namespace GUI
             translater.postMessage(message);
         }
 
+        // -----< Change_CurrentUser: Click handler of User Login Botton >-----
         private void Change_CurrentUser(object sender, RoutedEventArgs e)
         {
             theUser.Text = userName.Text;
             return;
         }
 
+        // -----< trackAllCategoriesCallbackHandler: Callback handler of tracking all categories >-----
         private void trackAllCategoriesCallbackHandler()
         {
             Action<CsMessage> trackAllCategoriesCallback = (CsMessage receiveMessage) =>
@@ -526,6 +589,7 @@ namespace GUI
             registerHandler("trackAllCategoriesCallback", trackAllCategoriesCallback);
         }
 
+        // -----< trackAllCategoriesHandler: Send message of tracking all categories >-----
         private void trackAllCategoriesHandler()
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -543,6 +607,7 @@ namespace GUI
             translater.postMessage(message);
         }
 
+        // -----< trackAllRecordsCallbackHandler: Callback handler of tracking all records >-----
         private void trackAllRecordsCallbackHandler()
         {
             Action<CsMessage> trackAllRecordsCallback = (CsMessage receiveMessage) =>
@@ -565,6 +630,7 @@ namespace GUI
             registerHandler("trackAllRecordsCallback", trackAllRecordsCallback);
         }
 
+        // -----< trackFiles: Send message of trackFiles >-----
         private void trackFiles()
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -582,6 +648,7 @@ namespace GUI
             translater.postMessage(message);
         }
 
+        // -----< pingHandler: Handler of ping >-----
         private void pingHandler()
         {
             Action<CsMessage> ping = (CsMessage receiveMessage) =>
@@ -591,6 +658,7 @@ namespace GUI
             registerHandler("ping", ping);
         }
 
+        // -----< ping: Send message of ping >-----
         private void ping(string name)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -607,6 +675,7 @@ namespace GUI
             message.show();
         }
 
+        // -----< browseDescriptionCallbackHandler: Callback handler of browseDescription >-----
         private void browseDescriptionCallbackHandler()
         {
             Action<CsMessage> browseDescriptionCallback = (CsMessage receiveMessage) =>
@@ -616,6 +685,7 @@ namespace GUI
             registerHandler("browseDescriptionCallback", browseDescriptionCallback);
         }
 
+        // -----< browseDescription: Send message of browseDescription >-----
         private void browseDescription(string fileName)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -632,6 +702,7 @@ namespace GUI
             message.show();
         }
 
+        // -----< Open_FileForm: Popup the file browse form >-----
         private void Open_FileForm(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog();
@@ -642,6 +713,7 @@ namespace GUI
             }
         }
 
+        // -----< elementInitialize: Initialize all elements >-----
         private void elementInitialize()
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -665,17 +737,18 @@ namespace GUI
             Dispatcher.Invoke(debug, new Object[] { message });
         }
 
+        // -----< Window_Loaded: Load the mainWindow >-----
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             endPoint_.machineAddress = "localhost";
-            endPoint_.port = 8082;
+            endPoint_.port = int.Parse(argPort);
             translater.listen(endPoint_);
 
-            userName.Text = "Administrator";
-            theUser.Text = "Administrator";
+            userName.Text = argUser;
+            theUser.Text = argUser;
             serverAddress.Text = "localhost";
             sendPort.Text = "8080";
-            receivePort.Text = "8082";
+            receivePort.Text = endPoint_.port.ToString();
 
             processMessages();
 
@@ -685,6 +758,8 @@ namespace GUI
 
             testStub();
         }
+
+        // -----< testStub: Run all tests >-----
         private void testStub()
         {
             theTab.SelectedIndex = 4;
@@ -695,9 +770,10 @@ namespace GUI
             test3b();
             test3c();
             test3d();
-            test3f();
+            test3e();
         }
 
+        // -----< Demostration of requirement 1 >-----
         private void test1()
         {
             Console.Write("Demostration of Requirement 1.\n");
@@ -706,6 +782,7 @@ namespace GUI
             Console.Write("  PASSED -- Requirement 1\n\n");
         }
 
+        // -----< Demostration of requirement 2 >-----
         private void test2()
         {
             Console.Write("Demostration of Requirement 2.\n\n");
@@ -715,6 +792,7 @@ namespace GUI
             Console.Write("  PASSED -- Requirement 2\n\n");
         }
 
+        // -----< Demostration of requirement 3a >-----
         private void test3a()
         {
             Console.Write("Demostration of Requirement 3a.\n\n");
@@ -724,6 +802,7 @@ namespace GUI
             Console.Write("  PASSED -- Requirement 3a\n\n");
         }
 
+        // -----< Demostration of requirement 3b >-----
         private void test3b()
         {
             Console.Write("Demostration of Requirment 3b.\n\n");
@@ -738,6 +817,7 @@ namespace GUI
             Console.Write("  PASSED -- Requirement 3b\n\n");
         }
 
+        // -----< Demostration of requirement 3c >-----
         private void test3c()
         {
             Console.Write("Demostration of Requirement 3c.\n\n");
@@ -763,6 +843,7 @@ namespace GUI
             Console.Write("  PASSED -- Requirement 3c\n\n");
         }
 
+        // -----< Demostration of requirement 3d >-----
         private void test3d()
         {
             Console.Write("Demostration of Requirement 3d.\n\n");
@@ -772,7 +853,8 @@ namespace GUI
             Console.Write("  PASSED -- Requirement 3d\n\n");
         }
 
-        private void test3f()
+        // -----< Demostration of requirement 3e >-----
+        private void test3e()
         {
             Console.Write("Demostration of Requirement 3e.\n\n");
             Console.Write("===============================\n\n");

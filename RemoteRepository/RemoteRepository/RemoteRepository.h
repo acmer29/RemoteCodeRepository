@@ -1,8 +1,8 @@
 #pragma once
 ///////////////////////////////////////////////////////////////////////
-// ServerPrototype.h - Console App that processes incoming messages  //
+// RemoteRepository.h - Console App that processes incoming messages //
 // ver 1.0                                                           //
-// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2018         //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018           //
 ///////////////////////////////////////////////////////////////////////
 /*
 *  Package Operations:

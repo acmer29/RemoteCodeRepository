@@ -6,6 +6,13 @@
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
         Title="Gypsophila" Height="600" Width="607.5" Padding="20" Loaded="Window_Loaded" FontFamily="tahoma" Background="#ccc">
+	<!-- 
+    ///////////////////////////////////////////////////////////////////////
+    // MainWindow.xaml - GUI for RemoteRepository                        //
+    // ver 1.0                                                           //
+    // Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018           //
+    ///////////////////////////////////////////////////////////////////////
+    -->
 	<Grid>
 		<Grid.RowDefinitions>
 			<RowDefinition Height="*"/>
