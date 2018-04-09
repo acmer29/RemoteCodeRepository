@@ -58,8 +58,11 @@ namespace GUI
         {
             InitializeComponent();
             string[] args = Environment.GetCommandLineArgs();
-            argPort = args[2];
-            argUser = args[4];
+            for(int i = 1; i < args.Count(); i += 2) {
+                if (args[i] == "--u") argUser = args[i + 1];
+                else if (args[i] == "--p") argPort = args[i + 1];
+                else if (args[i] == "--d" && args[i + 1] == "true") isDebug = true;
+            }
             Console.Title = "Client Console - User: " + argUser + " - Port: " + argPort;
         }
 
@@ -76,8 +79,9 @@ namespace GUI
         private HashSet<string> checkInCategories = new HashSet<string>();
         private List<string> successCheckouts = new List<string>();
         private List<string> failCheckouts = new List<string>();
-        private string argPort;
-        private string argUser;
+        private string argPort = "8082";
+        private string argUser = "Administrator";
+        private bool isDebug = false;
 
         //----< process incoming messages on child thread >--------------------
         //----< This function process the message coming from server side >----
@@ -408,7 +412,8 @@ namespace GUI
                 {
                     if (enumer.Current.Key == "errorInfo" && enumer.Current.Value != "") errorInfo = enumer.Current.Value;
                 }
-                MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
+                if (isDebug == false)
+                    MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
             };
             registerHandler("checkinCallback", checkinCallback);
         }
@@ -519,18 +524,22 @@ namespace GUI
                 }
                 if (errorInfo != "") MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
                 else {
-                    MessageBoxResult result = MessageBox.Show("You are going to checkout " + successCheckouts.Count.ToString() + " files" + "\n" +
+                    if (isDebug == false)
+                    {
+                        MessageBoxResult result = MessageBox.Show("You are going to checkout " + successCheckouts.Count.ToString() + " files" + "\n" +
                                                                failCheckouts.Count.ToString() + " files cannot be checked out by you because you do not own them" + "\n" +
-                                                               "Click \"OK\" to proceed and \"Cancel\" to cancel" + "\n", "Checkout Files Confirmation", 
+                                                               "Click \"OK\" to proceed and \"Cancel\" to cancel" + "\n", "Checkout Files Confirmation",
                                                                MessageBoxButton.OKCancel, MessageBoxImage.Information);
-                    if(result == MessageBoxResult.OK)
-                    {
-                        checkoutReceiveFile(successCheckouts); failCheckouts.Clear();
+                        if (result == MessageBoxResult.OK)
+                        {
+                            checkoutReceiveFile(successCheckouts); failCheckouts.Clear();
+                        }
+                        else
+                        {
+                            successCheckouts.Clear(); failCheckouts.Clear();
+                        }
                     }
-                    else
-                    {
-                        successCheckouts.Clear(); failCheckouts.Clear();
-                    }
+                    else { checkoutReceiveFile(successCheckouts); failCheckouts.Clear(); }
                 }
             };
             registerHandler("checkoutCallback", checkoutCallback);
