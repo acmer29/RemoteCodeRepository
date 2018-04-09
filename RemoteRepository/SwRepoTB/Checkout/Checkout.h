@@ -39,13 +39,17 @@
 namespace SWRTB {
 	class Checkout {
 	public:
-		explicit Checkout(Core& target, const std::string&  = "Anonymous", const std::string& targetDirectory = "../repoCheckout/");
+		explicit Checkout(Core& target, const std::string& targetDirectory = "../repoCheckout/");
 
 		Checkout& relocateDirectory(const std::string& newDirectory);
 
 		Checkout& setRequestor(const std::string& requestor);
 
-		void checkout(const std::string& NSPfileNameVersion, bool recursive = true);
+		void checkout(const std::string& NSNFileNameVersion, const std::string& requestor, bool recursive = true);
+		void checkout(const std::string& NSNfileNameVersion, bool recursive = true);
+
+		std::vector<std::string> successCheckouts();
+		std::vector<std::string> failCheckouts();
 
 	private:
 		Core& repo;
@@ -66,6 +70,11 @@ namespace SWRTB {
 
 		// Helper functions
 		std::string removeVersion(const std::string& fileNameVersion);
+
+		// fileName Helpers
+		// NSPFileName manner
+		std::vector<std::string> successCheckoutFiles;
+		std::vector<std::string> failCheckoutFiles;
 
 	};
 }

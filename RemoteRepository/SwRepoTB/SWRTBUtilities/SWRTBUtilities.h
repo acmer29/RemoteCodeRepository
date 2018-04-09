@@ -76,11 +76,10 @@ namespace SWRTB {
 	inline std::string nameOf(const std::string& NSFileNameVersion, const std::string& NS = "") {
 		if (NSFileNameVersion.length() == 0) return NSFileNameVersion;
 		size_t index = 0;
-		std::string result = "";
-		if(NS != "") while (NS[index] == NSFileNameVersion[index]) { index++; }
-		if (NSFileNameVersion[0] == '_') result = NSFileNameVersion.substr(index + 1, NSFileNameVersion.length());
-		else if (NSFileNameVersion[0] == ':') result = NSFileNameVersion.substr(index + 2, NSFileNameVersion.length());
-		else return NSFileNameVersion;
+		std::string result = NSFileNameVersion;
+		if (NS != "") while (index < NS.length() && NS[index] == NSFileNameVersion[index]) { index++; }
+		if (NSFileNameVersion[index] == '_') result = NSFileNameVersion.substr(index + 1, NSFileNameVersion.length());
+		else if (NSFileNameVersion[index] == ':') result = NSFileNameVersion.substr(index + 2, NSFileNameVersion.length());
 		for (index = result.length() - 1; index >= 1; --index) {
 			if (result[index] >= '0' && result[index] <= '9' && result[index - 1] == '.') {
 				return result.substr(0, index - 1);

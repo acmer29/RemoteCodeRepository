@@ -97,6 +97,8 @@ namespace Repository
 		static Msg trackAllRecordsMessage(const EndPoint& from, const EndPoint& to);
 		static Msg trackAllCategoriesMessage(const EndPoint& from, const EndPoint& to);
 		static Msg checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage);
+		static Msg checkOutCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage);
+		void sendMultipleFiles(Msg message);
 
 	private:
 		MsgPassingCommunication::Comm comm_;
@@ -143,40 +145,35 @@ namespace Repository
 	}
 	//----< start processing messages on child thread >------------------
 
-	inline void Server::processMessages()
-	{
-		auto proc = [&]()
-		{
-			if (dispatcher_.size() == 0)
-			{
+	inline void Server::processMessages() {
+		auto proc = [&]() {
+			if (dispatcher_.size() == 0) {
 				std::cout << "\n  no server procs to call";
 				return;
 			}
-			while (true)
-			{
+			while (true) {
 				Msg msg = getMessage();
 				std::cout << "\n receive message name: " << msg.name() << " from " << msg.from().toString();
 				std::cout << "\n  received message command: " << msg.command() << " from " << msg.from().toString();
-				if (msg.command() == "") {
-					continue;
-				}
+				if (msg.command() == "") continue;
 				if (msg.containsKey("content-length") && msg.value("content-length") == "0") continue;
-				if (msg.containsKey("verbose"))
-				{
+				if (msg.containsKey("verbose")) {
 					std::cout << "\n";
 					msg.show();
 				}
-				if (msg.command() == "serverQuit")
-					break;
+				if (msg.command() == "serverQuit") break;
+				if (msg.command() == "sendMultipleFiles") {
+					sendMultipleFiles(msg);
+					continue;
+				}
 				Msg reply = dispatcher_[msg.command()](msg);
-				if (msg.to().port != msg.from().port)  // avoid infinite message loop
-				{
+				// avoid infinite message loop 
+				if (msg.to().port != msg.from().port) {
 					postMessage(reply);
 					msg.show();
 					reply.show();
 				}
-				else
-					std::cout << "\n  server attempting to post to self";
+				else std::cout << "\n  server attempting to post to self";
 			}
 			std::cout << "\n  server message processing thread is shutting down";
 		};

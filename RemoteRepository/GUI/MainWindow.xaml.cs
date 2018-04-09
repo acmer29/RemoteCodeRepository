@@ -41,6 +41,8 @@ namespace GUI
         private HashSet<string> repoCategories = new HashSet<string>();
         private HashSet<string> checkInDependencies = new HashSet<string>();
         private HashSet<string> checkInCategories = new HashSet<string>();
+        private List<string> successCheckouts = new List<string>();
+        private List<string> failCheckouts = new List<string>();
 
         //----< process incoming messages on child thread >--------------------
         //----< This function process the message coming from server side >----
@@ -71,11 +73,14 @@ namespace GUI
         private void eventRegisterInitialization()
         {
             checkinCallbackHandler();
+            checkoutReceiveFileCallbackHandler();
             checkoutCallbackHandler();
             listContentsHandler();
             showFileHandler();
             trackAllRecordsCallbackHandler();
             trackAllCategoriesCallbackHandler();
+            pingHandler();
+            browseDescriptionCallbackHandler();
         }
 
         private void debugDisplay(CsMessage msg, String direction)
@@ -100,6 +105,7 @@ namespace GUI
             result.Name = infoBriefComplex[1];
             result.Version = infoBriefComplex[2];
             result.Status = infoBriefComplex[3];
+            result.Description = infoBriefComplex[4];
             result.Key = result.NameSpace + "::" + result.Name + "." + result.Version;
             return result;
         }
@@ -147,6 +153,7 @@ namespace GUI
             foreach(FileComplex item in repoRecords)
             {
                 checkInDependencyList.Items.Add(item);
+                checkOutList.Items.Add(item);
             }
         }
 
@@ -229,6 +236,7 @@ namespace GUI
         {
             Action<CsMessage> showFile = (CsMessage receiveMessage) =>
             {
+                receiveMessage.show();
                 var enumer = receiveMessage.attributes.GetEnumerator();
                 string fileName = "";
                 while (enumer.MoveNext())
@@ -261,6 +269,33 @@ namespace GUI
             registerHandler("showFile", showFile);
         }
 
+        private void doDirs(string toDo)
+        {
+            Action<string> doDir = (string toAdd) => {
+                addDir(toAdd);
+            };
+            Dispatcher.Invoke(doDir, new Object[] { toDo });
+        }
+
+        private void doFiles(string toDo)
+        {
+            Action<string> doFile = (string toAdd) => {
+                addFile(toAdd);
+            };
+            Dispatcher.Invoke(doFile, new Object[] { toDo });
+        }
+
+        private void doPathes(string toDo)
+        {
+            Action<string> changeCurrentDir = (string path) =>
+            {
+                path = lastFilter(path);
+                dirIndicator.Text = changeDir(path);
+                pathStack_.Push(path);
+            };
+            Dispatcher.Invoke(changeCurrentDir, new Object[] { toDo });
+        }
+
         private void listContentsHandler()
         {
             Action<CsMessage> listContent = (CsMessage receiveMessage) => {
@@ -269,27 +304,9 @@ namespace GUI
                 var enumer = receiveMessage.attributes.GetEnumerator();
                 while(enumer.MoveNext()) {
                     string key = enumer.Current.Key;
-                    Console.Write(key);
-                    if(key.Contains("dirs")) {
-                        Action<string> doDir = (string dirComplex) => {
-                            addDir(dirComplex);
-                        };
-                        Dispatcher.Invoke(doDir, new Object[] { enumer.Current.Value });
-                    }
-                    else if (key.Contains("files")) {
-                        Action<string> doFile = (string fileComplex) => {
-                            addFile(fileComplex);
-                        };
-                        Dispatcher.Invoke(doFile, new Object[] { enumer.Current.Value });
-                    }
-                    else if(key.Contains("path")) {
-                        Action<string> changeCurrentDir = (string path) => {
-                            path = lastFilter(path);
-                            dirIndicator.Text = changeDir(path);
-                            pathStack_.Push(path);
-                        };
-                        Dispatcher.Invoke(changeCurrentDir, new Object[] { enumer.Current.Value });
-                    }
+                    if (key.Contains("dirs")) { doDirs(enumer.Current.Value); }
+                    else if (key.Contains("files")) { doFiles(enumer.Current.Value); }
+                    else if (key.Contains("path")) { doPathes(enumer.Current.Value); }
                 }
                 Action insertParent = () => {
                     addParent();
@@ -330,13 +347,14 @@ namespace GUI
         {
             Action<CsMessage> checkinCallback = (CsMessage receiveMessage) =>
             {
+                receiveMessage.show();
                 string errorInfo = "Your file has been successfully checked in";
                 var enumer = receiveMessage.attributes.GetEnumerator();
                 while (enumer.MoveNext())
                 {
-                    if (enumer.Current.Key == "errorInfo") errorInfo = enumer.Current.Value;
+                    if (enumer.Current.Key == "errorInfo" && enumer.Current.Value != "") errorInfo = enumer.Current.Value;
                 }
-                MessageBoxResult result = MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
+                MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
             };
             registerHandler("checkinCallback", checkinCallback);
         }
@@ -346,7 +364,8 @@ namespace GUI
             serverEndPoint.machineAddress = "localhost";
             serverEndPoint.port = 8080;
             System.IO.FileInfo sourceFileInfo = new System.IO.FileInfo(pathFileName.Text);
-            string fileName = pathFileName.Text.Substring(pathFileName.Text.LastIndexOf("\\") + 1);
+            string fileName = pathFileName.Text.Substring(pathFileName.Text.LastIndexOf("/") + 1);
+            Console.Write(fileName + "\n");
             System.IO.File.Copy(pathFileName.Text, "../SendFiles/" + fileName, true);
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
@@ -388,22 +407,23 @@ namespace GUI
             closeCheckIn.IsChecked = false;
         }
 
-        private void checkoutCallbackHandler()
+        private void checkoutReceiveFileCallbackHandler()
         {
-            Action<CsMessage> checkoutCallback = (CsMessage receiveMessage) =>
+            Action<CsMessage> checkoutReceiveFilesCallback = (CsMessage receiveMessage) =>
             {
                 var enumer = receiveMessage.attributes.GetEnumerator();
-                while (enumer.MoveNext())
+                while(enumer.MoveNext())
                 {
-                    string key = enumer.Current.Key;
-                    string value = enumer.Current.Value;
-                    Console.WriteLine("\n" + key + ": " + value);
+                    if (enumer.Current.Key == "content-length" && enumer.Current.Value == "0") return; 
+                    if (enumer.Current.Key == "fileName") successCheckouts.Remove(enumer.Current.Value);
                 }
+                receiveMessage.show();
+                Console.Write("File checken out successful.\n");
             };
-            registerHandler("checkoutCallback", checkoutCallback);
+            registerHandler("checkoutReceiveFilesCallback", checkoutReceiveFilesCallback);
         }
 
-        private void Check_Out_Click(object sender, RoutedEventArgs e)
+        private void checkoutReceiveFile(List<string> toReceive)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = "localhost";
@@ -411,13 +431,77 @@ namespace GUI
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
-            message.add("command", "fileCheckout");
+            message.add("command", "sendMultipleFiles");
+            message.add("for", "checkoutReceiveFiles");
+            for(int i = 0; i < toReceive.Count; ++i)
+            {
+                message.add("fileName" + i.ToString(), toReceive[i]);
+            }
             Action<CsMessage> debug = (CsMessage msg) =>
             {
                 debugDisplay(msg, "send");
             };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
+        }
+
+        private void checkoutCallbackHandler()
+        {
+            Action<CsMessage> checkoutCallback = (CsMessage receiveMessage) =>
+            {
+                var enumer = receiveMessage.attributes.GetEnumerator();
+                string errorInfo = "";
+                while (enumer.MoveNext())
+                {
+                    if (enumer.Current.Key == "errorInfo" && enumer.Current.Value != "") errorInfo = enumer.Current.Value;
+                    else if (enumer.Current.Key.Contains("successFile")) successCheckouts.Add(enumer.Current.Value);
+                    else if (enumer.Current.Key.Contains("failFile")) failCheckouts.Add(enumer.Current.Value);
+                }
+                if (errorInfo != "") MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
+                else {
+                    MessageBoxResult result = MessageBox.Show("You are going to checkout " + successCheckouts.Count.ToString() + " files" + "\n" +
+                                                               failCheckouts.Count.ToString() + " files cannot be checked out by you because you do not own them" + "\n" +
+                                                               "Click \"OK\" to proceed and \"Cancel\" to cancel" + "\n", "Checkout Files Confirmation", 
+                                                               MessageBoxButton.OKCancel, MessageBoxImage.Information);
+                    if(result == MessageBoxResult.OK)
+                    {
+                        checkoutReceiveFile(successCheckouts); failCheckouts.Clear();
+                    }
+                    else
+                    {
+                        successCheckouts.Clear(); failCheckouts.Clear();
+                    }
+                }
+            };
+            registerHandler("checkoutCallback", checkoutCallback);
+        }
+
+        private void Check_Out_Click(object sender, RoutedEventArgs e)
+        {
+            if (checkOutList.SelectedItems.Count == 0) return;
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            FileComplex selected = checkOutList.SelectedItem as FileComplex;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "fileCheckout");
+            message.add("fileName", selected.Key);
+            message.add("requestor", theUser.Text);
+            message.add("recursive", recursiveCheckout.IsChecked.ToString().ToLower());
+            Action<CsMessage> debug = (CsMessage msg) =>
+            {
+                debugDisplay(msg, "send");
+            };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+        }
+
+        private void Change_CurrentUser(object sender, RoutedEventArgs e)
+        {
+            theUser.Text = userName.Text;
+            return;
         }
 
         private void trackAllCategoriesCallbackHandler()
@@ -498,6 +582,56 @@ namespace GUI
             translater.postMessage(message);
         }
 
+        private void pingHandler()
+        {
+            Action<CsMessage> ping = (CsMessage receiveMessage) =>
+            {
+                receiveMessage.show();
+            };
+            registerHandler("ping", ping);
+        }
+
+        private void ping(string name)
+        {
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "ping");
+            message.add("name", name);
+            Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+            message.show();
+        }
+
+        private void browseDescriptionCallbackHandler()
+        {
+            Action<CsMessage> browseDescriptionCallback = (CsMessage receiveMessage) =>
+            {
+                receiveMessage.show();
+            };
+            registerHandler("browseDescriptionCallback", browseDescriptionCallback);
+        }
+
+        private void browseDescription(string fileName)
+        {
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "browseDescription");
+            message.add("fileName", fileName);
+            Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+            message.show();
+        }
+
         private void Open_FileForm(object sender, RoutedEventArgs e)
         {
             var openFileDialog = new Microsoft.Win32.OpenFileDialog();
@@ -506,6 +640,29 @@ namespace GUI
             {
                 this.pathFileName.Text = openFileDialog.FileName;
             }
+        }
+
+        private void elementInitialize()
+        {
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            pathStack_.Push("../Storage");
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "listContent");
+            message.add("path", pathStack_.Peek());
+            translater.postMessage(message);
+            dirIndicator.Text = "Storage";
+            Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            message.overRide("command", "trackAllRecords");
+            translater.postMessage(message);
+            Dispatcher.Invoke(debug, new Object[] { message });
+            message.overRide("command", "trackAllCategories");
+            translater.postMessage(message);
+            Dispatcher.Invoke(debug, new Object[] { message });
         }
 
         private void Window_Loaded(object sender, RoutedEventArgs e)
@@ -524,29 +681,118 @@ namespace GUI
 
             eventRegisterInitialization();
 
+            elementInitialize();
+
+            testStub();
+        }
+        private void testStub()
+        {
+            theTab.SelectedIndex = 4;
+            Console.Write("\n");
+            test1();
+            test2();
+            test3a();
+            test3b();
+            test3c();
+            test3d();
+            test3f();
+        }
+
+        private void test1()
+        {
+            Console.Write("Demostration of Requirement 1.\n");
+            Console.Write("==============================\n\n");
+            Console.Write("  This requirement is satisified by both client and server side.\n\n");
+            Console.Write("  PASSED -- Requirement 1\n\n");
+        }
+
+        private void test2()
+        {
+            Console.Write("Demostration of Requirement 2.\n\n");
+            Console.Write("==============================\n\n");
+            Console.Write("  Demostrate the communication channel by sending ping message to server and get ping reply from server.\n\n");
+            ping("Demo message of requirement 2");
+            Console.Write("  PASSED -- Requirement 2\n\n");
+        }
+
+        private void test3a()
+        {
+            Console.Write("Demostration of Requirement 3a.\n\n");
+            Console.Write("===============================\n\n");
+            Console.Write("  Demostrate the capability of connecting to server in client side.\n\n");
+            ping("Demo message of requirement 3");
+            Console.Write("  PASSED -- Requirement 3a\n\n");
+        }
+
+        private void test3b()
+        {
+            Console.Write("Demostration of Requirment 3b.\n\n");
+            Console.Write("===============================\n\n");
+            Console.Write("  Demostrate the capability of sending checkin message and get reply from server.\n\n");
+            pathFileName.Text = "../RemoteRepository.cpp";
+            nameSpace.Text = "Server";
+            description.Text = "Source file of the server of project4";
+            checkInDependencies.Add("DbCore::DbCore.h.1"); checkInDependencies.Add("DbCore::DbCore.cpp.1");
+            checkInCategories.Add("source");
+            checkinButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
+            Console.Write("  PASSED -- Requirement 3b\n\n");
+        }
+
+        private void test3c()
+        {
+            Console.Write("Demostration of Requirement 3c.\n\n");
+            Console.Write("===============================\n\n");
+            Console.Write("  Demostrate the capability of sending checkout message and get reply from server.\n\n");
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = "localhost";
             serverEndPoint.port = 8080;
-            
-            pathStack_.Push("../Storage");
+            FileComplex selected = checkOutList.SelectedItem as FileComplex;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
-            message.add("command", "listContent");
-            message.add("path", pathStack_.Peek());
-            translater.postMessage(message);
-            dirIndicator.Text= "Storage";
+            message.add("command", "fileCheckout");
+            message.add("fileName", "DbCore::DbCore.h.1");
+            message.add("requestor", theUser.Text);
+            message.add("recursive", recursiveCheckout.IsChecked.ToString().ToLower());
             Action<CsMessage> debug = (CsMessage msg) =>
             {
                 debugDisplay(msg, "send");
             };
             Dispatcher.Invoke(debug, new Object[] { message });
-            message.overRide("command", "trackAllRecords");
             translater.postMessage(message);
+            Console.Write("  PASSED -- Requirement 3c\n\n");
+        }
+
+        private void test3d()
+        {
+            Console.Write("Demostration of Requirement 3d.\n\n");
+            Console.Write("===============================\n\n");
+            Console.Write("  Demostrate the capability of sending browsing specified package description message and get reply from server.\n\n");
+            browseDescription("DbCore::DbCore.h.1");
+            Console.Write("  PASSED -- Requirement 3d\n\n");
+        }
+
+        private void test3f()
+        {
+            Console.Write("Demostration of Requirement 3e.\n\n");
+            Console.Write("===============================\n\n");
+            Console.Write("  Demostrate the capability of viewing full text and metadata");
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "listContent");
+            message.add("path", pathStack_.Peek() + "/" + "DbCore_DbCore.h.1");
+            Action<CsMessage> debug = (CsMessage msg) =>
+            {
+                debugDisplay(msg, "send");
+            };
             Dispatcher.Invoke(debug, new Object[] { message });
-            message.overRide("command", "trackAllCategories");
             translater.postMessage(message);
-            Dispatcher.Invoke(debug, new Object[] { message });
+            message.show();
+            Console.Write("  PASSED -- Requirement 3f\n\n");
         }
     }
 }

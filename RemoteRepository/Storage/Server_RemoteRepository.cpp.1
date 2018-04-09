@@ -101,7 +101,7 @@ Msg Server::showFileMessge(const EndPoint& from, const EndPoint& to, const std::
 	reply.command("showFile");
 	std::string searchPath = storageRoot + "\\" + path;
 	reply.attribute("file", FileSystem::Path::getName(searchPath));
-	reply.contentLength(FileSystem::FileInfo(searchPath).size());
+	// reply.contentLength(FileSystem::FileInfo(searchPath).size());
 	try {
 		SWRTB::copyFile(searchPath, sendFilePath + FileSystem::Path::getName(searchPath));
 	}
@@ -134,7 +134,7 @@ Msg Server::trackAllRecordsMessage(const EndPoint& from, const EndPoint& to) {
 	size_t count = 0;
 	for (auto item : result) {
 		std::string recordBrief = item.nameSpace() + "$"
-			+ SWRTB::nameOf(item.name()) + "$"
+			+ SWRTB::nameOf(item.name(), item.nameSpace()) + "$"
 			+ SWRTB::versionOf(item.name()) + "$"
 			+ item.status();
 		reply.attribute("record" + Utilities::Converter<size_t>::toString(count++), recordBrief);
@@ -164,7 +164,7 @@ Msg Server::trackAllCategoriesMessage(const EndPoint& from, const EndPoint& to) 
 
 Msg Server::checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage) {
 	Msg reply(to, from);
-	reply.attribute("command", "checkInCallback");
+	reply.attribute("command", "checkinCallback");
 	SWRTB::Core repo(Repository::repoHeartPath);
 	NoSqlDb::DbQuery<std::string> querier(repo.core());
 	SWRTB::Checkin worker(repo);
@@ -176,17 +176,56 @@ Msg Server::checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg
 	std::string owner = receiveMessage.value("owner");
 	bool close = (receiveMessage.value("close") == "true") ? true : false;
 	std::string errorInfo = "";
-	//try {
+	try {
 		worker.checkin(pathFileName, dependenies, description, categories, nameSpace, owner, close);
-	//}
-	/*catch (const std::exception& ex) {
+	}
+	catch (const std::exception& ex) {
 		errorInfo = ex.what();
-		for (size_t i = 0; i < errorInfo.length; ++i) {
+		for (size_t i = 0; i < errorInfo.length(); ++i) {
 			if (errorInfo[i] == '\n') errorInfo[i] = ' ';
 		}
-	}*/
+	}
 	reply.attribute("errorInfo", errorInfo);
+	std::cout << "------------errorInfo equals: " << (errorInfo == "") << std::endl;
 	return reply;
+}
+
+Msg Server::checkOutCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage) {
+	Msg reply(to, from);
+	reply.attribute("command", "checkoutCallback");
+	SWRTB::Core repo(Repository::repoHeartPath);
+	NoSqlDb::DbQuery<std::string> querier(repo.core());
+	SWRTB::Checkout worker(repo, "../SendFiles/");
+	std::string NSNFileNameVersion = receiveMessage.value("fileName");
+	std::string requestor = receiveMessage.value("requestor");
+	bool recursive = (receiveMessage.value("recursive") == "true") ? true : false;
+	std::string errorInfo = "";
+	try {
+		worker.checkout(NSNFileNameVersion, requestor, recursive);
+	}
+	catch (std::exception& ex) {
+		errorInfo = ex.what();
+	}
+	reply.attribute("errorInfo", errorInfo);
+	std::vector<std::string> theFiles = worker.successCheckouts();
+	for (size_t i = 0; i < theFiles.size(); ++i) reply.attribute("successFile" + std::to_string(int(i)), theFiles[i]);
+	theFiles = worker.failCheckouts();
+	for (size_t i = 0; i < theFiles.size(); ++i) reply.attribute("failFile" + std::to_string(int(i)), theFiles[i]);
+	return reply;
+}
+
+void Server::sendMultipleFiles(Msg message) {
+	Msg reply(message.from(), message.to());
+	if (message.value("for") == "checkoutReceiveFiles")
+		reply.attribute("command", "checkoutReceiveFilesCallback");
+	for (auto item : message.attributes()) {
+		if (item.first.find("fileName") != std::string::npos) {
+			reply.attribute("file", SWRTB::nameOf(item.second));
+			reply.attribute("fileName", item.second);
+			postMessage(reply);
+		}
+	}
+	return;
 }
 
 template<typename T>
@@ -247,12 +286,14 @@ std::function<Msg(Msg)> fileCheckin = [](Msg msg) {
 };
 
 std::function<Msg(Msg)> fileCheckout = [](Msg msg) {
-	Msg reply;
-	reply.to(msg.from());
-	reply.from(msg.to());
-	reply.name("File sended");
-	reply.command("checkoutCallback");
-	reply.file("server.js");
+	Msg reply = Server::checkOutCallbackMessage(msg.to(), msg.from(), msg);
+	return reply;
+};
+
+std::function<Msg(Msg)> ping = [](Msg msg) {
+	Msg reply(msg.from(), msg.to());
+	reply.attribute("name", "Server reply to " + msg.name());
+	reply.attribute("command", "ping");
 	return reply;
 };
 
@@ -269,14 +310,6 @@ int main()
 	Server server(serverEndPoint, "ServerPrototype");
 	server.start();
 
-	std::cout << "\n  testing getFiles and getDirs methods";
-	std::cout << "\n --------------------------------------";
-	Files files = server.getFiles();
-	show(files, "Files:");
-	Dirs dirs = server.getDirs();
-	show(dirs, "Dirs:");
-	std::cout << "\n";
-
 	std::cout << "\n  testing message processing";
 	std::cout << "\n ----------------------------";
 	server.addMsgProc("echo", echo);
@@ -287,6 +320,7 @@ int main()
 	server.addMsgProc("trackAllRecords", trackAllRecords);
 	server.addMsgProc("trackAllCategories", trackAllCategories);
 	server.addMsgProc("serverQuit", echo);
+	server.addMsgProc("ping", ping);
 	server.processMessages();
 
 	Msg msg(serverEndPoint, serverEndPoint);  // send to self

@@ -102,7 +102,7 @@ namespace MsgPassingCommunication
 
   inline void Translater::postMessage(CsMessage^ csMsg)
   {
-    std::cout << "\n  posting message in Translater";
+    // std::cout << "\n  posting message in Translater";
     Message msg = this->fromCsMessage(csMsg);
     pComm->postMessage(msg);
   }
@@ -110,7 +110,7 @@ namespace MsgPassingCommunication
 
   inline CsMessage^ Translater::getMessage()
   {
-    std::cout << "\n  getting message in Translater";
+    // std::cout << "\n  getting message in Translater";
     Message msg = pComm->getMessage();
     return fromMessage(msg);
   }

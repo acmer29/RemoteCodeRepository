@@ -11,128 +11,14 @@
 			<RowDefinition Height="*"/>
 			<RowDefinition Height="auto" />
 		</Grid.RowDefinitions>
-		<TabControl Grid.Row="0" Name="tabControl" Margin="10,10,10.5,10.5">
-			<TabItem Header="Check-In">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="40"/>
-						<RowDefinition Height="40"/>
-						<RowDefinition Height="40"/>
-						<RowDefinition Height="*"/>
-						<RowDefinition Height="*"/>
-						<RowDefinition Height="40"/>
-					</Grid.RowDefinitions>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="1*"/>
-						<ColumnDefinition Width="4*"/>
-					</Grid.ColumnDefinitions>
-					
-					<Label Grid.Row="0" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Select File</Label>
-					<Grid Grid.Row="0" Grid.Column="1">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="4*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-						</Grid.ColumnDefinitions>
-						<TextBox Grid.Column="0" Margin="5,5,66.5,5" Name="pathFileName" Grid.ColumnSpan="2"/>
-						<Button  Grid.Column="1" Margin="5,5,0,5" Click="Open_FileForm">Browse</Button>
-					</Grid>
-					<Label Grid.Row="1" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Namespace</Label>
-					<Grid Grid.Row="1" Grid.Column="1">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="5*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-						</Grid.ColumnDefinitions>
-						<TextBox Grid.Column="0" Margin="5,5,0,5" Name="nameSpace" HorizontalAlignment="Stretch"/>
-					</Grid>
-					<Label Grid.Row="2" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Description</Label>
-					<Grid Grid.Row="2" Grid.Column="1">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="5*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-						</Grid.ColumnDefinitions>
-						<TextBox Grid.Column="0" Margin="5,5,0,5" Name="description" HorizontalAlignment="Stretch"/>
-					</Grid>
-					<Label Grid.Row="3" Grid.Column="0" Margin="5 5 5 5" HorizontalAlignment="Right">Dependencies</Label>
-					<Grid Grid.Row="3" Grid.Column="1">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="5*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-						</Grid.ColumnDefinitions>
-						<ListView Grid.Column="0" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="checkInDependencyList">
-							<ListView.View>
-								<GridView>
-									<GridViewColumn Width="30">
-										<GridViewColumn.CellTemplate>
-											<DataTemplate>
-												<CheckBox Checked="addDependency" Unchecked="removeDependency" Tag="{Binding Path=Key}"/>
-											</DataTemplate>
-										</GridViewColumn.CellTemplate>
-									</GridViewColumn>
-									<GridViewColumn Header="Namespace" Width="100" DisplayMemberBinding="{Binding Path=NameSpace}"/>
-									<GridViewColumn Header="File Name" Width="100" DisplayMemberBinding="{Binding Path=Name}"/>
-									<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"/>
-									<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"/>
-								</GridView>
-							</ListView.View>
-						</ListView>
-					</Grid>
-					<Label Grid.Row="4" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Categories</Label>
-					<Grid Grid.Row="4" Grid.Column="1" Margin="5,5,5,5">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="5*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-						</Grid.ColumnDefinitions>
-						<ListView Grid.Row="0" Name="checkinCategoryList">
-							<ListView.View>
-								<GridView>
-									<GridViewColumn Width="30">
-										<GridViewColumn.CellTemplate>
-											<DataTemplate>
-												<CheckBox Checked="addCategory" Unchecked="removeCategory" Tag="{Binding Path=Value}"/>
-											</DataTemplate>
-										</GridViewColumn.CellTemplate>
-									</GridViewColumn>
-									<GridViewColumn Header="Category" Width="100" DisplayMemberBinding="{Binding Path=Value}"></GridViewColumn>
-								</GridView>
-							</ListView.View>
-						</ListView>
-					</Grid>
-					<Grid Grid.Row="5" Grid.Column="1">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="3*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-						</Grid.ColumnDefinitions>
-						<CheckBox Grid.Column="0" IsChecked="false" Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Center" Name="closeCheckIn">Checkin as closed</CheckBox>
-						<Button Grid.Column="1" Margin="5,5,5,5" Click="Check_In_Click">Checkin</Button>
-						<Button Grid.Column="2" Margin="5,5,5,5" Click="Check_In_Cancel_Click">Cancel</Button>
-					</Grid>
-					
-				</Grid>
-			</TabItem>
-			<TabItem Header="Check-Out"></TabItem>
-
-			<TabItem Header="Browse">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition Height="25"></RowDefinition>
-						<RowDefinition Height="*"></RowDefinition>
-					</Grid.RowDefinitions>
-					<TextBlock Grid.Row="0" Margin="5,5,5,5" Name="dirIndicator" Text=""></TextBlock>
-					<ListView Grid.Row="1" Margin="5,5,5,5" VerticalAlignment="Stretch" Name="browseList" MouseDoubleClick="browseList_DoubleClick"/>
-
-				</Grid>
-			</TabItem>
+		<TabControl Grid.Row="0" Name="theTab" Margin="10,10,10.5,10.5">
 			<TabItem Header="Connect">
 				<Grid Margin="5,5,5,5">
 					<Grid.RowDefinitions>
 						<RowDefinition Height="1*"></RowDefinition>
 						<RowDefinition Height="1*"></RowDefinition>
 						<RowDefinition Height="1*"></RowDefinition>
-						<RowDefinition Height="1*"></RowDefinition>
-						<RowDefinition Height="1*"></RowDefinition>
+						<RowDefinition Height="40"></RowDefinition>
 					</Grid.RowDefinitions>
 					<Grid Grid.Row="0" Margin="5,5,5,5">
 						<Grid.ColumnDefinitions>
@@ -190,10 +76,147 @@
 							<ColumnDefinition Width="1*"></ColumnDefinition>
 							<ColumnDefinition Width="1*"></ColumnDefinition>
 						</Grid.ColumnDefinitions>
-						<Button Grid.Column="0" Margin="10,10,10,10">Test Coonection</Button>
-						<Button Grid.Column="1" Margin="10,10,10,10">Set Coonection</Button>
-						<Button Grid.Column="2" Margin="10,10,10,10">User Login</Button>
+						<Button Grid.Column="0" Margin="5,5,5,5">Test Coonection</Button>
+						<Button Grid.Column="1" Margin="5,5,5,5">Set Coonection</Button>
+						<Button Grid.Column="2" Margin="5,5,5,5" Click="Change_CurrentUser">User Login</Button>
 					</Grid>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Check-In">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="40"/>
+						<RowDefinition Height="40"/>
+						<RowDefinition Height="40"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="*"/>
+						<RowDefinition Height="40"/>
+					</Grid.RowDefinitions>
+					<Grid.ColumnDefinitions>
+						<ColumnDefinition Width="1*"/>
+						<ColumnDefinition Width="4*"/>
+					</Grid.ColumnDefinitions>
+					<Label Grid.Row="0" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Select File</Label>
+					<Grid Grid.Row="0" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="4*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<TextBox Grid.Column="0" Margin="5,5,66.5,5" Name="pathFileName" Grid.ColumnSpan="2"/>
+						<Button  Grid.Column="1" Margin="5,5,0,5" Click="Open_FileForm">Browse</Button>
+					</Grid>
+					<Label Grid.Row="1" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Namespace</Label>
+					<Grid Grid.Row="1" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="5*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<TextBox Grid.Column="0" Margin="5,5,0,5" Name="nameSpace" HorizontalAlignment="Stretch"/>
+					</Grid>
+					<Label Grid.Row="2" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Description</Label>
+					<Grid Grid.Row="2" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="5*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<TextBox Grid.Column="0" Margin="5,5,0,5" Name="description" HorizontalAlignment="Stretch"/>
+					</Grid>
+					<Label Grid.Row="3" Grid.Column="0" Margin="5 5 5 5" HorizontalAlignment="Right">Dependencies</Label>
+					<Grid Grid.Row="3" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="5*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<ListView Grid.Column="0" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="checkInDependencyList">
+							<ListView.View>
+								<GridView>
+									<GridViewColumn Width="30">
+										<GridViewColumn.CellTemplate>
+											<DataTemplate>
+												<CheckBox Checked="addDependency" Unchecked="removeDependency" Tag="{Binding Path=Key}"/>
+											</DataTemplate>
+										</GridViewColumn.CellTemplate>
+									</GridViewColumn>
+									<GridViewColumn Header="Namespace" Width="80" DisplayMemberBinding="{Binding Path=NameSpace}"/>
+									<GridViewColumn Header="File Name" Width="80" DisplayMemberBinding="{Binding Path=Name}"/>
+									<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"/>
+									<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"/>
+									<GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Description}"></GridViewColumn>
+								</GridView>
+							</ListView.View>
+						</ListView>
+					</Grid>
+					<Label Grid.Row="4" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Categories</Label>
+					<Grid Grid.Row="4" Grid.Column="1" Margin="5,5,5,5">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="5*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<ListView Grid.Row="0" Name="checkinCategoryList">
+							<ListView.View>
+								<GridView>
+									<GridViewColumn Width="30">
+										<GridViewColumn.CellTemplate>
+											<DataTemplate>
+												<CheckBox Checked="addCategory" Unchecked="removeCategory" Tag="{Binding Path=Value}"/>
+											</DataTemplate>
+										</GridViewColumn.CellTemplate>
+									</GridViewColumn>
+									<GridViewColumn Header="Category" Width="100" DisplayMemberBinding="{Binding Path=Value}"></GridViewColumn>
+								</GridView>
+							</ListView.View>
+						</ListView>
+					</Grid>
+					<Grid Grid.Row="5" Grid.Column="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="3*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+							<ColumnDefinition Width="1*"></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<CheckBox Grid.Column="0" IsChecked="false" Margin="5,5,5,5" HorizontalAlignment="Left" VerticalAlignment="Center" Name="closeCheckIn">Checkin as closed</CheckBox>
+						<Button Grid.Column="1" Margin="5,5,5,5" Click="Check_In_Click" Name="checkinButton">Checkin</Button>
+						<Button Grid.Column="2" Margin="5,5,5,5" Click="Check_In_Cancel_Click">Cancel</Button>
+					</Grid>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Check-Out">
+				<Grid Margin="25, 0, 25, 0">
+					<Grid.RowDefinitions>
+						<RowDefinition Height="*"></RowDefinition>
+						<RowDefinition Height="40"></RowDefinition>
+					</Grid.RowDefinitions>
+					<ListView Grid.Row="0" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="checkOutList">
+						<ListView.View>
+							<GridView>
+								<GridViewColumn Header="Namespace" Width="100" DisplayMemberBinding="{Binding Path=NameSpace}"/>
+								<GridViewColumn Header="File Name" Width="100" DisplayMemberBinding="{Binding Path=Name}"/>
+								<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"/>
+								<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"/>
+								<GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Desription}"></GridViewColumn>
+							</GridView>
+						</ListView.View>
+					</ListView>
+					<Grid Grid.Row="1">
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition></ColumnDefinition>
+							<ColumnDefinition></ColumnDefinition>
+						</Grid.ColumnDefinitions>
+						<CheckBox Grid.Column="1" HorizontalAlignment="Left" VerticalAlignment="Center" Name="recursiveCheckout">Checkout all its dependencies</CheckBox>
+						<Button Grid.Column="1" Margin="5,5,0,5" HorizontalAlignment="Right" Click="Check_Out_Click">Check out</Button>
+					</Grid>
+				</Grid>
+			</TabItem>
+			<TabItem Header="Browse">
+				<Grid>
+					<Grid.RowDefinitions>
+						<RowDefinition Height="25"></RowDefinition>
+						<RowDefinition Height="*"></RowDefinition>
+					</Grid.RowDefinitions>
+					<TextBlock Grid.Row="0" Margin="5,5,5,5" Name="dirIndicator" Text=""></TextBlock>
+					<ListView Grid.Row="1" Margin="5,5,5,5" VerticalAlignment="Stretch" Name="browseList" MouseDoubleClick="browseList_DoubleClick"/>
+
 				</Grid>
 			</TabItem>
 			<TabItem Header="Debug Messages">
