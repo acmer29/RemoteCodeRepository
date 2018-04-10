@@ -51,10 +51,6 @@ using MsgPassingCommunication;
 
 namespace GUI
 {
-    /// <summary>
-    /// Interaction logic for fileWindow.xaml
-    /// </summary>
-    
     public partial class fileWindow : Window
     {
         public fileWindow()
@@ -69,6 +65,7 @@ namespace GUI
         private HashSet<string> selectedDependencies = new HashSet<string>();
         private HashSet<string> selectedCategories = new HashSet<string>();
 
+        // -----< getFileInfo: get file info from mainWindow >-----
         public void getFileInfo(CsMessage receiveMessage)
         {
             errorInformation = "";
@@ -90,15 +87,19 @@ namespace GUI
             theFile.Key = theFile.NameSpace + "::" + theFile.Name + "." + theFile.Version;
         }
 
+        // -----< getAllRecordInfo: get all record info from mainWindow >-----
         public void getAllRecordInfo(HashSet<FileComplex> repoRecords)
         {
             allRecords = repoRecords;
         }
 
+        // -----< getAllCategories: get all categories info from mainWindow >-----
         public void getAllCategories(HashSet<string> repoCategories)
         {
             allCategories = repoCategories;
         }
+
+        // -----< Window_Loaded: load the window >-----
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
             loadFileCode();
@@ -107,13 +108,14 @@ namespace GUI
             loadFileCategories();
             applyChanges.IsEnabled = false;
         }
-        
 
+        // -----< stringToArray: Convert string to array >-----
         private string[] stringToArray(string toConvert)
         {
             return toConvert.Split('$');
         }
 
+        // -----< loadFileCode: Load file code >-----
         private void loadFileCode()
         {
             string fileContent = File.ReadAllText(filePath);
@@ -122,6 +124,7 @@ namespace GUI
             fileCode.Blocks.Add(paragraph);
         }
 
+        // -----< loadFileInformation: Load file information >-----
         private void loadFileInformation()
         {
             basicDataList.Items.Add(new KeyValuePair("Namespace", theFile.NameSpace, false));
@@ -133,6 +136,7 @@ namespace GUI
             description.Text = theFile.Description;
         }
 
+        // -----< loadFileDependencies: Load file dependencies >-----
         private void loadFileDependencies()
         {
             foreach(FileComplex item in allRecords)
@@ -147,6 +151,7 @@ namespace GUI
             }
         }
 
+        // -----< loadFileCategories: Load file categories >-----
         private void loadFileCategories()
         {
             foreach(string item in allCategories)
@@ -163,6 +168,7 @@ namespace GUI
             }
         }
 
+        // -----< addDependency: Add file dependencies >-----
         private void addDependency(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
@@ -171,6 +177,7 @@ namespace GUI
             applyChanges.IsEnabled = true;
         }
 
+        // -----< removeDependency: Remove file dependencies >-----
         private void removeDependency(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
@@ -179,6 +186,7 @@ namespace GUI
             applyChanges.IsEnabled = true;
         }
 
+        // -----< addCategory: Add file categories >-----
         private void addCategory(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
@@ -187,6 +195,7 @@ namespace GUI
             applyChanges.IsEnabled = true;
         }
 
+        // -----< removeCategory: Remove file categories >-----
         private void removeCategory(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
@@ -195,6 +204,7 @@ namespace GUI
             applyChanges.IsEnabled = true;
         }
 
+        // -----< applyDependencies_Click: Click handler of addDependencyList checkbox >-----
         private void applyDependencies_Click(object sender, RoutedEventArgs e)
         {
             List<string> result = new List<string>();
@@ -205,6 +215,7 @@ namespace GUI
             theFile.Dependencies = result.ToArray();
         }
 
+        // -----< applyCategories_Click: Click handler of addCategoryList checkbox >-----
         private void applyCategories_Click(object sender, RoutedEventArgs e)
         {
             List<string> result = new List<string>();
@@ -215,25 +226,7 @@ namespace GUI
             theFile.Dependencies = result.ToArray();
         }
 
-        //private void basicDataListItem_DoubleClick(object sender, RoutedEventArgs e)
-        //{
-        //    //ListViewItem selected = sender as ListViewItem;
-        //    KeyValuePair selected = basicDataList.SelectedItem as KeyValuePair;
-        //    string theKey = selected.Key;
-        //    string theValue = selected.Value;
-        //    if (theKey == "Name" || theKey == "Namespace") return;
-        //    KeyValuePopup editPopup = new KeyValuePopup();
-        //    editPopup.getKey(theKey);
-        //    editPopup.getValue(theValue);
-        //    editPopup.submitResult += submission =>
-        //    {
-        //        selected = submission;
-        //        Console.Write(selected.Key + ": " + selected.Value);
-        //    };
-        //    editPopup.Owner = this;
-        //    editPopup.Show();
-        //}
-
+        // Not finished yet
         private void submitFileComplex(object sender, RoutedEventArgs e)
         {
 

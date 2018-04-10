@@ -197,7 +197,7 @@ Msg Server::checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg
 		}
 	}
 	reply.attribute("errorInfo", errorInfo);
-	std::cout << "------------errorInfo equals: " << (errorInfo == "") << std::endl;
+	if (receiveMessage.containsKey("name")) reply.attribute("name", "Server replys " + receiveMessage.value("name"));
 	return reply;
 }
 
@@ -223,6 +223,7 @@ Msg Server::checkOutCallbackMessage(const EndPoint& from, const EndPoint& to, Ms
 	for (size_t i = 0; i < theFiles.size(); ++i) reply.attribute("successFile" + std::to_string(int(i)), theFiles[i]);
 	theFiles = worker.failCheckouts();
 	for (size_t i = 0; i < theFiles.size(); ++i) reply.attribute("failFile" + std::to_string(int(i)), theFiles[i]);
+	if (receiveMessage.containsKey("name")) reply.attribute("name", "Server replys " + receiveMessage.value("name"));
 	return reply;
 }
 
@@ -257,18 +258,21 @@ std::function<Msg(Msg)> echo = [](Msg msg) {
 	Msg reply = msg;
 	reply.to(msg.from());
 	reply.from(msg.to());
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
 	return reply;
 };
 
 // -----< trackAllCategories: reply trackAllCategories message >-----
 std::function<Msg(Msg)> trackAllCategories = [](Msg msg) {
 	Msg reply = Server::trackAllCategoriesMessage(msg.to(), msg.from());
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
 	return reply;
 };
 
 // -----< trackAllRecords: reply trackAllCategories message >-----
 std::function<Msg(Msg)> trackAllRecords = [](Msg msg) {
 	Msg reply = Server::trackAllRecordsMessage(msg.to(), msg.from());
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
 	return reply;
 };
 
@@ -278,7 +282,7 @@ std::function<Msg(Msg)> showFileCleanUp = [](Msg msg) {
 	reply.command("echo");
 	std::string file = msg.value("fileName");
 	FileSystem::File("").remove(Repository::sendFilePath + file);
-	std::cout << "showFileCleanUp: " << Repository::sendFilePath + file << " has been cleaned up.\n";
+	//std::cout << "showFileCleanUp: " << Repository::sendFilePath + file << " has been cleaned up.\n";
 	return reply;
 };
 
@@ -296,6 +300,7 @@ std::function<Msg(Msg)> listContent = [](Msg msg) {
 	else {
 		std::cout << "listContent: \"" << path << "\" did not represent a file or a directory.\n";
 	}
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
 	return reply;
 };
 
@@ -314,7 +319,7 @@ std::function<Msg(Msg)> fileCheckout = [](Msg msg) {
 // -----< ping: reply ping message >-----
 std::function<Msg(Msg)> ping = [](Msg msg) {
 	Msg reply(msg.from(), msg.to());
-	reply.attribute("name", "Server reply to " + msg.name());
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
 	reply.attribute("command", "ping");
 	return reply;
 };
@@ -328,6 +333,7 @@ std::function<Msg(Msg)> browseDescription = [](Msg msg) {
 	std::vector<NoSqlDb::DbElement<std::string>> result =
 		querier.from(repo.core()).find("name", msg.value("fileName")).eval();
 	reply.attribute("description", result[0].descrip());
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
 	return reply;
 };
 
@@ -344,7 +350,7 @@ int main()
 	Server server(serverEndPoint, "ServerPrototype");
 	server.start();
 
-	std::cout << "\n  testing message processing";
+	std::cout << "\n  Demostrate message processing as requirement 2 & 3 of Project3";
 	std::cout << "\n ----------------------------";
 	server.addMsgProc("echo", echo);
 	server.addMsgProc("listContent", listContent);

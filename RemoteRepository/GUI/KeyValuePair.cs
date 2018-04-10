@@ -1,4 +1,36 @@
-﻿using System;
+﻿///////////////////////////////////////////////////////////////////////
+// KeyValuePair.cs - Key Value Pair Class for ListView Display       //
+// ver 1.0                                                           //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018           //
+///////////////////////////////////////////////////////////////////////
+/*
+ * Package Operations:
+ * -------------------
+ * This package provides a WPF-based GUI for Project3HelpWPF demo.  It's 
+ * responsibilities are to:
+ * - Provide a display of directory contents of a remote ServerPrototype.
+ * - It provides a subdirectory list and a filelist for the selected directory.
+ * - You can navigate into subdirectories by double-clicking on subdirectory
+ *   or the parent directory, indicated by the name "..".
+ *   
+ * Required Files:
+ * ---------------
+ * Mainwindow.xaml, MainWindow.xaml.cs
+ * FileComplex.cs
+ * KeyValuePair.cs
+ * fileWindow.xaml, fileWindow.xaml.cs
+ * Translater.dll
+ * 
+ * Maintenance History:
+ * --------------------
+ * ver 1.0 : 30 Mar 2018
+ * - first release
+ * 
+ */
+
+// Translater has to be statically linked with CommLibWrapper
+// - loader can't find Translater.dll dependent CommLibWrapper.dll
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;

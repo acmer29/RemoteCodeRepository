@@ -153,7 +153,7 @@ bool Sender::sendFile(Message msg)
     
   std::string fileSpec = sendFilePath + "/" + msg.file();
   std::ifstream sendFile(fileSpec, std::ios::binary);
-  std::cout << "Send file located at " << fileSpec << std::endl;
+  // std::cout << "Send file located at " << fileSpec << std::endl;
   if (!sendFile.good())
     return false;
   while (true)
@@ -168,7 +168,7 @@ bool Sender::sendFile(Message msg)
     connecter.send(blockSize, rwBuffer);
   }
   sendFile.close();
-  std::cout << "The file " << msg.file() << " has been sended" << std::endl;
+  // std::cout << "The file " << msg.file() << " has been sended" << std::endl;
   return true;
 }
 //----< callable object posts incoming message to rcvQ >-------------
