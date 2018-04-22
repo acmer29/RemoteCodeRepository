@@ -66,8 +66,7 @@ namespace GUI
             Console.Title = "Client Console - User: " + argUser + " - Port: " + argPort;
             Title = "Client Console - User: " + argUser + " - Port: " + argPort;
         }
-
-        private Stack<string> pathStack_ = new Stack<string>();
+        
         private Translater translater = new Translater();
         private CsEndPoint endPoint_ = new CsEndPoint();
         private CsEndPoint serverEndPoint = new CsEndPoint();
@@ -75,6 +74,7 @@ namespace GUI
         private Dictionary<string, Action<CsMessage>> dispatcher_
           = new Dictionary<string, Action<CsMessage>>();
         private HashSet<FileComplex> repoRecords = new HashSet<FileComplex>();
+        private HashSet<FileComplex> filterRecords = new HashSet<FileComplex>();
         private HashSet<string> repoCategories = new HashSet<string>();
         private HashSet<string> checkInDependencies = new HashSet<string>();
         private HashSet<string> checkInCategories = new HashSet<string>();
@@ -115,8 +115,7 @@ namespace GUI
             checkinCallbackHandler();
             checkoutReceiveFileCallbackHandler();
             checkoutCallbackHandler();
-            listContentsHandler();
-            showFileHandler();
+            showFileCallbackHandler();
             trackAllRecordsCallbackHandler();
             trackAllCategoriesCallbackHandler();
             pingHandler();
@@ -195,13 +194,30 @@ namespace GUI
             checkInCategories.Remove(toRemove);
         }
 
-        // -----< populateCheckInDependencyListView: Populate checkin dependency ListView >-----
+        // -----< populateAllListView: Populate checkin dependency ListView >-----
         private void populateCheckInDependencyListView()
         {
-            foreach(FileComplex item in repoRecords)
+            foreach (FileComplex item in repoRecords)
             {
                 checkInDependencyList.Items.Add(item);
+            }
+        }
+
+        // -----< populateAllListView: Populate checkout ListView >-----
+        private void populateCheckoutListView()
+        {
+            foreach (FileComplex item in repoRecords)
+            {
                 checkOutList.Items.Add(item);
+            }
+        }
+
+        // -----< populateAllListView: Populate browse ListView >-----
+        private void populateBrowseListView()
+        {
+            foreach (FileComplex item in repoRecords)
+            {
+                browseList.Items.Add(item);
             }
         }
 
@@ -214,60 +230,7 @@ namespace GUI
                 checkinCategoryList.Items.Add(toAdd);
             }
         }
-
-        // -----< lastFilter: Remove "/" from the last of the string >----- 
-        private string lastFilter(string path)
-        {
-            if (path[path.Length - 1] == '/') return path.Substring(0, path.Length - 1);
-            else return path;
-        }
-
-        // -----< changeDir: Change directory according to the path value >-----
-        private string changeDir(string path)
-        {
-            string modifiedPath = path;
-            int pos = path.IndexOf("/");
-            modifiedPath = path.Substring(pos + 1, path.Length - pos - 1);
-            return modifiedPath;
-        }
-
-        // -----< clearDirs: Clear out the directory value >-----
-        private void clearDirs()
-        {
-            browseList.Items.Clear();
-        }
-
-        // ----< addDir: Function dispatched by child thread to main thread >-----
-        private void addDir(string dirComplex)
-        {
-            string[] dirs = dirComplex.Split('$');
-            foreach (string dir in dirs) {
-                browseList.Items.Add(dir);
-            }
                 
-        }
-
-        // ----< addFile: Function dispatched by child thread to main thread >-----
-        private void addFile(string fileComplex)
-        {
-            string[] files = fileComplex.Split('$');
-            foreach (string file in files) {
-                browseList.Items.Add(file);
-            }
-        }
-
-        // -----< addParent: Function dispatched by child thread to main thread >-----
-        private void addParent()
-        {
-            browseList.Items.Insert(0, "..");
-        }
-
-        // -----< clearFiles: Function dispatched by child thread to main thread >-----
-        private void clearFiles()
-        {
-            browseList.Items.Clear();
-        }
-
         // -----< showFileWindowPopup: Popup the fileWindow >-----
         private void showFileWindowPopup(CsMessage msg)
         {
@@ -287,9 +250,9 @@ namespace GUI
         }
 
         // -----< showFileHandler: Callback handler of showFile >-----
-        private void showFileHandler()
+        private void showFileCallbackHandler()
         {
-            Action<CsMessage> showFile = (CsMessage receiveMessage) =>
+            Action<CsMessage> showFileCallback = (CsMessage receiveMessage) =>
             {
                 var enumer = receiveMessage.attributes.GetEnumerator();
                 string fileName = "";
@@ -321,86 +284,32 @@ namespace GUI
                 };
                 Dispatcher.Invoke(showFileInPopup, receiveMessage);
             };
-            registerHandler("showFile", showFile);
+            registerHandler("showFileCallback", showFileCallback);
         }
 
-        // -----< doDirs: Helper function of add directory >-----
-        private void doDirs(string toDo)
+        // -----< showFile: Send the message of showFile >-----
+        private void showFile(string fileKey)
         {
-            Action<string> doDir = (string toAdd) => {
-                addDir(toAdd);
-            };
-            Dispatcher.Invoke(doDir, new Object[] { toDo });
-        }
-
-        // -----< doFiles: Helper function of add files >-----
-        private void doFiles(string toDo)
-        {
-            Action<string> doFile = (string toAdd) => {
-                addFile(toAdd);
-            };
-            Dispatcher.Invoke(doFile, new Object[] { toDo });
-        }
-
-        // -----< doPathes: Helper function of add pathes >-----
-        private void doPathes(string toDo)
-        {
-            Action<string> changeCurrentDir = (string path) =>
-            {
-                path = lastFilter(path);
-                dirIndicator.Text = changeDir(path);
-                pathStack_.Push(path);
-            };
-            Dispatcher.Invoke(changeCurrentDir, new Object[] { toDo });
-        }
-
-        // -----< listContentsHandler: Callback handler of listContents >-----
-        private void listContentsHandler()
-        {
-            Action<CsMessage> listContent = (CsMessage receiveMessage) => {
-                Action clrFiles = () => { clearFiles(); };
-                Dispatcher.Invoke(clrFiles, new Object[] { });
-                var enumer = receiveMessage.attributes.GetEnumerator();
-                while(enumer.MoveNext()) {
-                    string key = enumer.Current.Key;
-                    if (key.Contains("dirs")) { doDirs(enumer.Current.Value); }
-                    else if (key.Contains("files")) { doFiles(enumer.Current.Value); }
-                    else if (key.Contains("path")) { doPathes(enumer.Current.Value); }
-                    else if(key.Contains("name") && isDebug == true) { receiveMessage.show(); }
-                }
-                Action insertParent = () => {
-                    addParent();
-                };
-                Dispatcher.Invoke(insertParent, new Object[] { });
-            };
-            registerHandler("listContent", listContent);
-        }
-
-        // -----< browseList_DoubleClick: DoubleClick handler of browseList >-----
-        private void browseList_DoubleClick(object sender, MouseButtonEventArgs e) {
-            string selectedItem = (string)browseList.SelectedItem;
-            Console.Write(selectedItem);
-            if (selectedItem == "..") {
-                if (pathStack_.Count > 1) {
-                    pathStack_.Pop();
-                    selectedItem = "";
-                }
-                else return;
-            }
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = "localhost";
             serverEndPoint.port = 8080;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
-            message.add("command", "listContent");
-            message.add("path", pathStack_.Peek() + "/" + selectedItem);
+            message.add("command", "showFile");
+            message.add("fileName", fileKey);
             Action<CsMessage> debug = (CsMessage msg) =>
             {
                 debugDisplay(msg, "send");
             };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
+        }
+
+        // -----< browseList_DoubleClick: DoubleClick handler of browseList >-----
+        private void browseList_DoubleClick(object sender, MouseButtonEventArgs e) {
+            FileComplex selected = browseList.SelectedItem as FileComplex;
+            showFile(selected.Key);
         }
 
         // -----< checkinCallbackHandler: Receive checkin result from the server >-----
@@ -637,6 +546,8 @@ namespace GUI
                 Action updateCheckInDependencyList = () =>
                 {
                     populateCheckInDependencyListView();
+                    populateBrowseListView();
+                    populateCheckoutListView();
                 };
                 Dispatcher.Invoke(updateCheckInDependencyList, new Object[] { });
             };
@@ -734,18 +645,12 @@ namespace GUI
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = "localhost";
             serverEndPoint.port = 8080;
-            pathStack_.Push("../Storage");
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
-            message.add("command", "listContent");
-            message.add("path", pathStack_.Peek());
+            message.add("command", "trackAllRecords");
             translater.postMessage(message);
-            dirIndicator.Text = "Storage";
             Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
-            Dispatcher.Invoke(debug, new Object[] { message });
-            message.overRide("command", "trackAllRecords");
-            translater.postMessage(message);
             Dispatcher.Invoke(debug, new Object[] { message });
             message.overRide("command", "trackAllCategories");
             translater.postMessage(message);
@@ -773,7 +678,7 @@ namespace GUI
 
             elementInitialize();
 
-            testStub();
+            // checkInDependencyList();
         }
 
         // -----< testStub: Run all tests >-----
@@ -899,8 +804,8 @@ namespace GUI
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
-            message.add("command", "listContent");
-            message.add("path", pathStack_.Peek() + "/" + "DbCore_DbCore.h.1");
+            message.add("command", "showFile");
+            message.add("fileName", "DbCore::DbCore.h.1");
             if (isDebug == true) { message.add("name", "Demo message of requirement 3e & 3f"); }
             Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
@@ -922,14 +827,11 @@ namespace GUI
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = "localhost";
             serverEndPoint.port = 8080;
-            pathStack_.Push("../Storage");
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
             message.add("command", "listContent");
-            message.add("path", pathStack_.Peek());
             if (isDebug == true) { message.add("name", "Demo message of requirement 3g"); }
-            dirIndicator.Text = "Storage";
             Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);

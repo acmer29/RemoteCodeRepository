@@ -61,23 +61,16 @@ std::string Server::getDirsPlus(const Repository::SearchPath& searchPath) {
 }
 
 // -----< fileInfoAssembler: Assemble the file info  >-----
-std::vector<std::string> Server::fileInfoAssembler(const std::string& NSPFileName) {
+std::vector<std::string> Server::fileInfoAssembler(const std::string& NSNFileName) {
 	SWRTB::Core repo(Repository::repoHeartPath);
 	std::vector<std::string> ans;
 	NoSqlDb::DbQuery<std::string> querier(repo.core());
-	try {
-		SWRTB::NSPFileNameToNSNFileName(NSPFileName);
-	}
-	catch (std::exception &ex) {
-		std::cout << "Error: " << ex.what() << std::endl;
-		return ans;
-	}
 	std::vector<NoSqlDb::DbElement<std::string>> result =
-		querier.from(repo.core()).find("name", SWRTB::NSPFileNameToNSNFileName(NSPFileName)).eval();
+		querier.from(repo.core()).find("name", NSNFileName).eval();
 	if (result.size() == 0) return ans;
 	else {
 		ans.push_back(result[0].nameSpace());
-		ans.push_back(SWRTB::nameOf(result[0].name()));
+		ans.push_back(SWRTB::nameOf(result[0].name(), result[0].nameSpace()));
 		ans.push_back(SWRTB::versionOf(result[0].name()));
 		ans.push_back(result[0].descrip());
 		ans.push_back(std::string(result[0].dateTime()));
@@ -89,31 +82,22 @@ std::vector<std::string> Server::fileInfoAssembler(const std::string& NSPFileNam
 	}
 }
 
-// -----< listContentMessage: Assemble the listConent message >-----
-Msg Server::listContentMessage(const EndPoint& from, const EndPoint& to, const std::string& path) {
-	Msg reply(to, from);
-	reply.command("listContent");
-	std::string searchPath = storageRoot;
-	if (path != ".") searchPath = searchPath + "\\" + path;
-	std::string dirComplex = Server::getDirsPlus(searchPath), fileComplex = Server::getFilesPlus(searchPath);
-	if (dirComplex != "") reply.attribute("dirs", dirComplex);
-	if (fileComplex != "") reply.attribute("files", fileComplex);
-	reply.attribute("path", path);
-	return reply;
-}
-
 // -----< showFileMessge: Assemble the showFile message >-----
-Msg Server::showFileMessge(const EndPoint& from, const EndPoint& to, const std::string& path) {
+Msg Server::showFileMessge(const EndPoint& from, const EndPoint& to, const std::string& fileName) {
 	Msg reply(to, from);
-	reply.command("showFile");
-	std::string searchPath = storageRoot + "\\" + path;
-	reply.attribute("file", FileSystem::Path::getName(searchPath));
-	// reply.contentLength(FileSystem::FileInfo(searchPath).size());
+	reply.command("showFileCallback");
+	std::vector<std::string> fileInfo = fileInfoAssembler(fileName);
+	if (fileInfo.size() == 0) {
+		reply.attribute("error", "The request file does not exist.");
+		return reply;
+	}
+	std::string NSPFileName = SWRTB::NSNFileNameToNSPFileName(fileName);
+	reply.attribute("file", NSPFileName);
 	try {
-		SWRTB::copyFile(searchPath, sendFilePath + FileSystem::Path::getName(searchPath));
+		SWRTB::copyFile(repoHeartPath + NSPFileName, sendFilePath + NSPFileName);
 	}
 	catch (std::exception & ex) { std::cout << ex.what() << std::endl; }
-	std::vector<std::string> fileInfo = fileInfoAssembler(FileSystem::Path::getName(searchPath));
+	
 	if (fileInfo.size()) {
 		reply.attribute("file-Namespace", fileInfo[0]);
 		reply.attribute("file-Name", fileInfo[1]);
@@ -124,9 +108,6 @@ Msg Server::showFileMessge(const EndPoint& from, const EndPoint& to, const std::
 		reply.attribute("file-Owner", fileInfo[6]);
 		reply.attribute("file-Dependencies", fileInfo[7]);
 		reply.attribute("file-Categories", fileInfo[8]);
-	}
-	else {
-		reply.attribute("error", "The file has no database record");
 	}
 	return reply;
 }
@@ -286,21 +267,9 @@ std::function<Msg(Msg)> showFileCleanUp = [](Msg msg) {
 	return reply;
 };
 
-// -----< listContent: reply listContent message >-----
-std::function<Msg(Msg)> listContent = [](Msg msg) {
-	Msg reply;
-	std::string path = msg.value("path");
-	if(path == "") std::cout << "listContent: message did not define a path attribute.\n";
-	else if (SWRTB::isDirectory(msg.value("path")) == true) {
-		reply = Server::listContentMessage(msg.to(), msg.from(), path);
-	}
-	else if (SWRTB::isFile(msg.value("path")) == true) {
-		reply = Server::showFileMessge(msg.to(), msg.from(), path);
-	}
-	else {
-		std::cout << "listContent: \"" << path << "\" did not represent a file or a directory.\n";
-	}
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+// -----< showFile: reply showFile message >-----
+std::function<Msg(Msg)> showFile = [](Msg msg) {
+	Msg reply = Server::showFileMessge(msg.to(), msg.from(), msg.value("fileName"));
 	return reply;
 };
 
@@ -353,7 +322,7 @@ int main()
 	std::cout << "\n  Demostrate message processing as requirement 2 & 3 of Project3";
 	std::cout << "\n ----------------------------";
 	server.addMsgProc("echo", echo);
-	server.addMsgProc("listContent", listContent);
+	server.addMsgProc("showFile", showFile);
 	server.addMsgProc("fileCheckin", fileCheckin);
 	server.addMsgProc("fileCheckout", fileCheckout);
 	server.addMsgProc("showFileCleanUp", showFileCleanUp);

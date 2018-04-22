@@ -92,8 +92,7 @@ namespace Repository
 		static std::vector<std::string> fileInfoAssembler(const std::string& NSPFileName);
 
 		// message helpers
-		static Msg listContentMessage(const EndPoint& from, const EndPoint& to, const std::string& path);
-		static Msg showFileMessge(const EndPoint& from, const EndPoint& to, const std::string& path);
+		static Msg showFileMessge(const EndPoint& from, const EndPoint& to, const std::string& fileName);
 		static Msg trackAllRecordsMessage(const EndPoint& from, const EndPoint& to);
 		static Msg trackAllCategoriesMessage(const EndPoint& from, const EndPoint& to);
 		static Msg checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage);
