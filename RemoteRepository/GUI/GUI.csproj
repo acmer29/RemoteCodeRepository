@@ -62,6 +62,10 @@
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
     </Page>
+    <Page Include="filterWindow.xaml">
+      <SubType>Designer</SubType>
+      <Generator>MSBuild:Compile</Generator>
+    </Page>
     <Page Include="MainWindow.xaml">
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
@@ -73,6 +77,9 @@
     <Compile Include="FileComplex.cs" />
     <Compile Include="fileWindow.xaml.cs">
       <DependentUpon>fileWindow.xaml</DependentUpon>
+    </Compile>
+    <Compile Include="filterWindow.xaml.cs">
+      <DependentUpon>filterWindow.xaml</DependentUpon>
     </Compile>
     <Compile Include="KeyValuePair.cs" />
     <Compile Include="MainWindow.xaml.cs">

@@ -98,6 +98,8 @@ namespace Repository
 		static Msg checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage);
 		static Msg checkOutCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage);
 		void sendMultipleFiles(Msg message);
+		static Msg setFilterMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage);
+		static Msg resumeCheckinMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage);
 
 	private:
 		MsgPassingCommunication::Comm comm_;

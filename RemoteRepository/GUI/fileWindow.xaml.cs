@@ -99,6 +99,15 @@ namespace GUI
             allCategories = repoCategories;
         }
 
+        // -----< SubmitResult: Public SubmitResult handler >-----
+        public event Action<FileComplex> SubmitResult;
+
+        // -----< submiteResult: Submit the file >-----
+        public void submitResult()
+        {
+            SubmitResult(theFile);
+        }
+
         // -----< Window_Loaded: load the window >-----
         private void Window_Loaded(object sender, RoutedEventArgs e)
         {
@@ -127,13 +136,14 @@ namespace GUI
         // -----< loadFileInformation: Load file information >-----
         private void loadFileInformation()
         {
-            basicDataList.Items.Add(new KeyValuePair("Namespace", theFile.NameSpace, false));
-            basicDataList.Items.Add(new KeyValuePair("Name", theFile.Name, false));
-            basicDataList.Items.Add(new KeyValuePair("Status", theFile.Status, false));
-            basicDataList.Items.Add(new KeyValuePair("Owner", theFile.Owner, false));
-            basicDataList.Items.Add(new KeyValuePair("Version", theFile.Version, false));
-            basicDataList.Items.Add(new KeyValuePair("Last Modified", theFile.DateTime, false));
+            nameSpace.Text = theFile.NameSpace;
+            fileName.Text = theFile.Name;
+            version.Text = theFile.Version;
+            owner.Text = theFile.Owner;
+            status.Text = theFile.Status;
             description.Text = theFile.Description;
+            dateTime.Text = theFile.DateTime;
+            if (theFile.Status != "open") closeCheckin.IsEnabled = false;
         }
 
         // -----< loadFileDependencies: Load file dependencies >-----
@@ -213,6 +223,7 @@ namespace GUI
                 result.Add(item);
             }
             theFile.Dependencies = result.ToArray();
+            submitResult();
         }
 
         // -----< applyCategories_Click: Click handler of addCategoryList checkbox >-----
@@ -223,13 +234,24 @@ namespace GUI
             {
                 result.Add(item);
             }
-            theFile.Dependencies = result.ToArray();
+            theFile.Categories = result.ToArray();
+            submitResult();
         }
 
-        // Not finished yet
-        private void submitFileComplex(object sender, RoutedEventArgs e)
+        // -----< applyBasicInfo_Click: Handle applyBasicInfo button click event >-----
+        private void applyBasicInfo_Click(object sender, RoutedEventArgs e)
         {
+            theFile.Owner = owner.Text;
+            theFile.Status = status.Text;
+            theFile.Description = description.Text;
+            theFile.DateTime = dateTime.Text;
+            submitResult();
+        }
 
+        // -----< cancel_Click: Handle cancel button click event >-----
+        private void cancel_Click(object sender, RoutedEventArgs e)
+        {
+            this.Close();
         }
     }
 }

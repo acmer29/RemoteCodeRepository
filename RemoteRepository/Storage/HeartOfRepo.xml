@@ -75,41 +75,6 @@
     </record>
     <record>
       <name>
-        DbCore::DbCore.h.2
-      </name>
-      <description>
-        Version 2 DbCore header
-      </description>
-      <dateTime>
-        Thu Mar 29 11:30:12 2018
-      </dateTime>
-      <children>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/DbCore_DbCore.h.2
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          Tianyu
-        </owner>
-        <nameSpace>
-          DbCore
-        </nameSpace>
-        <categories>
-          <category>
-            DbCore
-          </category>
-          <category>
-            Project 1
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
         SWRTB::SWRepoCore.h.1
       </name>
       <description>
@@ -151,35 +116,32 @@
     </record>
     <record>
       <name>
-        Server::RemoteRepository.cpp.1
+        DbCore::DbCore.h.2
       </name>
       <description>
-        Source file of the server of project4
+        New version of DbCore.h
       </description>
       <dateTime>
-        Sun Apr  8 23:10:08 2018
+        Thu Mar 29 11:30:12 2018
       </dateTime>
       <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
       </children>
       <payLoads>
         <payLoad>
-          ../Storage/Server_RemoteRepository.cpp.1
+          ../Storage/DbCore_DbCore.h.2
         </payLoad>
         <status>
           open
         </status>
         <owner>
-          Administrator
+          Tianyu
         </owner>
         <nameSpace>
-          Server
+          DbCore
         </nameSpace>
         <categories>
           <category>
-            source
+            Project 1
           </category>
         </categories>
       </payLoads>
@@ -219,6 +181,41 @@
           <category>
             Project2
           </category>
+          <category>
+            source
+          </category>
+        </categories>
+      </payLoads>
+    </record>
+    <record>
+      <name>
+        Server::RemoteRepository.cpp.1
+      </name>
+      <description>
+        Source file of the server of project4
+      </description>
+      <dateTime>
+        Sun Apr  8 23:10:08 2018
+      </dateTime>
+      <children>
+        <childName>
+          DbCore::DbCore.h.1
+        </childName>
+      </children>
+      <payLoads>
+        <payLoad>
+          ../Storage/Server_RemoteRepository.cpp.1
+        </payLoad>
+        <status>
+          open
+        </status>
+        <owner>
+          Administrator
+        </owner>
+        <nameSpace>
+          Server
+        </nameSpace>
+        <categories>
           <category>
             source
           </category>

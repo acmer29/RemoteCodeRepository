@@ -1,0 +1,45 @@
+﻿<Window x:Class="GUI.filterWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:GUI"
+        mc:Ignorable="d"
+        Title="Set the Filter" Height="300" Width="600" Loaded="Window_Loaded">
+	<Grid Margin="5,15,5,15">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="1.5*"></ColumnDefinition>
+			<ColumnDefinition Width="5*"></ColumnDefinition>
+			<ColumnDefinition Width="1*"></ColumnDefinition>
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition></RowDefinition>
+			<RowDefinition></RowDefinition>
+			<RowDefinition></RowDefinition>
+			<RowDefinition></RowDefinition>
+			<RowDefinition></RowDefinition>
+			<RowDefinition></RowDefinition>
+			<RowDefinition></RowDefinition>
+			<RowDefinition></RowDefinition>
+			<RowDefinition></RowDefinition>
+		</Grid.RowDefinitions>
+		<Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">Filename</Label>
+		<TextBox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,0,5,0" Name="fileName"/>
+		<CheckBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepFileName" Checked="keepFileName_Checked" Unchecked="keepFileName_Unchecked">Select all</CheckBox>
+
+		<Label Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Version</Label>
+		<TextBox Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,5,0" Width="24" Name="version"/>
+		<CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepVersion" Checked="keepVersion_Checked" Unchecked="keepVersion_Unchecked">Select all</CheckBox>
+
+		<Label Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Dependencies</Label>
+		<TextBox Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,0,5,0" Name="dependencies"/>
+		<CheckBox Grid.Column="1" Grid.Row="5" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepDependencies" Checked="keepDependencies_Checked" Unchecked="keepDependenices_Unchecked">Select all</CheckBox>
+
+		<Label Grid.Column="0" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center">Categories</Label>
+		<TextBox Grid.Column="1" Grid.Row="6" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,0,5,0" Name="categories"/>
+		<CheckBox Grid.Column="1" Grid.Row="7" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepCategories" Checked="keepCategories_Checked" Unchecked="keepCategories_Unchecked">Select all</CheckBox>
+		
+		<Button Grid.Column="1" Grid.Row="9" Width="60" Margin="5,0,75,0" HorizontalAlignment="Right" Click="SetFilter_Click">Set Filter</Button>
+		<Button Grid.Column="1" Grid.Row="9" Width="60" Margin="5,0,5,0" HorizontalAlignment="Right" Click="Cancel_Click">Cancel</Button>
+	</Grid>
+</Window>

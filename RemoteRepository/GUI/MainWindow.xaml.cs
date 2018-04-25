@@ -48,6 +48,7 @@ using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Threading;
+using System.Windows.Threading;
 using MsgPassingCommunication;
 
 namespace GUI
@@ -120,6 +121,8 @@ namespace GUI
             trackAllCategoriesCallbackHandler();
             pingHandler();
             browseDescriptionCallbackHandler();
+            setFilterCallbackHandler();
+            resumeCheckinCallbackHandler();
         }
 
         // -----< debugDisply: Display messages in the debug message tab >-----
@@ -135,6 +138,28 @@ namespace GUI
             }
             if (direction == "send") SendMessageDebugView.Items.Insert(0, toDisplay);
             else if (direction == "receive") ReceiveMessageDebugView.Items.Insert(0, toDisplay);
+        }
+
+        private static DispatcherOperationCallback exitFrameCallback = new DispatcherOperationCallback(ExitFrame);
+
+        public static void DoEvents()
+        {
+            DispatcherFrame nestedFrame = new DispatcherFrame();
+            DispatcherOperation exitOperation = Dispatcher.CurrentDispatcher.BeginInvoke(DispatcherPriority.Background, exitFrameCallback, nestedFrame);
+            Dispatcher.PushFrame(nestedFrame);
+            if (exitOperation.Status !=
+            DispatcherOperationStatus.Completed)
+            {
+                exitOperation.Abort();
+            }
+        }
+
+        private static Object ExitFrame(Object state)
+        {
+            DispatcherFrame frame = state as
+            DispatcherFrame;
+            frame.Continue = false;
+            return null;
         }
 
         // -----< fileInfoBriefAssembler: Assemble the file brief >-----
@@ -160,6 +185,16 @@ namespace GUI
                 result += item + ",";
             }
             return result.Substring(0, result.Length - 1); 
+        }
+
+        private string arrayToString(string[] toConvert)
+        {
+            string result = "";
+            foreach (string item in toConvert)
+            {
+                result += item + ",";
+            }
+            return result.Substring(0, result.Length - 1);
         }
 
         // -----< addDependency: Add dependency to checkin item >-----
@@ -218,6 +253,7 @@ namespace GUI
             foreach (FileComplex item in repoRecords)
             {
                 browseList.Items.Add(item);
+                filterRecords.Add(item);
             }
         }
 
@@ -230,7 +266,62 @@ namespace GUI
                 checkinCategoryList.Items.Add(toAdd);
             }
         }
-                
+
+        // -----< clearBrowseListView: Clear browse listview >-----
+        private void clearBrowseListView()
+        {
+            browseList.Items.Clear();
+        }
+        
+        // -----< populateFilterBrowseListView: Populate filter browse listview >-----
+        private void populateFilterBrowseListView()
+        {
+            foreach (FileComplex item in filterRecords)
+            {
+                browseList.Items.Add(item);
+            }
+        }
+
+        // -----< resumeCheckinCallbackHandler: Handle resumeCheckinCallback >-----
+        private void resumeCheckinCallbackHandler()
+        {
+            Action<CsMessage> resumeCheckinCallback = (CsMessage receiveMessage) =>
+            {
+                var enumer = receiveMessage.attributes.GetEnumerator();
+                while (enumer.MoveNext())
+                {
+                    if (enumer.Current.Key.Contains("errorInfo") && enumer.Current.Value != "")
+                    {
+                        Console.Write("\nWe are in trouble!\n");
+                    }
+                };
+            };
+            registerHandler("resumeCheckinCallback", resumeCheckinCallback);
+        }
+        
+        // -----< resumeCheckinHandler: Handle resumeCheckin event >-----
+        private void resumeCheckinHandler(FileComplex raw)
+        {
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "resumeCheckin");
+            message.add("fileName", "$" + raw.NameSpace + "_" + raw.Name + "." + raw.Version);
+            message.add("dependencies", arrayToString(raw.Dependencies));
+            message.add("categories", arrayToString(raw.Categories));
+            message.add("status", raw.Status);
+            message.add("nameSpace", raw.NameSpace);
+            message.add("fileKey", raw.Key);
+            message.add("owner", raw.Owner);
+            message.add("description", raw.Description);
+            Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send");
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+        }
+
         // -----< showFileWindowPopup: Popup the fileWindow >-----
         private void showFileWindowPopup(CsMessage msg)
         {
@@ -241,12 +332,86 @@ namespace GUI
             popUp.Owner = this;
             popUp.Title = "File Popup Window - User: " + argUser + " - Port: " + argPort;
             popUp.Show();
+            popUp.SubmitResult += submission =>
+            {
+                FileComplex selected = submission;
+                resumeCheckinHandler(selected);
+            };
         }
 
         // -----< registerHandler: Add client processing for message with key >-----
         private void registerHandler(string key, Action<CsMessage> clientProc)
         {
             dispatcher_[key] = clientProc;
+        }
+
+        private void setFilterCallbackHandler()
+        {
+            Action<CsMessage> setFilterCallback = (CsMessage receiveMessage) =>
+            {
+                filterRecords.Clear();
+                Action clearList = () => { clearBrowseListView(); };
+                Dispatcher.Invoke(clearList, new Object[] { });
+                var enumer = receiveMessage.attributes.GetEnumerator();
+                while (enumer.MoveNext())
+                {
+                    if (enumer.Current.Key.Contains("record"))
+                    {
+                        filterRecords.Add(fileInfoBriefAssembler(enumer.Current.Value));
+                    }
+                }
+                Action addList = () => { populateFilterBrowseListView(); };
+                Dispatcher.Invoke(addList, new Object[] { });
+            };
+            registerHandler("setFilterCallback", setFilterCallback);
+        }
+
+            // ----< setFilter: Set the filter >-----
+        private void setFilterHandler(string[] raw)
+        {
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = "localhost";
+            serverEndPoint.port = 8080;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "setFilter");
+            if (raw[0] != "\n") message.add("fileName", raw[0]);
+            if (raw[1] != "\n") message.add("version", raw[1]);
+            if (raw[2] != "\n") message.add("dependencies", raw[2]);
+            if (raw[3] != "\n") message.add("categories", raw[3]);
+            if (raw[4] != "\n") message.add("relationship", raw[4]);
+            string currentDisplay = "";
+            foreach (FileComplex item in filterRecords)
+            {
+                currentDisplay += ("$" + item.Key);
+            }
+            currentDisplay = currentDisplay.Substring(1);
+            message.add("source", currentDisplay);
+            Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send");
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+        }
+
+        // -----< Clear_Filter_Click: Handle clearFilter button click event >-----
+        private void Clear_Filter_Click(object sender, RoutedEventArgs e)
+        {
+            clearBrowseListView();
+            populateBrowseListView();
+            
+        }
+
+        // -----< Set_Filter_Click: Handle setFilter button click event >-----
+        private void Set_Filter_Click(object sender, RoutedEventArgs e)
+        {
+            filterWindow filterPopup = new filterWindow();
+            filterPopup.Owner = this;
+            filterPopup.Show();
+            filterPopup.SubmitFilter += submission =>
+            {
+                string[] selected = submission;
+                setFilterHandler(selected);
+            };
         }
 
         // -----< showFileHandler: Callback handler of showFile >-----
@@ -272,16 +437,10 @@ namespace GUI
                 message.add("from", CsEndPoint.toString(endPoint_));
                 message.add("command", "showFileCleanUp");
                 message.add("fileName", fileName);
-                Action<CsMessage> debug = (CsMessage msg) =>
-                {
-                    debugDisplay(msg, "send");
-                };
+                Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send");
                 Dispatcher.Invoke(debug, new Object[] { message });
                 translater.postMessage(message);
-                Action<CsMessage> showFileInPopup = (CsMessage msg) =>
-                {
-                    showFileWindowPopup(msg);
-                };
+                Action<CsMessage> showFileInPopup = (CsMessage msg) => showFileWindowPopup(msg);
                 Dispatcher.Invoke(showFileInPopup, receiveMessage);
             };
             registerHandler("showFileCallback", showFileCallback);
@@ -298,10 +457,7 @@ namespace GUI
             message.add("from", CsEndPoint.toString(endPoint_));
             message.add("command", "showFile");
             message.add("fileName", fileKey);
-            Action<CsMessage> debug = (CsMessage msg) =>
-            {
-                debugDisplay(msg, "send");
-            };
+            Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send"); 
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
         }
@@ -352,10 +508,7 @@ namespace GUI
             message.add("nameSpace", nameSpace.Text);
             message.add("owner", theUser.Text);
             message.add("close", closeCheckIn.IsChecked.ToString().ToLower());
-            Action<CsMessage> debug = (CsMessage msg) =>
-            {
-                debugDisplay(msg, "send");
-            };
+            Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send"); 
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
             message.show();

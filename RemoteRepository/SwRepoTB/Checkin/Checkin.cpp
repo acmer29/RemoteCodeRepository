@@ -95,8 +95,7 @@ void Checkin::pathSolver(const std::string& pathFileName) {
 
 // -----< localPathSolver: Solve the path appears to be the working directory >-----
 void Checkin::localPathSolver(const std::string& fileName) {
-	querier.from(repo.core()).find("payLoad", 
-		"/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/").find("status", "open");
+	querier.from(repo.core()).find("payLoad", workDirectory + fileName).find("status", "open");
 	if (querier.eval().size() != 1) throw std::exception("Check-in: Cannot locate local file by given fileName.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
 	filesForCheckin.push_back(fileCplx.payLoad());

@@ -158,7 +158,6 @@ Msg Server::checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg
 	Msg reply(to, from);
 	reply.attribute("command", "checkinCallback");
 	SWRTB::Core repo(Repository::repoHeartPath);
-	NoSqlDb::DbQuery<std::string> querier(repo.core());
 	SWRTB::Checkin worker(repo);
 	std::string pathFileName = "../SaveFiles/" + receiveMessage.value("file");
 	std::string description = receiveMessage.value("description");
@@ -187,7 +186,6 @@ Msg Server::checkOutCallbackMessage(const EndPoint& from, const EndPoint& to, Ms
 	Msg reply(to, from);
 	reply.attribute("command", "checkoutCallback");
 	SWRTB::Core repo(Repository::repoHeartPath);
-	NoSqlDb::DbQuery<std::string> querier(repo.core());
 	SWRTB::Checkout worker(repo, "../SendFiles/");
 	std::string NSNFileNameVersion = receiveMessage.value("fileName");
 	std::string requestor = receiveMessage.value("requestor");
@@ -223,6 +221,80 @@ void Server::sendMultipleFiles(Msg message) {
 	return;
 }
 
+// -----< buildSource: Helper function of setFilterMessage >----------------------------
+std::vector<NoSqlDb::DbElement<std::string>> buildSource(const std::string& rawSource) {
+	SWRTB::Core repo(Repository::repoHeartPath);
+	NoSqlDb::DbQuery<std::string> querier(repo.core());
+	std::vector<std::string> names = Utilities::splitPlus(rawSource, '$');
+	std::vector<NoSqlDb::DbElement<std::string>> result;
+	for (auto item : names) {
+		std::vector<NoSqlDb::DbElement<std::string>> tmp = querier.from(repo.core()).find("name", item).eval();
+		if (tmp.size()) result.push_back(tmp[0]);
+	}
+	return result;
+}
+
+// -----< setFilterMessage: Assemble setFilter message >------------------------------------
+Msg Server::setFilterMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage) {
+	Msg reply(to, from);
+	reply.attribute("command", "setFilterCallback");
+	SWRTB::Core repo(Repository::repoHeartPath);
+	NoSqlDb::DbQuery<std::string> querier(repo.core());
+	std::vector<NoSqlDb::DbElement<std::string>> result;
+	std::string queryString = "";
+	if (receiveMessage.containsKey("fileName")) queryString += "name: \"" + receiveMessage.value("fileName") + "\"";
+	if (receiveMessage.containsKey("version")) queryString += "name: \"/.*\\." + receiveMessage.value("version") + "/\"";
+	if (receiveMessage.containsKey("dependencies")) queryString += "children: \"" + receiveMessage.value("dependencies") + "\"";
+	if (receiveMessage.containsKey("categories")) queryString += "category: \"" + receiveMessage.value("category") + "\"";
+	result = querier.from(buildSource(receiveMessage.value("source"))).find(queryString).eval();
+	size_t count = 0;
+	for (auto item : result) {
+		std::string recordBrief = item.nameSpace() + "$"
+			+ SWRTB::nameOf(item.name(), item.nameSpace()) + "$"
+			+ SWRTB::versionOf(item.name()) + "$"
+			+ item.status() + "$"
+			+ item.descrip();
+		reply.attribute("record" + Utilities::Converter<size_t>::toString(count++), recordBrief);
+	}
+	return reply;
+}
+
+// -----< shouldClose: Helper function of resumeCheckinMessage >-----
+bool shouldClose(const std::string& name) {
+	SWRTB::Core repo(Repository::repoHeartPath);
+	NoSqlDb::DbQuery<std::string> querier(repo.core());
+	std::vector<NoSqlDb::DbElement<std::string>> tmp = querier.from(repo.core()).find("name", name).eval();
+	if (tmp.size() == 0) return false;
+	else if (tmp[0].status() != "open") return false;
+	else return true;
+}
+
+// -----< resumeCheckinMessage: Assamble resumeCheckinMessage >---------------------------------
+Msg Server::resumeCheckinMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage) {
+	Msg reply(to, from);
+	reply.attribute("command", "resumeCheckinCallback");
+	SWRTB::Core repo(Repository::repoHeartPath);
+	SWRTB::Checkin worker(repo);
+	std::string name = receiveMessage.value("fileKey");
+	std::string errorInfo = "";
+	std::cout << "----------" << receiveMessage.value("fileName") << "--------------" << std::endl;
+	try {
+		if (shouldClose(name) == true && receiveMessage.value("status") != "open") {
+			worker.checkin(receiveMessage.value("fileName"), receiveMessage.value("dependencies"), receiveMessage.value("description"),
+				receiveMessage.value("categories"), receiveMessage.value("nameSpace"), receiveMessage.value("owner"), true);
+		}
+		else {
+			worker.checkin(receiveMessage.value("fileName"), receiveMessage.value("dependencies"), receiveMessage.value("description"),
+				receiveMessage.value("categories"), receiveMessage.value("nameSpace"), receiveMessage.value("owner"), false);
+		}
+	}
+	catch (std::exception& ex) {
+		errorInfo = ex.what();
+	}
+	reply.attribute("errorInfo", errorInfo);
+	return reply;
+}
+
 // -----< show: show different type of message >-----
 template<typename T>
 void show(const T& t, const std::string& msg)
@@ -234,7 +306,7 @@ void show(const T& t, const std::string& msg)
 	}
 }
 
-// -----< echo: reply echo message >-----
+// -----< echo: reply echo message >--------
 std::function<Msg(Msg)> echo = [](Msg msg) {
 	Msg reply = msg;
 	reply.to(msg.from());
@@ -306,6 +378,20 @@ std::function<Msg(Msg)> browseDescription = [](Msg msg) {
 	return reply;
 };
 
+// -----< setFilter: reply setFilter message >-----
+std::function<Msg(Msg)> setFilter = [](Msg msg) {
+	Msg reply = Server::setFilterMessage(msg.to(), msg.from(), msg);
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	return reply;
+};
+
+// -----< resumeCheckin: reply resumeCheckin message >-----
+std::function<Msg(Msg)> resumeCheckin = [](Msg msg) {
+	Msg reply = Server::resumeCheckinMessage(msg.to(), msg.from(), msg);
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	return reply;
+};
+
 int main()
 {
 	SetConsoleTitleA("Server Console");
@@ -331,6 +417,8 @@ int main()
 	server.addMsgProc("serverQuit", echo);
 	server.addMsgProc("ping", ping);
 	server.addMsgProc("browseDescription", browseDescription);
+	server.addMsgProc("setFilter", setFilter);
+	server.addMsgProc("resumeCheckin", resumeCheckin);
 	server.processMessages();
 
 	Msg msg(serverEndPoint, serverEndPoint);  // send to self
