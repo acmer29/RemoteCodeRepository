@@ -5,10 +5,17 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:GUI"
         mc:Ignorable="d"
-        Title="Set the Filter" Height="300" Width="600" Loaded="Window_Loaded">
+        Title="Filter" Height="300" Width="600" Loaded="Window_Loaded">
+	<!-- 
+    ///////////////////////////////////////////////////////////////////////
+    // filter.xaml - GUI for popup filterWindow                          //
+    // ver 1.0                                                           //
+    // Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018           //
+    ///////////////////////////////////////////////////////////////////////
+    -->
 	<Grid Margin="5,15,5,15">
 		<Grid.ColumnDefinitions>
-			<ColumnDefinition Width="1.5*"></ColumnDefinition>
+			<ColumnDefinition Width="1.8*"></ColumnDefinition>
 			<ColumnDefinition Width="5*"></ColumnDefinition>
 			<ColumnDefinition Width="1*"></ColumnDefinition>
 		</Grid.ColumnDefinitions>
@@ -23,23 +30,30 @@
 			<RowDefinition></RowDefinition>
 			<RowDefinition></RowDefinition>
 		</Grid.RowDefinitions>
-		<Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">Filename</Label>
-		<TextBox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,0,5,0" Name="fileName"/>
-		<CheckBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepFileName" Checked="keepFileName_Checked" Unchecked="keepFileName_Unchecked">Select all</CheckBox>
+		<Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">Namespace::Filename</Label>
+		<Label Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="8">Filename must be given</Label>
+		<TextBox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,5,0" Name="nameSpace" Width="60"/>
+		<Label Grid.Column="1" Grid.Row="0" Margin="65,0,0,0" VerticalAlignment="Center">::</Label>
+		<TextBox Grid.Column="1" Grid.Row="0" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="80,0,5,0" Width="80" Name="fileName"/>
+		<CheckBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepNameSpace" Checked="keepNameSpace_Checked" Unchecked="keepNameSpace_Unchecked">Select all Namespace</CheckBox>
+		<CheckBox Grid.Column="1" Grid.Row="1" VerticalAlignment="Center" Margin="150,0,5,0" Name="keepFileName" Checked="keepFileName_Checked" Unchecked="keepFileName_Unchecked">Select all Filenames</CheckBox>
 
 		<Label Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Version</Label>
+		<Label Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="8">Version must be digits</Label>
 		<TextBox Grid.Column="1" Grid.Row="2" HorizontalAlignment="Left" VerticalAlignment="Center" Margin="5,0,5,0" Width="24" Name="version"/>
-		<CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepVersion" Checked="keepVersion_Checked" Unchecked="keepVersion_Unchecked">Select all</CheckBox>
+		<CheckBox Grid.Column="1" Grid.Row="3" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepVersion" Checked="keepVersion_Checked" Unchecked="keepVersion_Unchecked">Select all versions</CheckBox>
 
 		<Label Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Dependencies</Label>
+		<Label Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="8">Use ',' to seprate names</Label>
 		<TextBox Grid.Column="1" Grid.Row="4" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,0,5,0" Name="dependencies"/>
-		<CheckBox Grid.Column="1" Grid.Row="5" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepDependencies" Checked="keepDependencies_Checked" Unchecked="keepDependenices_Unchecked">Select all</CheckBox>
+		<CheckBox Grid.Column="1" Grid.Row="5" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepDependencies" Checked="keepDependencies_Checked" Unchecked="keepDependenices_Unchecked">Select all dependencies</CheckBox>
 
 		<Label Grid.Column="0" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center">Categories</Label>
+		<Label Grid.Column="0" Grid.Row="7" HorizontalAlignment="Right" VerticalAlignment="Top" FontSize="8">Use ',' to seprate names</Label>
 		<TextBox Grid.Column="1" Grid.Row="6" HorizontalAlignment="Stretch" VerticalAlignment="Center" Margin="5,0,5,0" Name="categories"/>
-		<CheckBox Grid.Column="1" Grid.Row="7" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepCategories" Checked="keepCategories_Checked" Unchecked="keepCategories_Unchecked">Select all</CheckBox>
+		<CheckBox Grid.Column="1" Grid.Row="7" VerticalAlignment="Center" Margin="5,0,5,0" Name="keepCategories" Checked="keepCategories_Checked" Unchecked="keepCategories_Unchecked">Select all categories</CheckBox>
 		
-		<Button Grid.Column="1" Grid.Row="9" Width="60" Margin="5,0,75,0" HorizontalAlignment="Right" Click="SetFilter_Click">Set Filter</Button>
+		<Button Grid.Column="1" Grid.Row="9" Width="60" Margin="5,0,75,0" HorizontalAlignment="Right" Click="SetFilter_Click">Set</Button>
 		<Button Grid.Column="1" Grid.Row="9" Width="60" Margin="5,0,5,0" HorizontalAlignment="Right" Click="Cancel_Click">Cancel</Button>
 	</Grid>
 </Window>

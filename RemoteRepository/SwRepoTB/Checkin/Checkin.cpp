@@ -166,9 +166,9 @@ void Checkin::resumeCheckin(const std::string& pathFileName) {
 	std::string fileName = pathHelper.getName(pathFileName);
 	if (pathFileName.substr(0, workDirectory.length()) != workDirectory) fileName = nameConcater(fileName, nameSpace_, "_");
 	else fileName = fileName.substr(0, fileName.find_last_of('.'));
-	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/").find("status", "open").eval().size() != 1 && \
-		querier.from(repo.core()).find("payLoad", pathFileName).find("status", "open").eval().size() != 1)
-		throw std::exception("This file has no open version.\n");
+	if (querier.from(repo.core()).find("payLoad", "/" + Utilities::regexSafeFilter(workDirectory) + Utilities::regexSafeFilter(fileName) + "\\.[0-9]*/").eval().size() != 1 && \
+		querier.from(repo.core()).find("payLoad", pathFileName).eval().size() != 1)
+		throw std::exception("Checkin: This file is not exist.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
 	if (canTouch(fileCplx.owner(), owner_) == false) 
 		throw std::exception("Checkin: This file is not owned by you!\n");

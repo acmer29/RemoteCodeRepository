@@ -171,7 +171,7 @@ namespace GUI
             result.Name = infoBriefComplex[1];
             result.Version = infoBriefComplex[2];
             result.Status = infoBriefComplex[3];
-            result.Description = infoBriefComplex[4];
+            result.Owner = infoBriefComplex[4];
             result.Key = result.NameSpace + "::" + result.Name + "." + result.Version;
             return result;
         }
@@ -227,6 +227,18 @@ namespace GUI
             CheckBox selected = sender as CheckBox;
             string toRemove = selected.Tag.ToString();
             checkInCategories.Remove(toRemove);
+        }
+
+        // -----< addCategory_Clicked: Handler addCategory click event >-----
+        private void addCategory_Click(object sender, RoutedEventArgs e)
+        {
+            KeyValuePair theNew = new KeyValuePair();
+            if (newCategory.Text == "") return;
+            theNew.IsChecked = true;
+            theNew.Value = newCategory.Text;
+            checkinCategoryList.Items.Add(theNew);
+            checkInCategories.Add(newCategory.Text);
+            newCategory.Text = "";
         }
 
         // -----< populateAllListView: Populate checkin dependency ListView >-----
@@ -287,14 +299,17 @@ namespace GUI
         {
             Action<CsMessage> resumeCheckinCallback = (CsMessage receiveMessage) =>
             {
+                string errorInfo = "File information modification success.\n";
                 var enumer = receiveMessage.attributes.GetEnumerator();
                 while (enumer.MoveNext())
                 {
                     if (enumer.Current.Key.Contains("errorInfo") && enumer.Current.Value != "")
                     {
-                        Console.Write("\nWe are in trouble!\n");
+                        errorInfo = enumer.Current.Value;
                     }
                 };
+                if (isDebug == false)
+                    MessageBox.Show(errorInfo, "File Information Modification", MessageBoxButton.OK, MessageBoxImage.Information);
             };
             registerHandler("resumeCheckinCallback", resumeCheckinCallback);
         }
@@ -329,6 +344,7 @@ namespace GUI
             popUp.getFileInfo(msg);
             popUp.getAllRecordInfo(repoRecords);
             popUp.getAllCategories(repoCategories);
+            popUp.getCurrentUser(argUser);
             popUp.Owner = this;
             popUp.Title = "File Popup Window - User: " + argUser + " - Port: " + argPort;
             popUp.Show();
@@ -345,6 +361,7 @@ namespace GUI
             dispatcher_[key] = clientProc;
         }
 
+        // -----< setFilterCallbackHandler: Handler setFilterCallback >-----
         private void setFilterCallbackHandler()
         {
             Action<CsMessage> setFilterCallback = (CsMessage receiveMessage) =>
@@ -366,7 +383,7 @@ namespace GUI
             registerHandler("setFilterCallback", setFilterCallback);
         }
 
-            // ----< setFilter: Set the filter >-----
+        // ----< setFilter: Set the filter >-----
         private void setFilterHandler(string[] raw)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -376,11 +393,11 @@ namespace GUI
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
             message.add("command", "setFilter");
-            if (raw[0] != "\n") message.add("fileName", raw[0]);
-            if (raw[1] != "\n") message.add("version", raw[1]);
-            if (raw[2] != "\n") message.add("dependencies", raw[2]);
-            if (raw[3] != "\n") message.add("categories", raw[3]);
-            if (raw[4] != "\n") message.add("relationship", raw[4]);
+            if (raw[0] != "\n") message.add("nameSpace", raw[0]);
+            if (raw[1] != "\n") message.add("fileName", raw[1]);
+            if (raw[2] != "\n") message.add("version", raw[2]);
+            if (raw[3] != "\n") message.add("dependencies", raw[3]);
+            if (raw[4] != "\n") message.add("categories", raw[4]);
             string currentDisplay = "";
             foreach (FileComplex item in filterRecords)
             {

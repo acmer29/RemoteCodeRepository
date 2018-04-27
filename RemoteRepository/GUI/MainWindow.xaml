@@ -149,7 +149,7 @@
 									<GridViewColumn Header="File Name" Width="80" DisplayMemberBinding="{Binding Path=Name}"/>
 									<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"/>
 									<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"/>
-									<GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Description}"></GridViewColumn>
+									<GridViewColumn Header="Owner" DisplayMemberBinding="{Binding Path=Owner}"></GridViewColumn>
 								</GridView>
 							</ListView.View>
 						</ListView>
@@ -160,7 +160,11 @@
 							<ColumnDefinition Width="5*"></ColumnDefinition>
 							<ColumnDefinition Width="1*"></ColumnDefinition>
 						</Grid.ColumnDefinitions>
-						<ListView Grid.Row="0" Name="checkinCategoryList">
+						<Grid.RowDefinitions>
+							<RowDefinition></RowDefinition>
+							<RowDefinition Height="35"></RowDefinition>
+						</Grid.RowDefinitions>
+						<ListView Grid.Row="0" Grid.Column="0" Name="checkinCategoryList">
 							<ListView.View>
 								<GridView>
 									<GridViewColumn Width="30">
@@ -174,6 +178,8 @@
 								</GridView>
 							</ListView.View>
 						</ListView>
+						<TextBox Grid.Row="1" Margin="0,0,80,5" Name="newCategory"></TextBox>
+						<Button Grid.Row="1" HorizontalAlignment="Right" Margin="0,0,0,5" Width="80" Name="addCategoryButton" Click="addCategory_Click">Add Category</Button>
 					</Grid>
 					<Grid Grid.Row="5" Grid.Column="1">
 						<Grid.ColumnDefinitions>
@@ -201,7 +207,7 @@
 								<GridViewColumn Header="File Name" Width="100" DisplayMemberBinding="{Binding Path=Name}"/>
 								<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"/>
 								<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"/>
-								<GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Desription}"></GridViewColumn>
+								<GridViewColumn Header="Owner" DisplayMemberBinding="{Binding Path=Owner}"></GridViewColumn>
 							</GridView>
 						</ListView.View>
 					</ListView>
@@ -228,7 +234,7 @@
 								<GridViewColumn Header="File Name" Width="100" DisplayMemberBinding="{Binding Path=Name}"/>
 								<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"/>
 								<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"/>
-								<GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Desription}"></GridViewColumn>
+								<GridViewColumn Header="Owner" DisplayMemberBinding="{Binding Path=Owner}"></GridViewColumn>
 							</GridView>
 						</ListView.View>
 					</ListView>
@@ -268,6 +274,13 @@
 						<ListBox Grid.Row="1" Name="ReceiveMessageDebugView"></ListBox>
 					</Grid>
 				</Grid>
+			</TabItem>
+			<TabItem Header="About">
+				<FlowDocumentScrollViewer  Margin="15,15,15,15">
+					<FlowDocument Name="fileCode" FontSize="12">
+
+					</FlowDocument>
+				</FlowDocumentScrollViewer>
 			</TabItem>
 		</TabControl>
 		<StatusBar Grid.Row="1">

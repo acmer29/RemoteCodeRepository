@@ -8,10 +8,8 @@
  * -------------------
  * This package provides a WPF-based GUI for Project3HelpWPF demo.  It's 
  * responsibilities are to:
- * - Provide a display of directory contents of a remote ServerPrototype.
- * - It provides a subdirectory list and a filelist for the selected directory.
- * - You can navigate into subdirectories by double-clicking on subdirectory
- *   or the parent directory, indicated by the name "..".
+ * - Provide a browse window for browse detailed file metadata
+ * - Provide function to change file metadata
  *   
  * Required Files:
  * ---------------
@@ -58,8 +56,8 @@ namespace GUI
             InitializeComponent();
         }
         private FileComplex theFile = new FileComplex();
+        private string theUser;
         private string filePath;
-        private string errorInformation;
         private HashSet<FileComplex> allRecords = new HashSet<FileComplex>();
         private HashSet<string> allCategories = new HashSet<string>();
         private HashSet<string> selectedDependencies = new HashSet<string>();
@@ -68,7 +66,6 @@ namespace GUI
         // -----< getFileInfo: get file info from mainWindow >-----
         public void getFileInfo(CsMessage receiveMessage)
         {
-            errorInformation = "";
             var enumer = receiveMessage.attributes.GetEnumerator();
             while (enumer.MoveNext())
             {
@@ -82,7 +79,6 @@ namespace GUI
                 else if (enumer.Current.Key == "file-Categories") theFile.Categories = stringToArray(enumer.Current.Value);
                 else if (enumer.Current.Key == "file-Status") theFile.Status = enumer.Current.Value;
                 else if (enumer.Current.Key == "file-Owner") theFile.Owner = enumer.Current.Value;
-                else if (enumer.Current.Key == "error") errorInformation = enumer.Current.Value;
             }
             theFile.Key = theFile.NameSpace + "::" + theFile.Name + "." + theFile.Version;
         }
@@ -97,6 +93,12 @@ namespace GUI
         public void getAllCategories(HashSet<string> repoCategories)
         {
             allCategories = repoCategories;
+        }
+
+        // -----< getCurrentUser: get current username >-----
+        public void getCurrentUser(string userName)
+        {
+            theUser = userName;
         }
 
         // -----< SubmitResult: Public SubmitResult handler >-----
@@ -116,6 +118,26 @@ namespace GUI
             loadFileDependencies();
             loadFileCategories();
             applyChanges.IsEnabled = false;
+            if(theUser != theFile.Owner)
+            {
+                description.IsEnabled = false; allRecordBriefList.IsEnabled = false; allCategoryList.IsEnabled = false; version.IsEnabled = false; owner.IsEnabled = false; newCategory.IsEnabled = false; addCategoryButton.IsEnabled = false;
+                fileInfoNotificationLabel.Content = "  The file is not own by you.\n  You cannot modify its metadata.";
+                dependenciesNotificationLabel.Content = "  The file is not own by you.\n  You cannot modify its metadata.";
+                categoriesInfoNotificationLabel.Content = "  The file is not own by you.\n  You cannot modify its metadata.";
+            }
+            else if (theFile.Status != "open")
+            {
+                allRecordBriefList.IsEnabled = false;
+                fileInfoNotificationLabel.Content = "  You can transfer ownership by changing the owner name";
+                dependenciesNotificationLabel.Content = "  Closed checkin file cannot change its dependencies.";
+                categoriesInfoNotificationLabel.Content = "  You can click the checkbox to add the file to this category";
+            }
+            else
+            {
+                fileInfoNotificationLabel.Content = "  You can transfer ownership by changing the owner name\n  Open checkin can be closed by clicking \"close\" button";
+                dependenciesNotificationLabel.Content = "  You can add dependency file by clicking its checkbox.";
+                categoriesInfoNotificationLabel.Content = "  You can add the file to this category by clicking its checkbox.";
+            }
         }
 
         // -----< stringToArray: Convert string to array >-----
@@ -143,13 +165,18 @@ namespace GUI
             status.Text = theFile.Status;
             description.Text = theFile.Description;
             dateTime.Text = theFile.DateTime;
-            if (theFile.Status != "open") closeCheckin.IsEnabled = false;
+            if (theFile.Status != "open")
+            {
+                closeCheckin.IsEnabled = false;
+                closeCheckin.Content = "Closed";
+            }
+            else closeCheckin.Content = "Close";
         }
 
         // -----< loadFileDependencies: Load file dependencies >-----
         private void loadFileDependencies()
         {
-            foreach(FileComplex item in allRecords)
+            foreach (FileComplex item in allRecords)
             {
                 if (item.NameSpace == theFile.NameSpace && item.Name == theFile.Name) continue;
                 item.IsChecked = false;
@@ -164,12 +191,12 @@ namespace GUI
         // -----< loadFileCategories: Load file categories >-----
         private void loadFileCategories()
         {
-            foreach(string item in allCategories)
+            foreach (string item in allCategories)
             {
                 KeyValuePair toAdd = new KeyValuePair("", item);
-                foreach(string category in theFile.Categories)
+                foreach (string category in theFile.Categories)
                 {
-                    if(category == item)
+                    if (category == item)
                     {
                         toAdd.IsChecked = true;
                     }
@@ -191,7 +218,7 @@ namespace GUI
         private void removeDependency(object sender, RoutedEventArgs e)
         {
             CheckBox selected = sender as CheckBox;
-            string toRemove= selected.Tag.ToString();
+            string toRemove = selected.Tag.ToString();
             selectedCategories.Remove(toRemove);
             applyChanges.IsEnabled = true;
         }
@@ -214,8 +241,20 @@ namespace GUI
             applyChanges.IsEnabled = true;
         }
 
+        // -----< addCategory_Click: Handle addCategory click event >-----
+        private void addCategory_Click(object sender, RoutedEventArgs e)
+        {
+            KeyValuePair theNew = new KeyValuePair();
+            if (newCategory.Text == "") return;
+            theNew.IsChecked = true;
+            theNew.Value = newCategory.Text;
+            allCategoryList.Items.Add(theNew);
+            selectedCategories.Add(newCategory.Text);
+            newCategory.Text = "";
+        }
+
         // -----< applyDependencies_Click: Click handler of addDependencyList checkbox >-----
-        private void applyDependencies_Click(object sender, RoutedEventArgs e)
+        private void applyDependencies()
         {
             List<string> result = new List<string>();
             foreach (string item in selectedDependencies)
@@ -223,11 +262,10 @@ namespace GUI
                 result.Add(item);
             }
             theFile.Dependencies = result.ToArray();
-            submitResult();
         }
 
         // -----< applyCategories_Click: Click handler of addCategoryList checkbox >-----
-        private void applyCategories_Click(object sender, RoutedEventArgs e)
+        private void applyCategories()
         {
             List<string> result = new List<string>();
             foreach (string item in selectedCategories)
@@ -235,23 +273,46 @@ namespace GUI
                 result.Add(item);
             }
             theFile.Categories = result.ToArray();
-            submitResult();
         }
 
         // -----< applyBasicInfo_Click: Handle applyBasicInfo button click event >-----
-        private void applyBasicInfo_Click(object sender, RoutedEventArgs e)
+        private void applyBasicInfo()
         {
             theFile.Owner = owner.Text;
             theFile.Status = status.Text;
             theFile.Description = description.Text;
             theFile.DateTime = dateTime.Text;
+        }
+
+        private void applyChanges_Click(object sender, RoutedEventArgs e)
+        {
+            applyBasicInfo();
+            applyDependencies();
+            applyCategories();
             submitResult();
+            this.Close();
         }
 
         // -----< cancel_Click: Handle cancel button click event >-----
         private void cancel_Click(object sender, RoutedEventArgs e)
         {
             this.Close();
+        }
+
+        // -----< closeCheckin_Click: Handle closeCheckin button click event >-----
+        private void closeCheckin_Click(object sender, RoutedEventArgs e)
+        {
+            string tmp = closeCheckin.Content as string;
+            if (tmp == "Close")
+            {
+                closeCheckin.Content = "Undo";
+                status.Text = "close";
+            }
+            else
+            {
+                closeCheckin.Content = "Close";
+                status.Text = "open";
+            }
         }
     }
 }

@@ -6,13 +6,11 @@
 /*
  * Package Operations:
  * -------------------
- * This package provides a WPF-based GUI for Project3HelpWPF demo.  It's 
+ * This package provides a FileComplex class for Project4. It's 
  * responsibilities are to:
- * - Provide a display of directory contents of a remote ServerPrototype.
- * - It provides a subdirectory list and a filelist for the selected directory.
- * - You can navigate into subdirectories by double-clicking on subdirectory
- *   or the parent directory, indicated by the name "..".
- *   
+ * - Provide a data structure to store all metadata of the file and all
+ *   window can use it to pass the information.
+ * 
  * Required Files:
  * ---------------
  * Mainwindow.xaml, MainWindow.xaml.cs

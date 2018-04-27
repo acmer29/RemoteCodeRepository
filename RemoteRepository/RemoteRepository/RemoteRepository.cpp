@@ -126,7 +126,7 @@ Msg Server::trackAllRecordsMessage(const EndPoint& from, const EndPoint& to) {
 			+ SWRTB::nameOf(item.name(), item.nameSpace()) + "$"
 			+ SWRTB::versionOf(item.name()) + "$"
 			+ item.status() + "$" 
-			+ item.descrip();
+			+ item.owner();
 		reply.attribute("record" + Utilities::Converter<size_t>::toString(count++), recordBrief);
 	}
 	return reply;
@@ -241,12 +241,15 @@ Msg Server::setFilterMessage(const EndPoint& from, const EndPoint& to, Msg recei
 	SWRTB::Core repo(Repository::repoHeartPath);
 	NoSqlDb::DbQuery<std::string> querier(repo.core());
 	std::vector<NoSqlDb::DbElement<std::string>> result;
-	std::string queryString = "";
-	if (receiveMessage.containsKey("fileName")) queryString += "name: \"" + receiveMessage.value("fileName") + "\"";
-	if (receiveMessage.containsKey("version")) queryString += "name: \"/.*\\." + receiveMessage.value("version") + "/\"";
-	if (receiveMessage.containsKey("dependencies")) queryString += "children: \"" + receiveMessage.value("dependencies") + "\"";
-	if (receiveMessage.containsKey("categories")) queryString += "category: \"" + receiveMessage.value("category") + "\"";
-	result = querier.from(buildSource(receiveMessage.value("source"))).find(queryString).eval();
+	std::string queryString = "", nameSpace = ".*", fileName = ".*", version = "[0-9]*", fileNameRegex = "";
+	if (receiveMessage.containsKey("nameSpace")) nameSpace = Utilities::regexSafeFilter(receiveMessage.value("nameSpace"));
+	if (receiveMessage.containsKey("fileName")) fileName = Utilities::regexSafeFilter(receiveMessage.value("fileName"));
+	if (receiveMessage.containsKey("version")) version = Utilities::regexSafeFilter(receiveMessage.value("version"));
+	fileNameRegex = "/" + Utilities::regexSafeFilter(repo.root()) + nameSpace + "_" + fileName + "\\." + version +"/";
+	queryString += "payLoad: \"" + fileNameRegex + "\",";
+	if (receiveMessage.containsKey("dependencies")) queryString += "children: \"" + receiveMessage.value("dependencies") + "\",";
+	if (receiveMessage.containsKey("categories")) queryString += "category: \"" + receiveMessage.value("category") + "\",";
+	result = querier.from(buildSource(receiveMessage.value("source"))).find(queryString.substr(0, queryString.length() - 1)).eval();
 	size_t count = 0;
 	for (auto item : result) {
 		std::string recordBrief = item.nameSpace() + "$"
@@ -398,10 +401,8 @@ int main()
 	std::cout << "\n  Testing Server Prototype";
 	std::cout << "\n ==========================";
 	std::cout << "\n";
-
 	//StaticLogger<1>::attach(&std::cout);
 	//StaticLogger<1>::start();
-
 	Server server(serverEndPoint, "ServerPrototype");
 	server.start();
 
