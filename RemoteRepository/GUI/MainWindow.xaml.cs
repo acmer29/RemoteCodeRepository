@@ -70,7 +70,6 @@ namespace GUI
         
         private Translater translater = new Translater();
         private CsEndPoint endPoint_ = new CsEndPoint();
-        private CsEndPoint serverEndPoint = new CsEndPoint();
         private Thread rcvThrd = null;
         private Dictionary<string, Action<CsMessage>> dispatcher_
           = new Dictionary<string, Action<CsMessage>>();
@@ -83,6 +82,8 @@ namespace GUI
         private List<string> failCheckouts = new List<string>();
         private string argPort = "8082";
         private string argUser = "Administrator";
+        private string theServerAddress = "localhost";
+        private int serverPort = 8080;
         private bool isDebug = false;
 
         //----< process incoming messages on child thread >--------------------
@@ -140,8 +141,15 @@ namespace GUI
             else if (direction == "receive") ReceiveMessageDebugView.Items.Insert(0, toDisplay);
         }
 
+        // -----< hintDisplay: Erase the previous hint and show new >-----
+        private void hintDisplay(string newHint = "")
+        {
+            Hint.Content = newHint;
+        }
+
         private static DispatcherOperationCallback exitFrameCallback = new DispatcherOperationCallback(ExitFrame);
 
+        // -----<DoEvents: Force refresh the window >-----
         public static void DoEvents()
         {
             DispatcherFrame nestedFrame = new DispatcherFrame();
@@ -154,6 +162,7 @@ namespace GUI
             }
         }
 
+        // -----< ExitFrame: Helper of Doevents >-----
         private static Object ExitFrame(Object state)
         {
             DispatcherFrame frame = state as
@@ -187,6 +196,7 @@ namespace GUI
             return result.Substring(0, result.Length - 1); 
         }
 
+        // -----< arrayToString: Convert array to string >-----
         private string arrayToString(string[] toConvert)
         {
             string result = "";
@@ -318,8 +328,8 @@ namespace GUI
         private void resumeCheckinHandler(FileComplex raw)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -387,8 +397,8 @@ namespace GUI
         private void setFilterHandler(string[] raw)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -447,8 +457,8 @@ namespace GUI
                     else if (key == "content-length" && value != "0" && isDebug == true) receiveMessage.show();
                 }
                 CsEndPoint serverEndPoint = new CsEndPoint();
-                serverEndPoint.machineAddress = "localhost";
-                serverEndPoint.port = 8080;
+                serverEndPoint.machineAddress = theServerAddress;
+                serverEndPoint.port = serverPort;
                 CsMessage message = new CsMessage();
                 message.add("to", CsEndPoint.toString(serverEndPoint));
                 message.add("from", CsEndPoint.toString(endPoint_));
@@ -467,8 +477,8 @@ namespace GUI
         private void showFile(string fileKey)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -499,6 +509,7 @@ namespace GUI
                 }
                 if (isDebug == false)
                     MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
+                hintDisplay(errorInfo);
             };
             registerHandler("checkinCallback", checkinCallback);
         }
@@ -507,8 +518,8 @@ namespace GUI
         private void Check_In_Click(object sender, RoutedEventArgs e)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             System.IO.FileInfo sourceFileInfo = new System.IO.FileInfo(pathFileName.Text);
             string fileName = pathFileName.Text.Substring(pathFileName.Text.LastIndexOf("/") + 1);
             System.IO.File.Copy(pathFileName.Text, "../SendFiles/" + fileName, true);
@@ -534,7 +545,7 @@ namespace GUI
         // -----< Check_In_Cancel_Click: Click handler of checkInCancel Button >-----
         private void Check_In_Cancel_Click(object sender, RoutedEventArgs e)
         {
-            pathFileName.Text = "";
+            pathFileName.Text = "Click Browse to select the file";
             description.Text = "";
             checkinCategoryList.Items.Clear();
             checkInDependencyList.Items.Clear();
@@ -562,8 +573,7 @@ namespace GUI
                     if (enumer.Current.Key == "content-length" && enumer.Current.Value == "0") return; 
                     if (enumer.Current.Key == "fileName") successCheckouts.Remove(enumer.Current.Value);
                 }
-                // receiveMessage.show();
-                // Console.Write("File checken out successful.\n");
+                hintDisplay("File checken out successful");
             };
             registerHandler("checkoutReceiveFilesCallback", checkoutReceiveFilesCallback);
         }
@@ -572,8 +582,8 @@ namespace GUI
         private void checkoutReceiveFile(List<string> toReceive)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -599,28 +609,25 @@ namespace GUI
                 receiveMessage.show();
                 var enumer = receiveMessage.attributes.GetEnumerator();
                 string errorInfo = "";
-                while (enumer.MoveNext())
-                {
+                while (enumer.MoveNext()) {
                     if (enumer.Current.Key == "errorInfo" && enumer.Current.Value != "") errorInfo = enumer.Current.Value;
                     else if (enumer.Current.Key.Contains("successFile")) successCheckouts.Add(enumer.Current.Value);
                     else if (enumer.Current.Key.Contains("failFile")) failCheckouts.Add(enumer.Current.Value);
                 }
-                if (errorInfo != "") MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
-                else {
+                if (errorInfo != "") {
+                    hintDisplay("Checkout Failed: " + errorInfo);
+                    MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
+                }
+                else
+                {
                     if (isDebug == false)
                     {
                         MessageBoxResult result = MessageBox.Show("You are going to checkout " + successCheckouts.Count.ToString() + " files" + "\n" +
                                                                failCheckouts.Count.ToString() + " files cannot be checked out by you because you do not own them" + "\n" +
                                                                "Click \"OK\" to proceed and \"Cancel\" to cancel" + "\n", "Checkout Files Confirmation",
                                                                MessageBoxButton.OKCancel, MessageBoxImage.Information);
-                        if (result == MessageBoxResult.OK)
-                        {
-                            checkoutReceiveFile(successCheckouts); failCheckouts.Clear();
-                        }
-                        else
-                        {
-                            successCheckouts.Clear(); failCheckouts.Clear();
-                        }
+                        if (result == MessageBoxResult.OK) { checkoutReceiveFile(successCheckouts); failCheckouts.Clear(); }
+                        else successCheckouts.Clear(); failCheckouts.Clear();
                     }
                     else { checkoutReceiveFile(successCheckouts); failCheckouts.Clear(); }
                 }
@@ -633,8 +640,8 @@ namespace GUI
         {
             if (checkOutList.SelectedItems.Count == 0) return;
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             FileComplex selected = checkOutList.SelectedItem as FileComplex;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
@@ -643,19 +650,34 @@ namespace GUI
             message.add("fileName", selected.Key);
             message.add("requestor", theUser.Text);
             message.add("recursive", recursiveCheckout.IsChecked.ToString().ToLower());
-            Action<CsMessage> debug = (CsMessage msg) =>
-            {
-                debugDisplay(msg, "send");
-            };
+            Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
+        }
+        
+        // -----< SetConnection_Click: Handle SetConnection click event >-----
+        private void SetConnection_Click(object sender, RoutedEventArgs e)
+        {
+            int n;
+            if (int.TryParse(sendPort.Text, out n) == false || int.TryParse(receivePort.Text, out n) == false)
+            {
+                hintDisplay("Invalid connection configuration");
+                return;
+            }
+            else
+            {
+                endPoint_.port = int.Parse(sendPort.Text);
+                serverPort = int.Parse(receivePort.Text);
+                theServerAddress = serverAddress.Text;
+                hintDisplay("Connection set");
+            }
         }
 
         // -----< Change_CurrentUser: Click handler of User Login Botton >-----
         private void Change_CurrentUser(object sender, RoutedEventArgs e)
         {
             theUser.Text = userName.Text;
-            return;
+            hintDisplay(userName.Text + " has logged in");
         }
 
         // -----< trackAllCategoriesCallbackHandler: Callback handler of tracking all categories >-----
@@ -685,8 +707,8 @@ namespace GUI
         private void trackAllCategoriesHandler()
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -728,8 +750,8 @@ namespace GUI
         private void trackFiles(bool show)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -757,8 +779,8 @@ namespace GUI
         private void ping(string name)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -784,8 +806,8 @@ namespace GUI
         private void browseDescription(string fileName)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -796,6 +818,84 @@ namespace GUI
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
             message.show();
+        }
+
+        // -----< RecursiveCheckout_MouseEnter: Handle RecursiveCheckout MouseEnter event >-----
+        private void RecursiveCheckout_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Check to checkout the files with all its dependencies");
+        }
+
+        // -----< CloseCheckin_MouseEnter: Handle CloseCheckin MouseEnter event >-----
+        private void CloseCheckin_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Check to checkin the file as closed");
+        }
+
+        // -----< ClearFilter_MouseEnter: Handle ClearFilter MouseEnter event >-----
+        private void ClearFilter_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to clear the query filter of the browse list");
+        }
+
+        // -----< SetFilter_MouseEnter: Handle SetFilter MouseEnter event >-----
+        private void SetFilter_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to set the query filter of the browse list");
+        }
+
+        // -----< Checkout_MouseEnter: Handle Checkout MouseEnter event >-----
+        private void Checkout_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to checkout the selected file");
+        }
+
+        // -----< CheckinCancel_MouseEnter: Handle CheckinCancel MouseEnter event >-----
+        private void CheckinCancel_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to cancel checkin");
+        }
+
+        // -----< Browse_MouseEnter: Handle Checkin MouseEnter event >-----
+        private void Browse_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to select the checkin file");
+        }
+
+        // -----< Checkin_MouseEnter: Handle Checkin MouseEnter event >-----
+        private void Checkin_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to checkin the selected file with metadata");
+        }
+
+        // -----< AddCategory_MouseEnter: Handle AddCategory MouseEnter event >-----
+        private void AddCategory_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to add your new customed category into the category list");
+        }
+
+        // -----< TestConnection_MouseEnter: Handle TestConnection MouseEnter event >-----
+        private void TestConnection_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to test connection");
+        }
+
+        // -----< SetConnection_MouseEnter: Handle SetConnection MouseEnter event >-----
+        private void SetConnection_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to set connection");
+        }
+
+        // -----< ChangeCurrentUser_MouseEnter: Handle ChangeCurrentUser MouseEnter event >-----
+        private void ChangeCurrentUser_MouseEnter(object sender, MouseEventArgs e)
+        {
+            hintDisplay("Click to use the client as the new username");
+        }
+
+        // -----< mouseLeave: Handle all buttons' MouseLeave event >-----
+        private void mouseLeave(object sender, MouseEventArgs e)
+        {
+            hintDisplay("");
         }
 
         // -----< Open_FileForm: Popup the file browse form >-----
@@ -813,8 +913,8 @@ namespace GUI
         private void elementInitialize()
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -825,6 +925,15 @@ namespace GUI
             message.overRide("command", "trackAllCategories");
             translater.postMessage(message);
             Dispatcher.Invoke(debug, new Object[] { message });
+        }
+
+        // -----< loadAboutText: Load the about content from About.txt >-----
+        private void loadAboutText()
+        {
+            string fileContent = File.ReadAllText("../About.txt");
+            Paragraph paragraph = new Paragraph();
+            paragraph.Inlines.Add(new Run(fileContent));
+            about.Blocks.Add(paragraph);
         }
 
         // -----< Window_Loaded: Load the mainWindow >-----
@@ -838,9 +947,9 @@ namespace GUI
 
             userName.Text = argUser;
             theUser.Text = argUser;
-            serverAddress.Text = "localhost";
-            sendPort.Text = "8080";
-            receivePort.Text = endPoint_.port.ToString();
+            serverAddress.Text = theServerAddress;
+            sendPort.Text = argPort;
+            receivePort.Text = serverPort.ToString();
 
             processMessages();
 
@@ -848,7 +957,7 @@ namespace GUI
 
             elementInitialize();
 
-            // checkInDependencyList();
+            loadAboutText();
         }
 
         // -----< testStub: Run all tests >-----
@@ -925,8 +1034,8 @@ namespace GUI
             Console.Write("===============================\n\n");
             Console.Write("  Demostrate the capability of sending checkout message and get reply from server.\n\n");
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             FileComplex selected = checkOutList.SelectedItem as FileComplex;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
@@ -969,8 +1078,8 @@ namespace GUI
             Console.Write("====================================\n\n");
             Console.Write("  Demostrate the capability of viewing full text and metadata");
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -995,8 +1104,8 @@ namespace GUI
             Console.Write("===============================\n\n");
             Console.Write("  Demostrate the capability of browsing all files in the repository");
             CsEndPoint serverEndPoint = new CsEndPoint();
-            serverEndPoint.machineAddress = "localhost";
-            serverEndPoint.port = 8080;
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));

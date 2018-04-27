@@ -25,126 +25,124 @@
 			</FlowDocument>
 		</FlowDocumentScrollViewer>
 		<GridSplitter Grid.Column="1"></GridSplitter>
-		<TabControl Grid.Column="2" Margin="5,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
-			<TabItem Header="File Information">
-				<Grid Margin="15,5,15,5">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"></RowDefinition>
-						<RowDefinition Height="6*"></RowDefinition>
-						<RowDefinition Height="1*"></RowDefinition>
-					</Grid.RowDefinitions>
-					<Label Grid.Row="0" Name="fileInfoNotificationLabel" VerticalAlignment="Center"></Label>
-					<Grid Grid.Row="1">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="1*"></ColumnDefinition>
-							<ColumnDefinition Width="2*"></ColumnDefinition>
-							<ColumnDefinition Width="0.5*"></ColumnDefinition>
-						</Grid.ColumnDefinitions>
+		<Grid Grid.Column="2">
+			<Grid.RowDefinitions>
+				<RowDefinition Height="7*"></RowDefinition>
+				<RowDefinition Height="1*"></RowDefinition>
+			</Grid.RowDefinitions>
+			<TabControl Grid.Column="2" Margin="5,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+				<TabItem Header="File Information">
+					<Grid Margin="15,5,15,5">
 						<Grid.RowDefinitions>
-							<RowDefinition></RowDefinition>
-							<RowDefinition></RowDefinition>
-							<RowDefinition></RowDefinition>
-							<RowDefinition></RowDefinition>
-							<RowDefinition></RowDefinition>
-							<RowDefinition></RowDefinition>
-							<RowDefinition></RowDefinition>
+							<RowDefinition Height="1*"></RowDefinition>
+							<RowDefinition Height="6*"></RowDefinition>
 						</Grid.RowDefinitions>
+						<Label Grid.Row="0" Name="fileInfoNotificationLabel" VerticalAlignment="Center"></Label>
+						<Grid Grid.Row="1">
+							<Grid.ColumnDefinitions>
+								<ColumnDefinition Width="1*"></ColumnDefinition>
+								<ColumnDefinition Width="2*"></ColumnDefinition>
+								<ColumnDefinition Width="0.5*"></ColumnDefinition>
+							</Grid.ColumnDefinitions>
+							<Grid.RowDefinitions>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+								<RowDefinition></RowDefinition>
+							</Grid.RowDefinitions>
 
-						<Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">Namespace</Label>
-						<TextBox Grid.Column="1" Grid.Row="0" Name="nameSpace" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14" IsEnabled="False"></TextBox>
+							<Label Grid.Column="0" Grid.Row="0" HorizontalAlignment="Right" VerticalAlignment="Center">Namespace</Label>
+							<TextBox Grid.Column="1" Grid.Row="0" Name="nameSpace" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14" IsEnabled="False"></TextBox>
 
-						<Label Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center">File Name</Label>
-						<TextBox Grid.Column="1" Grid.Row="1" Name="fileName" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14" IsEnabled="False"></TextBox>
+							<Label Grid.Column="0" Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center">File Name</Label>
+							<TextBox Grid.Column="1" Grid.Row="1" Name="fileName" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14" IsEnabled="False"></TextBox>
 
-						<Label Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Version</Label>
-						<TextBox Grid.Column="1" Grid.Row="2" Name="version" HorizontalAlignment="Left" VerticalAlignment="Center" Height="32" FontSize="14" Width="36" IsEnabled="False"></TextBox>
+							<Label Grid.Column="0" Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center">Version</Label>
+							<TextBox Grid.Column="1" Grid.Row="2" Name="version" HorizontalAlignment="Left" VerticalAlignment="Center" Height="32" FontSize="14" Width="36" IsEnabled="False"></TextBox>
 
-						<Label Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center">Owner</Label>
-						<TextBox Grid.Column="1" Grid.Row="3" Name="owner" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14"></TextBox>
+							<Label Grid.Column="0" Grid.Row="3" HorizontalAlignment="Right" VerticalAlignment="Center">Owner</Label>
+							<TextBox Grid.Column="1" Grid.Row="3" Name="owner" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14" TextChanged="changeFileInfo"></TextBox>
 
-						<Label Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Status</Label>
-						<TextBox Grid.Column="1" Grid.Row="4" Name="status" HorizontalAlignment="Left" VerticalAlignment="Center" Height="32" FontSize="14" Width="60" IsEnabled="False"></TextBox>
-						<Button Grid.Column="1" Grid.Row="4" Name="closeCheckin" Margin="20,0,0,0" Width="60" Height="32" Click="closeCheckin_Click"></Button>
+							<Label Grid.Column="0" Grid.Row="4" HorizontalAlignment="Right" VerticalAlignment="Center">Status</Label>
+							<TextBox Grid.Column="1" Grid.Row="4" Name="status" HorizontalAlignment="Left" VerticalAlignment="Center" Height="32" FontSize="14" Width="60" IsEnabled="False"></TextBox>
+							<Button Grid.Column="1" Grid.Row="4" Name="closeCheckin" Margin="20,0,0,0" Width="60" Height="32" Click="closeCheckin_Click"></Button>
 
-						<Label Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center">Description</Label>
-						<TextBox Grid.Column="1" Grid.Row="5" Name="description" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14"></TextBox>
+							<Label Grid.Column="0" Grid.Row="5" HorizontalAlignment="Right" VerticalAlignment="Center">Description</Label>
+							<TextBox Grid.Column="1" Grid.Row="5" Name="description" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14" TextChanged="changeFileInfo"></TextBox>
 
-						<Label Grid.Column="0" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center">Time Created</Label>
-						<TextBox Grid.Column="1" Grid.Row="6" Name="dateTime" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14" IsEnabled="False"></TextBox>
+							<Label Grid.Column="0" Grid.Row="6" HorizontalAlignment="Right" VerticalAlignment="Center">Time Created</Label>
+							<TextBox Grid.Column="1" Grid.Row="6" Name="dateTime" HorizontalAlignment="Stretch" VerticalAlignment="Center" Height="32" FontSize="14" IsEnabled="False"></TextBox>
+
+						</Grid>
 
 					</Grid>
-
-					<Button Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,80,0" Width="60" Height="40" Click="applyChanges_Click">Apply</Button>
-					<Button Grid.Column="1" Grid.Row="7" HorizontalAlignment="Right" VerticalAlignment="Center" Width="60" Height="40" Click="cancel_Click">Cancel</Button>
-				</Grid>
-			</TabItem>
-			<TabItem Header="Dependencies">
-				<Grid Margin="15,5,15,5">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"></RowDefinition>
-						<RowDefinition Height="6*"></RowDefinition>
-						<RowDefinition Height="1*"></RowDefinition>
-					</Grid.RowDefinitions>
-					<Label Grid.Row="0" Name="dependenciesNotificationLabel" VerticalAlignment="Center"></Label>
-					<ListView Grid.Row="1" Name="allRecordBriefList">
-						<ListView.View>
-							<GridView>
-								<GridViewColumn Width="30">
-									<GridViewColumn.CellTemplate>
-										<DataTemplate>
-											<CheckBox Checked="addDependency" Unchecked="removeDependency" IsChecked="{Binding Path=IsChecked}" Tag="{Binding Path=Key}"/>
-										</DataTemplate>
-									</GridViewColumn.CellTemplate>
-								</GridViewColumn>
-								<GridViewColumn Header="Name" Width="60" DisplayMemberBinding="{Binding Path=NameSpace}"></GridViewColumn>
-								<GridViewColumn Header="Namespace" Width="80" DisplayMemberBinding="{Binding Path=Name}"></GridViewColumn>
-								<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"></GridViewColumn>
-								<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"></GridViewColumn>
-								<GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Description}"></GridViewColumn>
-							</GridView>
-						</ListView.View>
-					</ListView>
-					<Button Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,80,0" Width="60" Height="40" Click="applyChanges_Click">Apply</Button>
-					<Button Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Width="60" Height="40" Click="cancel_Click">Cancel</Button>
-
-				</Grid>
-			</TabItem>
-			<TabItem Header="Categories">
-				<Grid Margin="15,5,15,5">
-					<Grid.RowDefinitions>
-						<RowDefinition Height="1*"></RowDefinition>
-						<RowDefinition Height="6*"></RowDefinition>
-						<RowDefinition Height="1*"></RowDefinition>
-					</Grid.RowDefinitions>
-					<Label Grid.Row="0" Name="categoriesInfoNotificationLabel" VerticalAlignment="Center"></Label>
-					<Grid Grid.Row="1">
-						<Grid>
-							<Grid.RowDefinitions>
-								<RowDefinition Height="1*"></RowDefinition>
-								<RowDefinition Height="40"></RowDefinition>
-							</Grid.RowDefinitions>
-							<ListView Grid.Row="0" Name="allCategoryList">
-								<ListView.View>
-									<GridView>
-										<GridViewColumn Width="30">
-											<GridViewColumn.CellTemplate>
-												<DataTemplate>
-													<CheckBox Checked="addCategory" Unchecked="removeCategory" IsChecked="{Binding Path=IsChecked}" Tag="{Binding Path=Value}"/>
-												</DataTemplate>
-											</GridViewColumn.CellTemplate>
-										</GridViewColumn>
-										<GridViewColumn Header="Category" Width="100" DisplayMemberBinding="{Binding Path=Value}"></GridViewColumn>
-									</GridView>
-								</ListView.View>
-							</ListView>
-							<TextBox Grid.Row="1" Margin="0,5,80,5" Name="newCategory"></TextBox>
-							<Button Grid.Row="1" HorizontalAlignment="Right" Margin="0,5,0,5" Width="80" Name="addCategoryButton" Click="addCategory_Click">Add Category</Button>
+				</TabItem>
+				<TabItem Header="Dependencies">
+					<Grid Margin="15,5,15,5">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"></RowDefinition>
+							<RowDefinition Height="6*"></RowDefinition>
+						</Grid.RowDefinitions>
+						<Label Grid.Row="0" Name="dependenciesNotificationLabel" VerticalAlignment="Center"></Label>
+						<ListView Grid.Row="1" Name="allRecordBriefList">
+							<ListView.View>
+								<GridView>
+									<GridViewColumn Width="30">
+										<GridViewColumn.CellTemplate>
+											<DataTemplate>
+												<CheckBox Checked="addDependency" Unchecked="removeDependency" IsChecked="{Binding Path=IsChecked}" Tag="{Binding Path=Key}"/>
+											</DataTemplate>
+										</GridViewColumn.CellTemplate>
+									</GridViewColumn>
+									<GridViewColumn Header="Name" Width="60" DisplayMemberBinding="{Binding Path=NameSpace}"></GridViewColumn>
+									<GridViewColumn Header="Namespace" Width="80" DisplayMemberBinding="{Binding Path=Name}"></GridViewColumn>
+									<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"></GridViewColumn>
+									<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"></GridViewColumn>
+									<GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Description}"></GridViewColumn>
+								</GridView>
+							</ListView.View>
+						</ListView>
+					</Grid>
+				</TabItem>
+				<TabItem Header="Categories">
+					<Grid Margin="15,5,15,5">
+						<Grid.RowDefinitions>
+							<RowDefinition Height="1*"></RowDefinition>
+							<RowDefinition Height="6*"></RowDefinition>
+						</Grid.RowDefinitions>
+						<Label Grid.Row="0" Name="categoriesInfoNotificationLabel" VerticalAlignment="Center"></Label>
+						<Grid Grid.Row="1">
+							<Grid>
+								<Grid.RowDefinitions>
+									<RowDefinition Height="1*"></RowDefinition>
+									<RowDefinition Height="40"></RowDefinition>
+								</Grid.RowDefinitions>
+								<ListView Grid.Row="0" Name="allCategoryList">
+									<ListView.View>
+										<GridView>
+											<GridViewColumn Width="30">
+												<GridViewColumn.CellTemplate>
+													<DataTemplate>
+														<CheckBox Checked="addCategory" Unchecked="removeCategory" IsChecked="{Binding Path=IsChecked}" Tag="{Binding Path=Value}"/>
+													</DataTemplate>
+												</GridViewColumn.CellTemplate>
+											</GridViewColumn>
+											<GridViewColumn Header="Category" Width="100" DisplayMemberBinding="{Binding Path=Value}"></GridViewColumn>
+										</GridView>
+									</ListView.View>
+								</ListView>
+								<TextBox Grid.Row="1" Margin="0,5,80,5" Name="newCategory"></TextBox>
+								<Button Grid.Row="1" HorizontalAlignment="Right" Margin="0,5,0,5" Width="80" Name="addCategoryButton" Click="addCategory_Click">Add Category</Button>
+							</Grid>
 						</Grid>
 					</Grid>
-					<Button Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,80,0" Width="60" Height="40" Name="applyChanges" Click="applyChanges_Click">Apply</Button>
-					<Button Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Width="60" Height="40" Click="cancel_Click">Cancel</Button>
-				</Grid>
-			</TabItem>
-		</TabControl>
+				</TabItem>
+			</TabControl>
+			<Button Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,105,0" Width="60" Height="40" Click="applyChanges_Click" Name="applyChanges">Apply</Button>
+			<Button Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,25,0" Width="60" Height="40" Click="cancel_Click">Cancel</Button>
+		</Grid>
 	</Grid>
 </Window>

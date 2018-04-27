@@ -118,7 +118,13 @@ namespace GUI
             loadFileDependencies();
             loadFileCategories();
             applyChanges.IsEnabled = false;
-            if(theUser != theFile.Owner)
+            setNotifications();
+        }
+
+        // -----< setNotifications: Set the notifications according to different conditions >-----
+        private void setNotifications()
+        {
+            if (theUser != theFile.Owner)
             {
                 description.IsEnabled = false; allRecordBriefList.IsEnabled = false; allCategoryList.IsEnabled = false; version.IsEnabled = false; owner.IsEnabled = false; newCategory.IsEnabled = false; addCategoryButton.IsEnabled = false;
                 fileInfoNotificationLabel.Content = "  The file is not own by you.\n  You cannot modify its metadata.";
@@ -275,6 +281,11 @@ namespace GUI
             theFile.Categories = result.ToArray();
         }
 
+        private void changeFileInfo(object sender, RoutedEventArgs e)
+        {
+            applyChanges.IsEnabled = true;
+        }
+
         // -----< applyBasicInfo_Click: Handle applyBasicInfo button click event >-----
         private void applyBasicInfo()
         {
@@ -284,6 +295,7 @@ namespace GUI
             theFile.DateTime = dateTime.Text;
         }
 
+        // -----< applyChange_Click: Handle applyChanges button click event >-----
         private void applyChanges_Click(object sender, RoutedEventArgs e)
         {
             applyBasicInfo();
