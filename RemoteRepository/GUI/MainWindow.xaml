@@ -163,7 +163,7 @@
 						</ListView.View>
 					</ListView>
 					<CheckBox Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0 100,0" Name="recursiveCheckout" MouseEnter="RecursiveCheckout_MouseEnter" MouseLeave="mouseLeave">Checkout all its dependencies</CheckBox>
-					<Button Grid.Row="1" Margin="5,5,0,5" Width="80" HorizontalAlignment="Right" Click="Check_Out_Click" MouseEnter="CheckinCancel_MouseEnter" MouseLeave="mouseLeave">Check out</Button>
+					<Button Grid.Row="1" Margin="5,5,0,5" Width="80" HorizontalAlignment="Right" Click="Check_Out_Click" MouseEnter="Checkout_MouseEnter" MouseLeave="mouseLeave">Check out</Button>
 				</Grid>
 			</TabItem>
 			<TabItem Header="Browse">

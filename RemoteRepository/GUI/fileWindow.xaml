@@ -97,8 +97,8 @@
 											</DataTemplate>
 										</GridViewColumn.CellTemplate>
 									</GridViewColumn>
-									<GridViewColumn Header="Name" Width="60" DisplayMemberBinding="{Binding Path=NameSpace}"></GridViewColumn>
-									<GridViewColumn Header="Namespace" Width="80" DisplayMemberBinding="{Binding Path=Name}"></GridViewColumn>
+									<GridViewColumn Header="Namespace" Width="60" DisplayMemberBinding="{Binding Path=NameSpace}"></GridViewColumn>
+									<GridViewColumn Header="Name" Width="80" DisplayMemberBinding="{Binding Path=Name}"></GridViewColumn>
 									<GridViewColumn Header="Version" Width="60" DisplayMemberBinding="{Binding Path=Version}"></GridViewColumn>
 									<GridViewColumn Header="Status" Width="60" DisplayMemberBinding="{Binding Path=Status}"></GridViewColumn>
 									<GridViewColumn Header="Description" DisplayMemberBinding="{Binding Path=Description}"></GridViewColumn>

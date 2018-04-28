@@ -193,18 +193,21 @@ namespace GUI
             {
                 result += item + ",";
             }
-            return result.Substring(0, result.Length - 1); 
+            if (result == "") return result;
+            else return result.Substring(0, result.Length - 1); 
         }
 
         // -----< arrayToString: Convert array to string >-----
         private string arrayToString(string[] toConvert)
         {
             string result = "";
+            if (toConvert.Count() == 0) return "";
             foreach (string item in toConvert)
             {
                 result += item + ",";
             }
-            return result.Substring(0, result.Length - 1);
+            if (result == "") return result;
+            else return result.Substring(0, result.Length - 1);
         }
 
         // -----< addDependency: Add dependency to checkin item >-----
@@ -254,6 +257,7 @@ namespace GUI
         // -----< populateAllListView: Populate checkin dependency ListView >-----
         private void populateCheckInDependencyListView()
         {
+            checkInDependencyList.Items.Clear();
             foreach (FileComplex item in repoRecords)
             {
                 checkInDependencyList.Items.Add(item);
@@ -263,6 +267,7 @@ namespace GUI
         // -----< populateAllListView: Populate checkout ListView >-----
         private void populateCheckoutListView()
         {
+            checkOutList.Items.Clear();
             foreach (FileComplex item in repoRecords)
             {
                 checkOutList.Items.Add(item);
@@ -272,6 +277,7 @@ namespace GUI
         // -----< populateAllListView: Populate browse ListView >-----
         private void populateBrowseListView()
         {
+            browseList.Items.Clear();
             foreach (FileComplex item in repoRecords)
             {
                 browseList.Items.Add(item);
@@ -389,6 +395,7 @@ namespace GUI
                 }
                 Action addList = () => { populateFilterBrowseListView(); };
                 Dispatcher.Invoke(addList, new Object[] { });
+                if (isDebug == true) receiveMessage.show();
             };
             registerHandler("setFilterCallback", setFilterCallback);
         }
@@ -413,7 +420,7 @@ namespace GUI
             {
                 currentDisplay += ("$" + item.Key);
             }
-            currentDisplay = currentDisplay.Substring(1);
+            if(currentDisplay != "") currentDisplay = currentDisplay.Substring(1);
             message.add("source", currentDisplay);
             Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send");
             Dispatcher.Invoke(debug, new Object[] { message });
@@ -425,7 +432,6 @@ namespace GUI
         {
             clearBrowseListView();
             populateBrowseListView();
-            
         }
 
         // -----< Set_Filter_Click: Handle setFilter button click event >-----
@@ -509,25 +515,36 @@ namespace GUI
                 }
                 if (isDebug == false)
                     MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
-                hintDisplay(errorInfo);
+                Action hint = () => hintDisplay(errorInfo);
+                Dispatcher.Invoke(hint, new Object[] { });
             };
             registerHandler("checkinCallback", checkinCallback);
+        }
+
+        private string changeStringSeperator(string toConvert)
+        {
+            return toConvert.Replace('\\', '/');
         }
 
         // -----< Check_In_Click: Click handler of checkIn Button >-----
         private void Check_In_Click(object sender, RoutedEventArgs e)
         {
+            if(pathFileName.Text == "Click Browse to select the file") {
+                hintDisplay("Please at least specify FileName by clicking the browse button!");
+                return;
+            }
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = theServerAddress;
             serverEndPoint.port = serverPort;
             System.IO.FileInfo sourceFileInfo = new System.IO.FileInfo(pathFileName.Text);
-            string fileName = pathFileName.Text.Substring(pathFileName.Text.LastIndexOf("/") + 1);
-            System.IO.File.Copy(pathFileName.Text, "../SendFiles/" + fileName, true);
+            string turePathFileName = changeStringSeperator(pathFileName.Text);
+            string fileName = turePathFileName.Substring(turePathFileName.LastIndexOf("/") + 1);
+            System.IO.File.Copy(turePathFileName, "../SendFiles/" + fileName, true);
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
             message.add("file", fileName);
-            if(isDebug == true) { message.add("name", "Demo message of requirement 3b"); }
+            if(isDebug == true) { message.add("name", "Demo message of requirement 2a"); }
             message.add("command", "fileCheckin");
             message.add("content-length", sourceFileInfo.Length.ToString());
             message.add("description", description.Text);
@@ -539,7 +556,7 @@ namespace GUI
             Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send"); 
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
-            message.show();
+            if(isDebug == true) message.show();
         }
 
         // -----< Check_In_Cancel_Click: Click handler of checkInCancel Button >-----
@@ -547,6 +564,7 @@ namespace GUI
         {
             pathFileName.Text = "Click Browse to select the file";
             description.Text = "";
+            nameSpace.Text = "";
             checkinCategoryList.Items.Clear();
             checkInDependencyList.Items.Clear();
             Action updateCheckInCategoryList = () =>
@@ -573,7 +591,8 @@ namespace GUI
                     if (enumer.Current.Key == "content-length" && enumer.Current.Value == "0") return; 
                     if (enumer.Current.Key == "fileName") successCheckouts.Remove(enumer.Current.Value);
                 }
-                hintDisplay("File checken out successful");
+                Action hint = () => hintDisplay("File checken out successful");
+                Dispatcher.Invoke(hint, new Object[] { });
             };
             registerHandler("checkoutReceiveFilesCallback", checkoutReceiveFilesCallback);
         }
@@ -615,7 +634,8 @@ namespace GUI
                     else if (enumer.Current.Key.Contains("failFile")) failCheckouts.Add(enumer.Current.Value);
                 }
                 if (errorInfo != "") {
-                    hintDisplay("Checkout Failed: " + errorInfo);
+                    Action hint = () => hintDisplay("Checkout Failed: " + errorInfo);
+                    Dispatcher.Invoke(hint, new Object[] { });
                     MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
                 }
                 else
@@ -747,7 +767,7 @@ namespace GUI
         }
 
         // -----< trackFiles: Send message of trackFiles >-----
-        private void trackFiles(bool show)
+        private void trackFiles()
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = theServerAddress;
@@ -760,7 +780,6 @@ namespace GUI
             {
                 debugDisplay(msg, "send");
             };
-            if (show == true) { message.add("name", "Demo message of requirement 3g"); message.show(); }
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
         }
@@ -789,7 +808,7 @@ namespace GUI
             Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
-            message.show();
+            if(isDebug == true) message.show();
         }
 
         // -----< browseDescriptionCallbackHandler: Callback handler of browseDescription >-----
@@ -958,6 +977,8 @@ namespace GUI
             elementInitialize();
 
             loadAboutText();
+            if (isDebug == true && argUser == "Administrator") testStub();
+            else Console.Write("  This client only demostrate the project implements multi-client function, no demo shown in this client, the client title \"Client Console - User: Administrator - Port: 8081\" holds all requirements demostration");
         }
 
         // -----< testStub: Run all tests >-----
@@ -966,14 +987,15 @@ namespace GUI
             theTab.SelectedIndex = 4;
             Console.Write("\n");
             test1();
-            test2();
+            test2a();
+            test2b();
+            test2c();
             test3a();
             test3b();
-            test3c();
-            test3d();
-            test3ef();
-            test3g();
             test4();
+            test5();
+            test6();
+            test7();
         }
 
         // -----< Demostration of requirement 1 >-----
@@ -985,36 +1007,12 @@ namespace GUI
             Console.Write("  PASSED -- Requirement 1\n\n");
         }
 
-        // -----< Demostration of requirement 2 >-----
-        private void test2()
+        // -----< Demostration of requirement 2a >-----
+        private void test2a()
         {
-            Console.Write("Demostration of Requirement 2.\n\n");
-            Console.Write("==============================\n\n");
-            Console.Write("  Demostrate the communication channel by sending ping message to server and get ping reply from server.\n\n");
-            ping("Demo message of requirement 2");
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 2\"\n");
-            Console.Write("  Which can prove that this client is using communication channel to communicate with server.\n\n");
-            Console.Write("  PASSED -- Requirement 2\n\n");
-        }
-
-        // -----< Demostration of requirement 3a >-----
-        private void test3a()
-        {
-            Console.Write("Demostration of Requirement 3a.\n\n");
+            Console.Write("Demostration of Requirement 2a.\n\n");
             Console.Write("===============================\n\n");
-            Console.Write("  Demostrate the capability of connecting to server in client side.\n\n");
-            ping("Demo message of requirement 3a");
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 3a\"\n");
-            Console.Write("  Which can prove that this client has been connected to the server.\n\n");
-            Console.Write("  PASSED -- Requirement 3a\n\n");
-        }
-
-        // -----< Demostration of requirement 3b >-----
-        private void test3b()
-        {
-            Console.Write("Demostration of Requirment 3b.\n\n");
-            Console.Write("===============================\n\n");
-            Console.Write("  Demostrate the capability of sending checkin message and get reply from server.\n\n");
+            Console.Write("  Demostrate repository server provides check-in functionality\n\n");
             Console.Write("  The message below shows the client sending a checkin message with checkin file information.\n");
             pathFileName.Text = "../RemoteRepository.cpp";
             nameSpace.Text = "Server";
@@ -1022,21 +1020,20 @@ namespace GUI
             checkInDependencies.Add("DbCore::DbCore.h.1"); checkInDependencies.Add("DbCore::DbCore.cpp.1");
             checkInCategories.Add("source");
             checkinButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 3b\"\n");
+            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 2a\"\n");
             Console.Write("  Which can prove that this client can send and receive checkin messages.\n\n");
-            Console.Write("  PASSED -- Requirement 3b\n\n");
+            Console.Write("  PASSED -- Requirement 2a\n\n");
         }
 
-        // -----< Demostration of requirement 3c >-----
-        private void test3c()
+        // -----< Demostration of requirement 2b >-----
+        private void test2b()
         {
-            Console.Write("Demostration of Requirement 3c.\n\n");
+            Console.Write("Demostration of Requirement 2b.\n\n");
             Console.Write("===============================\n\n");
-            Console.Write("  Demostrate the capability of sending checkout message and get reply from server.\n\n");
+            Console.Write("  Demostrate repository server provides check-out functionality\n\n");
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = theServerAddress;
             serverEndPoint.port = serverPort;
-            FileComplex selected = checkOutList.SelectedItem as FileComplex;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
@@ -1044,39 +1041,62 @@ namespace GUI
             message.add("fileName", "DbCore::DbCore.h.1");
             message.add("requestor", theUser.Text);
             message.add("recursive", recursiveCheckout.IsChecked.ToString().ToLower());
-            if (isDebug == true) { message.add("name", "Demo message of requirement 3c"); }
-            Action<CsMessage> debug = (CsMessage msg) =>
-            {
-                debugDisplay(msg, "send");
-            };
+            if (isDebug == true) { message.add("name", "Demo message of requirement 2b"); }
+            Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
             Console.Write("  The message below shows the client sending a checkout message with checkout file information and requestor.\n");
             message.show();
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 3c\"\n");
+            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 2b\"\n");
             Console.Write("  Which can prove that this client can send and receive checkout messages.\n\n");
-            Console.Write("  PASSED -- Requirement 3c\n\n");
+            Console.Write("  PASSED -- Requirement 2b\n\n");
         }
 
-        // -----< Demostration of requirement 3d >-----
-        private void test3d()
+        // -----< Demostration of requirement 2c >-----
+        private void test2c()
         {
-            Console.Write("Demostration of Requirement 3d.\n\n");
+            Console.Write("Demostration of Requirement 2c.\n\n");
             Console.Write("===============================\n\n");
-            Console.Write("  Demostrate the capability of sending browsing specified package description message and get reply from server.\n\n");
-            Console.Write("  The message below shows the client sending a browsing specified package description message file information.\n");
-            browseDescription("DbCore::DbCore.h.1");
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 3d\"\n");
-            Console.Write("  Which can prove that this client can send and receive browse specified package description messages.\n\n");
-            Console.Write("  PASSED -- Requirement 3d\n\n");
+            Console.Write("  Demostrate repository server provides browse packages spcified by NoSql database queries.\n\n");
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "setFilter");
+            message.add("nameSpace", "DbCore");
+            message.add("source", "DbCore::DbCore.h.1$DbCore::DbCore.h.2$SWRTB::SWRepoCore.h.1$DbCore::DbCore.cpp.1$SWRTB::SWRepoCore.cpp.1$Server::RemoteRepository.cpp.1$");
+            message.add("name", "Demo message of requirement 2c");
+            Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send");
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+            Console.Write("  The message below shows the client sending a set filter message by using query, and filter the file with NameSpace \"DbCore\".\n");
+            message.show();
+            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 2c\"\n");
+            Console.Write("  The browse tab of the client window will show only files with NameSpace \"DbCore\" as well.\n\n");
+            Console.Write("  The file popup window with its source code and metadata will be demostrated seperately in demostration of requirement 3.\n\n");
+            Console.Write("  Which can prove that this client can send and receive browse package message specified with queries.\n\n");
+            Console.Write("  PASSED -- Requirement 2c\n\n");
         }
 
-        // -----< Demostration of requirement 3e & 3f >-----
-        private void test3ef()
+        // -----< Demostration of requirement 3a >-----
+        private void test3a()
         {
-            Console.Write("Demostration of Requirement 3e & 3f.\n\n");
-            Console.Write("====================================\n\n");
-            Console.Write("  Demostrate the capability of viewing full text and metadata");
+            Console.Write("Demostration of Requirement 3a.\n\n");
+            Console.Write("===============================\n\n");
+            Console.Write("  Demostrate client program can upload and download files.\n\n");
+            Console.Write("  Upload file has already demostrated as a part of checkin.\n\n");
+            Console.Write("  Download file has already demostrated as a part of checkout.\n\n");
+            Console.Write("  PASSED -- Requirement 3a\n\n");
+        }
+
+        // -----< Demostration of requirement 3b >-----
+        private void test3b()
+        {
+            Console.Write("Demostration of Requirment 3b.\n\n");
+            Console.Write("==============================\n\n");
+            Console.Write("  Demostrate client program can view repository contents.\n\n");
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = theServerAddress;
             serverEndPoint.port = serverPort;
@@ -1085,48 +1105,76 @@ namespace GUI
             message.add("from", CsEndPoint.toString(endPoint_));
             message.add("command", "showFile");
             message.add("fileName", "DbCore::DbCore.h.1");
-            if (isDebug == true) { message.add("name", "Demo message of requirement 3e & 3f"); }
+            if (isDebug == true) { message.add("name", "Demo message of requirement 3b"); }
             Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
             Console.Write("  The message below shows the client sending a view file and its metadata message file information.\n");
             message.show();
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 3e & 3f\"\n");
+            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 3b\"\n");
             Console.Write("  Meanwhile, a file window will popup, the left part of the window shows the full file text, and the right part of the file shows the file metadata.\n");
-            Console.Write("  As both file text and metadata are displayed in the same window, this test demostrates both requirement 3e and 3f.\n");
-            Console.Write("  Which can prove that this client can send and receive view full file text as well as view file metadata messages.\n\n");
-            Console.Write("  PASSED -- Requirement 3e & 3f\n\n");
+            Console.Write("  This popup window can prove that client can satisfy display categories as purpose dessribed.\n\n");
+            Console.Write("  Other file as well as their metadata can be viewed by double-clicking the listview item in the browse tab. And they represents the whole repositoey contents.\n\n");
+            Console.Write("  Which can prove that this client can view reporsitory contents.\n\n");
+            Console.Write("  PASSED -- Requirement 3b\n\n");
         }
 
-        private void test3g()
+        // -----< Demostration of requirement 4 >-----
+        private void test4()
         {
-            Console.Write("Demostration of Requirement 3g.\n\n");
-            Console.Write("===============================\n\n");
-            Console.Write("  Demostrate the capability of browsing all files in the repository");
+            Console.Write("Demostration of Requirement 4.\n\n");
+            Console.Write("==============================\n\n");
+            Console.Write("  Demostrate message-passing communication system based on sockets");
+            Console.Write("  The message below shows that the client sending a ping message to the server.\n");
+            ping("Demo message of requirement 4");
+            Console.Write("  The message will transferred by using socket.\n\n");
+            Console.Write("  Which can prove that the project is using message-passing communication system based on sockets.\n\n");
+            Console.Write("  PASSED -- Requirement 4\n\n");
+        }
+
+        // -----< Demostration of requirement 5 >-----
+        private void test5()
+        {
+            Console.Write("Demostration of Requirement 5.\n\n");
+            Console.Write("==============================\n\n");
+            Console.Write("  Demostrate communication system provides support for passing HTTP style messages using asynchronous one-way messaging.\n\n");
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = theServerAddress;
             serverEndPoint.port = serverPort;
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
-            message.add("command", "listContent");
-            if (isDebug == true) { message.add("name", "Demo message of requirement 3g"); }
+            message.add("one-way", "true");
+            if (isDebug == true) { message.add("name", "Demo message of requirement 5 - Should not be replied"); }
             Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
             message.show();
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 3g\"\n");
-            Console.Write("  Which can prove that this client can send and receive browse the repo.\n\n");
-            Console.Write("  The directory structure is shown intuitively in the GUI the \"browse\" tab.\n\n");
-            Console.Write("  PASSED -- Requirement 3g\n\n");
+            Console.Write("  The message below shows a non-reply message send from client to server.\n\n");
+            Console.Write("  Server will not reply this message, which represent the project uses one-way message passing.\n\n");
+            Console.Write("  The reply message does not follow the sent message, which represent the project uses achychorous message passing.\n\n");
+            Console.Write("  All messages shown in the demostration are HTTP style message, consist with key-value pairs.\n\n");
+            Console.Write("  Which can prove that communication system provides support for passing HTTP style messages using asynchronous one-way messaging.\n\n");
+            Console.Write("  PASSED -- Requirement 5\n\n");
         }
 
-        private void test4()
+        // -----< Demostration of requirement 6 >-----
+        private void test6()
         {
-            Console.Write("Demostration of Requirement 4.\n\n");
+            Console.Write("Demostration of Requirement 6.\n\n");
+            Console.Write("==============================\n\n");
+            Console.Write("  Demostrate the communication system shall also support sending and receiving blocks of bytes to support file transfer\n\n");
+            Console.Write("  The \"content-length\" attribute shown in checkin, checkout message represents that file transfer are based on sending and receiving blocks of bytes of the file.\n\n");
+            Console.Write("  Which can prove that the communication system are using block of bytes to transfer files.\n\n");
+        }
+
+        // -----< Demostration of requirement 7 >-----
+        private void test7()
+        {
+            Console.Write("Demostration of Requirement 7.\n\n");
             Console.Write("==============================\n\n");
             Console.Write("  All above tests can be executed automatically.\n\n");
-            Console.Write("  PASSED -- Requirement 4\n\n");
+            Console.Write("  PASSED -- Requirement 7\n\n");
         }
     }
 }

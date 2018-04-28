@@ -144,8 +144,8 @@ namespace Repository
 	{
 		dispatcher_[key] = proc;
 	}
-	//----< start processing messages on child thread >------------------
 
+	//----< start processing messages on child thread >------------------
 	inline void Server::processMessages() {
 		auto proc = [&]() {
 			if (dispatcher_.size() == 0) {
@@ -161,6 +161,11 @@ namespace Repository
 				if (msg.containsKey("verbose")) {
 					std::cout << "\n";
 					msg.show();
+				}
+				if (msg.containsKey("one-way")) {
+					std::cout << "\n";
+					msg.show();
+					continue;
 				}
 				if (msg.command() == "serverQuit") break;
 				if (msg.command() == "sendMultipleFiles") {
@@ -179,7 +184,6 @@ namespace Repository
 			std::cout << "\n  server message processing thread is shutting down";
 		};
 		std::thread t(proc);
-		//SetThreadPriority(t.native_handle(), THREAD_PRIORITY_HIGHEST);
 		std::cout << "\n  starting server thread to process messages";
 		msgProcThrd_ = std::move(t);
 	}

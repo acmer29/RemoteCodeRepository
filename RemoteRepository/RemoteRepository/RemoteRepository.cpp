@@ -345,6 +345,7 @@ std::function<Msg(Msg)> showFileCleanUp = [](Msg msg) {
 // -----< showFile: reply showFile message >-----
 std::function<Msg(Msg)> showFile = [](Msg msg) {
 	Msg reply = Server::showFileMessge(msg.to(), msg.from(), msg.value("fileName"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
 	return reply;
 };
 
@@ -398,15 +399,12 @@ std::function<Msg(Msg)> resumeCheckin = [](Msg msg) {
 int main()
 {
 	SetConsoleTitleA("Server Console");
-	std::cout << "\n  Testing Server Prototype";
-	std::cout << "\n ==========================";
-	std::cout << "\n";
 	//StaticLogger<1>::attach(&std::cout);
 	//StaticLogger<1>::start();
 	Server server(serverEndPoint, "ServerPrototype");
 	server.start();
 
-	std::cout << "\n  Demostrate message processing as requirement 2 & 3 of Project3";
+	std::cout << "\n  Demostrate message processing as requirement 2 - 6 of Project4";
 	std::cout << "\n ----------------------------";
 	server.addMsgProc("echo", echo);
 	server.addMsgProc("showFile", showFile);
