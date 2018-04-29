@@ -256,7 +256,7 @@ Msg Server::setFilterMessage(const EndPoint& from, const EndPoint& to, Msg recei
 			+ SWRTB::nameOf(item.name(), item.nameSpace()) + "$"
 			+ SWRTB::versionOf(item.name()) + "$"
 			+ item.status() + "$"
-			+ item.descrip();
+			+ item.owner();
 		reply.attribute("record" + Utilities::Converter<size_t>::toString(count++), recordBrief);
 	}
 	return reply;

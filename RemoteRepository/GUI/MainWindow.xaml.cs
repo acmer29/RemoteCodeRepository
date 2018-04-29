@@ -278,6 +278,7 @@ namespace GUI
         private void populateBrowseListView()
         {
             browseList.Items.Clear();
+            filterRecords.Clear();
             foreach (FileComplex item in repoRecords)
             {
                 browseList.Items.Add(item);
