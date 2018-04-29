@@ -320,8 +320,10 @@ namespace GUI
                 var enumer = receiveMessage.attributes.GetEnumerator();
                 while (enumer.MoveNext())
                 {
-                    if (enumer.Current.Key.Contains("errorInfo") && enumer.Current.Value != "") errorInfo = enumer.Current.Value;
-                    else if (enumer.Current.Key.Contains("errorInfo") && enumer.Current.Value == "") trackFiles();
+                    if (enumer.Current.Key.Contains("errorInfo") && enumer.Current.Value != "")
+                    {
+                        errorInfo = enumer.Current.Value;
+                    }
                 };
                 if (isDebug == false)
                     MessageBox.Show(errorInfo, "File Information Modification", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -511,7 +513,6 @@ namespace GUI
                 while (enumer.MoveNext())
                 {
                     if (enumer.Current.Key == "errorInfo" && enumer.Current.Value != "") errorInfo = enumer.Current.Value;
-                    else if (enumer.Current.Key == "errorInfo" && enumer.Current.Value == "") trackFiles();
                 }
                 if (isDebug == false)
                     MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);

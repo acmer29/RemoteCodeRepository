@@ -121,15 +121,23 @@ namespace GUI
             setNotifications();
         }
 
+        // -----< canTouch: Check the user have the authority to modify the file data >-----
+        private bool canTouch()
+        {
+            if (theUser == "Administrator") return true;
+            else if (theFile.Owner == "" || theFile.Owner == "Anonymous") return true;
+            else return (theUser == theFile.Owner);
+        }
+
         // -----< setNotifications: Set the notifications according to different conditions >-----
         private void setNotifications()
         {
-            if (theUser != theFile.Owner)
+            if (canTouch() == false)
             {
                 description.IsEnabled = false; allRecordBriefList.IsEnabled = false; allCategoryList.IsEnabled = false; version.IsEnabled = false; owner.IsEnabled = false; newCategory.IsEnabled = false; addCategoryButton.IsEnabled = false;
-                fileInfoNotificationLabel.Content = "  The file is not own by you.\n  You cannot modify its metadata.";
-                dependenciesNotificationLabel.Content = "  The file is not own by you.\n  You cannot modify its metadata.";
-                categoriesInfoNotificationLabel.Content = "  The file is not own by you.\n  You cannot modify its metadata.";
+                fileInfoNotificationLabel.Content = "  You have no authority to modify this file.\n  You cannot modify its metadata.";
+                dependenciesNotificationLabel.Content = "  You have no authority to modify this file.\n  You cannot modify its metadata.";
+                categoriesInfoNotificationLabel.Content = "  You have no authority to modify this file.\n  You cannot modify its metadata.";
             }
             else if (theFile.Status != "open")
             {
