@@ -134,7 +134,7 @@ namespace GUI
         {
             if (canTouch() == false)
             {
-                description.IsEnabled = false; allRecordBriefList.IsEnabled = false; allCategoryList.IsEnabled = false; version.IsEnabled = false; owner.IsEnabled = false; newCategory.IsEnabled = false; addCategoryButton.IsEnabled = false;
+                description.IsEnabled = false; allRecordBriefList.IsEnabled = false; allCategoryList.IsEnabled = false; version.IsEnabled = false; owner.IsEnabled = false; newCategory.IsEnabled = false; addCategoryButton.IsEnabled = false; closeCheckin.IsEnabled = false;
                 fileInfoNotificationLabel.Content = "  You have no authority to modify this file.\n  You cannot modify its metadata.";
                 dependenciesNotificationLabel.Content = "  You have no authority to modify this file.\n  You cannot modify its metadata.";
                 categoriesInfoNotificationLabel.Content = "  You have no authority to modify this file.\n  You cannot modify its metadata.";
@@ -333,6 +333,7 @@ namespace GUI
                 closeCheckin.Content = "Close";
                 status.Text = "open";
             }
+            applyChanges.IsEnabled = true;
         }
     }
 }

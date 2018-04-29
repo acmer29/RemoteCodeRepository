@@ -693,11 +693,32 @@ namespace GUI
             }
         }
 
+        // -----< correctUser: Trim the username >-----
+        private string correctUser(string toCorrect)
+        {
+            return toCorrect.Trim();
+        }
+
         // -----< Change_CurrentUser: Click handler of User Login Botton >-----
         private void Change_CurrentUser(object sender, RoutedEventArgs e)
         {
-            theUser.Text = userName.Text;
-            hintDisplay(userName.Text + " has logged in");
+            string tmp = correctUser(userName.Text);
+            if (tmp == "") { userName.Text = "Anonymous"; theUser.Text = "Anonymous"; }
+            else
+            {
+                string valid = @"^[a-zA-Z0-9]*$";
+                if (Regex.IsMatch(tmp, valid) == false)
+                {
+                    hintDisplay("User name should only consist of digits and letters");
+                    userName.Text = theUser.Text;
+                    return;
+                }
+                else
+                {
+                    theUser.Text = tmp;
+                    hintDisplay(userName.Text + " has logged in");
+                }
+            }
         }
 
         // -----< trackAllCategoriesCallbackHandler: Callback handler of tracking all categories >-----
