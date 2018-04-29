@@ -201,7 +201,7 @@ namespace GUI
         // -----< isAlphaDigit: Check if the string is consist of letter and digits >-----
         bool isAlphaDigit(string toCheck)
         {
-            string valid = @"^[A-Za-z0-9]\s$";
+            string valid = @"^[A-Za-z0-9\s]*$";
             return Regex.IsMatch(toCheck, valid);
         }
     }
