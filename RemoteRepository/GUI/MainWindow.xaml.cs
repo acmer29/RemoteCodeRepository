@@ -210,6 +210,13 @@ namespace GUI
             else return result.Substring(0, result.Length - 1);
         }
 
+        // -----< isAlphaDigit: Check if the string is consist of letter and digits >-----
+        bool isAlphaDigit(string toCheck)
+        {
+            string valid = @"^[A-Za-z0-9]\s$";
+            return Regex.IsMatch(toCheck, valid);
+        }
+
         // -----< addDependency: Add dependency to checkin item >-----
         private void addDependency(object sender, RoutedEventArgs e)
         {
@@ -246,7 +253,8 @@ namespace GUI
         private void addCategory_Click(object sender, RoutedEventArgs e)
         {
             KeyValuePair theNew = new KeyValuePair();
-            if (newCategory.Text == "") return;
+            if (newCategory.Text.Trim() == "") return;
+            else if(isAlphaDigit(newCategory.Text) == false) { hintDisplay("category should only consist of letter and digit!"); return; }
             theNew.IsChecked = true;
             theNew.Value = newCategory.Text;
             checkinCategoryList.Items.Add(theNew);
@@ -533,6 +541,7 @@ namespace GUI
                 hintDisplay("Please at least specify FileName by clicking the browse button!");
                 return;
             }
+            if(isAlphaDigit(description.Text) == false || isAlphaDigit(nameSpace.Text) == false) { hintDisplay("description and namespace should only consist of digit and letter!"); return; }
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = theServerAddress;
             serverEndPoint.port = serverPort;
@@ -706,8 +715,7 @@ namespace GUI
             if (tmp == "") { userName.Text = "Anonymous"; theUser.Text = "Anonymous"; }
             else
             {
-                string valid = @"^[a-zA-Z0-9]*$";
-                if (Regex.IsMatch(tmp, valid) == false)
+                if (isAlphaDigit(tmp) == false)
                 {
                     hintDisplay("User name should only consist of digits and letters");
                     userName.Text = theUser.Text;

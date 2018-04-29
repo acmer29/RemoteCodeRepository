@@ -28,9 +28,11 @@
  */
 
 using System;
+using System.IO;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
@@ -39,7 +41,10 @@ using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using System.Windows.Navigation;
 using System.Windows.Shapes;
+using System.Threading;
+using MsgPassingCommunication;
 
 namespace GUI
 {
@@ -172,6 +177,7 @@ namespace GUI
                 string errorInfo = "";
                 if (result == 1) errorInfo = "The version must be decimal integar!";
                 else if (result == 2) errorInfo = "Filename must not be empty unless select \"Select all files\"!";
+                else if (result == 3) errorInfo = "name and namespace must only consist of digit and letter!";
                 MessageBox.Show(errorInfo, "Set Filter", MessageBoxButton.OK, MessageBoxImage.Information);
             }
         }
@@ -188,7 +194,15 @@ namespace GUI
             int n;
             if (int.TryParse(version.Text, out n) == false && keepVersion.IsChecked != true) return 1;
             if (fileName.Text == "" && keepFileName.IsChecked != true) return 2;
+            if (isAlphaDigit(fileName.Text) == false || isAlphaDigit(nameSpace.Text) == false) return 3;
             return 0;
+        }
+
+        // -----< isAlphaDigit: Check if the string is consist of letter and digits >-----
+        bool isAlphaDigit(string toCheck)
+        {
+            string valid = @"^[A-Za-z0-9]\s$";
+            return Regex.IsMatch(toCheck, valid);
         }
     }
 }

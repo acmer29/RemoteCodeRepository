@@ -121,6 +121,13 @@ namespace GUI
             setNotifications();
         }
 
+        // -----< isAlphaDigit: Check if the string is consist of letter and digits >-----
+        bool isAlphaDigit(string toCheck)
+        {
+            string valid = @"^[A-Za-z0-9]\s$";
+            return Regex.IsMatch(toCheck, valid);
+        }
+
         // -----< canTouch: Check the user have the authority to modify the file data >-----
         private bool canTouch()
         {
@@ -260,6 +267,7 @@ namespace GUI
         {
             KeyValuePair theNew = new KeyValuePair();
             if (newCategory.Text == "") return;
+            else if (isAlphaDigit(newCategory.Text) == false) return;
             theNew.IsChecked = true;
             theNew.Value = newCategory.Text;
             allCategoryList.Items.Add(theNew);
@@ -297,6 +305,7 @@ namespace GUI
         // -----< applyBasicInfo_Click: Handle applyBasicInfo button click event >-----
         private void applyBasicInfo()
         {
+            if (isAlphaDigit(theFile.Owner) == false || isAlphaDigit(theFile.Description) == false) return;
             theFile.Owner = owner.Text;
             theFile.Status = status.Text;
             theFile.Description = description.Text;
