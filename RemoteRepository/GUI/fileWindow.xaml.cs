@@ -124,7 +124,7 @@ namespace GUI
         // -----< isAlphaDigit: Check if the string is consist of letter and digits >-----
         bool isAlphaDigit(string toCheck)
         {
-            string valid = @"^[A-Za-z0-9\s]*$";
+            string valid = @"^[A-Za-z0-9\s\\._-]*$";
             return Regex.IsMatch(toCheck, valid);
         }
 
@@ -203,7 +203,7 @@ namespace GUI
                 item.IsChecked = false;
                 foreach (string dependencies in theFile.Dependencies)
                 {
-                    if (dependencies == item.NameSpace + "::" + item.Name + "." + item.Version) { item.IsChecked = true; }
+                    if (dependencies == item.NameSpace + "::" + item.Name + "." + item.Version) { selectedDependencies.Add(dependencies); item.IsChecked = true; }
                 }
                 allRecordBriefList.Items.Add(item);
             }
@@ -217,10 +217,7 @@ namespace GUI
                 KeyValuePair toAdd = new KeyValuePair("", item);
                 foreach (string category in theFile.Categories)
                 {
-                    if (category == item)
-                    {
-                        toAdd.IsChecked = true;
-                    }
+                    if (category == item) { selectedCategories.Add(item); toAdd.IsChecked = true; }
                 }
                 allCategoryList.Items.Add(toAdd);
             }
@@ -240,7 +237,7 @@ namespace GUI
         {
             CheckBox selected = sender as CheckBox;
             string toRemove = selected.Tag.ToString();
-            selectedCategories.Remove(toRemove);
+            selectedDependencies.Remove(toRemove);
             applyChanges.IsEnabled = true;
         }
 
@@ -267,7 +264,16 @@ namespace GUI
         {
             KeyValuePair theNew = new KeyValuePair();
             if (newCategory.Text == "") return;
-            else if (isAlphaDigit(newCategory.Text) == false) return;
+            else if (isAlphaDigit(newCategory.Text) == false)
+            {
+                MessageBox.Show("The category value could only contain letters and digits and whitespace!", "Modify metadata", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
+            if (allCategories.Contains(newCategory.Text))
+            {
+                MessageBox.Show("This category value has already exists!", "Modify metadata", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
             theNew.IsChecked = true;
             theNew.Value = newCategory.Text;
             allCategoryList.Items.Add(theNew);
@@ -305,7 +311,6 @@ namespace GUI
         // -----< applyBasicInfo_Click: Handle applyBasicInfo button click event >-----
         private void applyBasicInfo()
         {
-            if (isAlphaDigit(theFile.Owner) == false || isAlphaDigit(theFile.Description) == false) return;
             theFile.Owner = owner.Text;
             theFile.Status = status.Text;
             theFile.Description = description.Text;
@@ -315,6 +320,10 @@ namespace GUI
         // -----< applyChange_Click: Handle applyChanges button click event >-----
         private void applyChanges_Click(object sender, RoutedEventArgs e)
         {
+            if (isAlphaDigit(owner.Text) == false || isAlphaDigit(description.Text) == false) {
+                MessageBox.Show("The owner and description value could only contain letters and digits and whitespace!", "Modify metadata", MessageBoxButton.OK, MessageBoxImage.Information);
+                return;
+            }
             applyBasicInfo();
             applyDependencies();
             applyCategories();

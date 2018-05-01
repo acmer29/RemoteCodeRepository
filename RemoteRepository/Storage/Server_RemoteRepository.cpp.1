@@ -1,7 +1,7 @@
 /////////////////////////////////////////////////////////////////////////
-// ServerPrototype.cpp - Console App that processes incoming messages  //
+// RemoteRepository.cpp - Console App that processes incoming messages //
 // ver 1.0                                                             //
-// Jim Fawcett, CSE687 - Object Oriented Design, Spring 2018           //
+// Tianyu Qi, CSE687 - Object Oriented Design, Spring 2018             //
 /////////////////////////////////////////////////////////////////////////
 
 #include "RemoteRepository.h"
@@ -14,6 +14,8 @@ using namespace Repository;
 using namespace FileSystem;
 using Msg = MsgPassingCommunication::Message;
 
+
+// -----< vectorToString: Helper function converting vector to string >-----
 std::string vectorToString(const std::vector<std::string>& toConvert) {
 	std::string result = "";
 	for (auto item : toConvert) {
@@ -23,26 +25,30 @@ std::string vectorToString(const std::vector<std::string>& toConvert) {
 	return result;
 }
 
+// -----< getFiles: get files from path >-----
 Files Server::getFiles(const Repository::SearchPath& path)
 {
 	return Directory::getFiles(path);
 }
 
+// -----< getDirs: get directories from path  >-----
 Dirs Server::getDirs(const Repository::SearchPath& path)
 {
 	return Directory::getDirectories(path);
 }
 
+// -----< getFilesPlus: Modified version of getFiles  >-----
 std::string Server::getFilesPlus(const Repository::SearchPath& searchPath) {
 	Files files = getFiles(searchPath);
 	std::string fileComplex = "";
 	for (auto item : files) {
 		fileComplex += (item + "$");
 	}
-if (fileComplex != "") fileComplex = fileComplex.substr(0, fileComplex.length() - 1);
-return fileComplex;
+	if (fileComplex != "") fileComplex = fileComplex.substr(0, fileComplex.length() - 1);
+	return fileComplex;
 }
 
+// -----< getDirsPlus: Modified version of getDirs  >-----
 std::string Server::getDirsPlus(const Repository::SearchPath& searchPath) {
 	Dirs dirs = getDirs(searchPath);
 	std::string dirComplex = "";
@@ -54,6 +60,7 @@ std::string Server::getDirsPlus(const Repository::SearchPath& searchPath) {
 	return dirComplex;
 }
 
+// -----< fileInfoAssembler: Assemble the file info  >-----
 std::vector<std::string> Server::fileInfoAssembler(const std::string& NSPFileName) {
 	SWRTB::Core repo(Repository::repoHeartPath);
 	std::vector<std::string> ans;
@@ -65,10 +72,8 @@ std::vector<std::string> Server::fileInfoAssembler(const std::string& NSPFileNam
 		std::cout << "Error: " << ex.what() << std::endl;
 		return ans;
 	}
-	//std::cout << "I need to find " << SWRTB::NSPFileNameToNSNFileName(NSPFileName) << std::endl;
 	std::vector<NoSqlDb::DbElement<std::string>> result =
 		querier.from(repo.core()).find("name", SWRTB::NSPFileNameToNSNFileName(NSPFileName)).eval();
-	std::cout << "I find " << result.size() << "!" << std::endl;
 	if (result.size() == 0) return ans;
 	else {
 		ans.push_back(result[0].nameSpace());
@@ -84,6 +89,7 @@ std::vector<std::string> Server::fileInfoAssembler(const std::string& NSPFileNam
 	}
 }
 
+// -----< listContentMessage: Assemble the listConent message >-----
 Msg Server::listContentMessage(const EndPoint& from, const EndPoint& to, const std::string& path) {
 	Msg reply(to, from);
 	reply.command("listContent");
@@ -96,6 +102,7 @@ Msg Server::listContentMessage(const EndPoint& from, const EndPoint& to, const s
 	return reply;
 }
 
+// -----< showFileMessge: Assemble the showFile message >-----
 Msg Server::showFileMessge(const EndPoint& from, const EndPoint& to, const std::string& path) {
 	Msg reply(to, from);
 	reply.command("showFile");
@@ -124,6 +131,7 @@ Msg Server::showFileMessge(const EndPoint& from, const EndPoint& to, const std::
 	return reply;
 }
 
+// -----< trackAllRecordsMessage: Assemble trackAllRecords message  >-----
 Msg Server::trackAllRecordsMessage(const EndPoint& from, const EndPoint& to) {
 	Msg reply(to, from);
 	reply.attribute("command", "trackAllRecordsCallback");
@@ -136,12 +144,14 @@ Msg Server::trackAllRecordsMessage(const EndPoint& from, const EndPoint& to) {
 		std::string recordBrief = item.nameSpace() + "$"
 			+ SWRTB::nameOf(item.name(), item.nameSpace()) + "$"
 			+ SWRTB::versionOf(item.name()) + "$"
-			+ item.status();
+			+ item.status() + "$" 
+			+ item.descrip();
 		reply.attribute("record" + Utilities::Converter<size_t>::toString(count++), recordBrief);
 	}
 	return reply;
 }
 
+// -----< trackAllCategoriesMessage: Assemble trackAllCategories message  >-----
 Msg Server::trackAllCategoriesMessage(const EndPoint& from, const EndPoint& to) {
 	Msg reply(to, from);
 	reply.attribute("command", "trackAllCategoriesCallback");
@@ -162,6 +172,7 @@ Msg Server::trackAllCategoriesMessage(const EndPoint& from, const EndPoint& to) 
 	return reply;
 }
 
+// -----< checkInCallbackMessage: Assemble checkInCallback message  >-----
 Msg Server::checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage) {
 	Msg reply(to, from);
 	reply.attribute("command", "checkinCallback");
@@ -190,6 +201,7 @@ Msg Server::checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg
 	return reply;
 }
 
+// -----< checkOutCallbackMessage: Assemble checkOutCallback message  >-----
 Msg Server::checkOutCallbackMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage) {
 	Msg reply(to, from);
 	reply.attribute("command", "checkoutCallback");
@@ -214,6 +226,7 @@ Msg Server::checkOutCallbackMessage(const EndPoint& from, const EndPoint& to, Ms
 	return reply;
 }
 
+// -----< sendMultipleFiles: Send multiple files  >-----
 void Server::sendMultipleFiles(Msg message) {
 	Msg reply(message.from(), message.to());
 	if (message.value("for") == "checkoutReceiveFiles")
@@ -228,6 +241,7 @@ void Server::sendMultipleFiles(Msg message) {
 	return;
 }
 
+// -----< show: show different type of message >-----
 template<typename T>
 void show(const T& t, const std::string& msg)
 {
@@ -238,6 +252,7 @@ void show(const T& t, const std::string& msg)
 	}
 }
 
+// -----< echo: reply echo message >-----
 std::function<Msg(Msg)> echo = [](Msg msg) {
 	Msg reply = msg;
 	reply.to(msg.from());
@@ -245,16 +260,19 @@ std::function<Msg(Msg)> echo = [](Msg msg) {
 	return reply;
 };
 
+// -----< trackAllCategories: reply trackAllCategories message >-----
 std::function<Msg(Msg)> trackAllCategories = [](Msg msg) {
 	Msg reply = Server::trackAllCategoriesMessage(msg.to(), msg.from());
 	return reply;
 };
 
+// -----< trackAllRecords: reply trackAllCategories message >-----
 std::function<Msg(Msg)> trackAllRecords = [](Msg msg) {
 	Msg reply = Server::trackAllRecordsMessage(msg.to(), msg.from());
 	return reply;
 };
 
+// -----< showFileCleanUp: reply showFileCleanUp message >-----
 std::function<Msg(Msg)> showFileCleanUp = [](Msg msg) {
 	Msg reply(serverEndPoint, serverEndPoint);
 	reply.command("echo");
@@ -264,6 +282,7 @@ std::function<Msg(Msg)> showFileCleanUp = [](Msg msg) {
 	return reply;
 };
 
+// -----< listContent: reply listContent message >-----
 std::function<Msg(Msg)> listContent = [](Msg msg) {
 	Msg reply;
 	std::string path = msg.value("path");
@@ -280,20 +299,35 @@ std::function<Msg(Msg)> listContent = [](Msg msg) {
 	return reply;
 };
 
+// -----< fileCheckin: reply fileCheckin message >-----
 std::function<Msg(Msg)> fileCheckin = [](Msg msg) {
 	Msg reply = Server::checkInCallbackMessage(msg.to(), msg.from(), msg);
 	return reply;
 };
 
+// -----< fileCheckout: reply fileCheckout message >-----
 std::function<Msg(Msg)> fileCheckout = [](Msg msg) {
 	Msg reply = Server::checkOutCallbackMessage(msg.to(), msg.from(), msg);
 	return reply;
 };
 
+// -----< ping: reply ping message >-----
 std::function<Msg(Msg)> ping = [](Msg msg) {
 	Msg reply(msg.from(), msg.to());
 	reply.attribute("name", "Server reply to " + msg.name());
 	reply.attribute("command", "ping");
+	return reply;
+};
+
+// -----< browseDescription: reply browseDescription message >-----
+std::function<Msg(Msg)> browseDescription = [](Msg msg) {
+	Msg reply(msg.from(), msg.to());
+	reply.attribute("command", "browseDescriptionCallback");
+	SWRTB::Core repo(Repository::repoHeartPath);
+	NoSqlDb::DbQuery<std::string> querier(repo.core());
+	std::vector<NoSqlDb::DbElement<std::string>> result =
+		querier.from(repo.core()).find("name", msg.value("fileName")).eval();
+	reply.attribute("description", result[0].descrip());
 	return reply;
 };
 
@@ -321,14 +355,10 @@ int main()
 	server.addMsgProc("trackAllCategories", trackAllCategories);
 	server.addMsgProc("serverQuit", echo);
 	server.addMsgProc("ping", ping);
+	server.addMsgProc("browseDescription", browseDescription);
 	server.processMessages();
 
 	Msg msg(serverEndPoint, serverEndPoint);  // send to self
-	msg.name("msgToSelf");
-	msg.command("echo");
-	msg.attribute("verbose", "show me");
-	server.postMessage(msg);
-	std::this_thread::sleep_for(std::chrono::milliseconds(1000));
 
 	std::cout << "\n  press enter to exit";
 	std::cin.get();

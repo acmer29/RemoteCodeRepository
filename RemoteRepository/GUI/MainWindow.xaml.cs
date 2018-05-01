@@ -121,7 +121,8 @@ namespace GUI
             trackAllRecordsCallbackHandler();
             trackAllCategoriesCallbackHandler();
             pingHandler();
-            browseDescriptionCallbackHandler();
+            uploadFilesCallbackHandler();
+            downloadFilesCallbackHandler();
             setFilterCallbackHandler();
             resumeCheckinCallbackHandler();
         }
@@ -191,7 +192,7 @@ namespace GUI
             string result = "";
             foreach (string item in toConvert)
             {
-                result += item + ",";
+                result += item + "$";
             }
             if (result == "") return result;
             else return result.Substring(0, result.Length - 1); 
@@ -204,7 +205,7 @@ namespace GUI
             if (toConvert.Count() == 0) return "";
             foreach (string item in toConvert)
             {
-                result += item + ",";
+                result += item + "$";
             }
             if (result == "") return result;
             else return result.Substring(0, result.Length - 1);
@@ -213,7 +214,7 @@ namespace GUI
         // -----< isAlphaDigit: Check if the string is consist of letter and digits >-----
         bool isAlphaDigit(string toCheck)
         {
-            string valid = @"^[A-Za-z0-9\s]*$";
+            string valid = @"^[A-Za-z0-9\s\\._-]*$";
             return Regex.IsMatch(toCheck, valid);
         }
 
@@ -255,6 +256,7 @@ namespace GUI
             KeyValuePair theNew = new KeyValuePair();
             if (newCategory.Text.Trim() == "") return;
             else if(isAlphaDigit(newCategory.Text) == false) { hintDisplay("category should only consist of letter and digit!"); return; }
+            if (repoCategories.Contains(newCategory.Text)) { hintDisplay("This category has already exists!"); return; } 
             theNew.IsChecked = true;
             theNew.Value = newCategory.Text;
             checkinCategoryList.Items.Add(theNew);
@@ -297,6 +299,7 @@ namespace GUI
         // -----< populateCheckInCategoryListView: Populate checkin category ListView >-----
         private void populateCheckInCategoryListView()
         {
+            checkinCategoryList.Items.Clear();
             foreach (string item in repoCategories)
             {
                 KeyValuePair toAdd = new KeyValuePair("", item);
@@ -313,10 +316,18 @@ namespace GUI
         // -----< populateFilterBrowseListView: Populate filter browse listview >-----
         private void populateFilterBrowseListView()
         {
+            browseList.Items.Clear();
+            DoEvents();
             foreach (FileComplex item in filterRecords)
             {
                 browseList.Items.Add(item);
             }
+        }
+
+        // -----< browseRefresh: Refresh the browseList >-----
+        private void browseRefresh(object sender, RoutedEventArgs e)
+        {
+            populateBrowseListView();
         }
 
         // -----< resumeCheckinCallbackHandler: Handle resumeCheckinCallback >-----
@@ -324,7 +335,7 @@ namespace GUI
         {
             Action<CsMessage> resumeCheckinCallback = (CsMessage receiveMessage) =>
             {
-                string errorInfo = "File information modification success.\n";
+                string errorInfo = "File information modification success.";
                 var enumer = receiveMessage.attributes.GetEnumerator();
                 while (enumer.MoveNext())
                 {
@@ -333,6 +344,8 @@ namespace GUI
                 };
                 if (isDebug == false)
                     MessageBox.Show(errorInfo, "File Information Modification", MessageBoxButton.OK, MessageBoxImage.Information);
+                Action hint = () => hintDisplay(errorInfo);
+                Dispatcher.Invoke(hint, new Object[] { });
             };
             registerHandler("resumeCheckinCallback", resumeCheckinCallback);
         }
@@ -402,7 +415,7 @@ namespace GUI
                 }
                 Action addList = () => { populateFilterBrowseListView(); };
                 Dispatcher.Invoke(addList, new Object[] { });
-                if (isDebug == true) receiveMessage.show();
+                if (isDebug == true) { receiveMessage.show(); }
             };
             registerHandler("setFilterCallback", setFilterCallback);
         }
@@ -571,22 +584,24 @@ namespace GUI
         // -----< Check_In_Cancel_Click: Click handler of checkInCancel Button >-----
         private void Check_In_Cancel_Click(object sender, RoutedEventArgs e)
         {
-            pathFileName.Text = "Click Browse to select the file";
-            description.Text = "";
-            nameSpace.Text = "";
-            checkinCategoryList.Items.Clear();
-            checkInDependencyList.Items.Clear();
-            Action updateCheckInCategoryList = () =>
+            refreshCheckinTab();
+        }
+
+        // -----< refreshCheckinTab: Refresh checkin tab >-----
+        private void refreshCheckinTab()
+        {
+            Action doAll = () =>
             {
                 populateCheckInCategoryListView();
-            };
-            Dispatcher.Invoke(updateCheckInCategoryList, new Object[] { });
-            Action updateCheckInDependencyList = () =>
-            {
+                pathFileName.Text = "Click Browse to select the file";
+                description.Text = "";
+                nameSpace.Text = "";
+                checkinCategoryList.Items.Clear();
+                checkInDependencyList.Items.Clear();
                 populateCheckInDependencyListView();
+                closeCheckIn.IsChecked = false;
             };
-            Dispatcher.Invoke(updateCheckInDependencyList, new Object[] { });
-            closeCheckIn.IsChecked = false;
+            Dispatcher.Invoke(doAll, new Object[] { });
         }
 
         // -----< checkoutReceiveFileCallbackHandler: Callback handler of checkoutReceiveFileCallback >-----
@@ -595,10 +610,17 @@ namespace GUI
             Action<CsMessage> checkoutReceiveFilesCallback = (CsMessage receiveMessage) =>
             {
                 var enumer = receiveMessage.attributes.GetEnumerator();
-                while(enumer.MoveNext())
+                while (enumer.MoveNext())
                 {
-                    if (enumer.Current.Key == "content-length" && enumer.Current.Value == "0") return; 
-                    if (enumer.Current.Key == "fileName") successCheckouts.Remove(enumer.Current.Value);
+                    if (enumer.Current.Key == "content-length" && enumer.Current.Value == "0") return;
+                    if (enumer.Current.Key == "fileName")
+                    {
+                        successCheckouts.Remove(enumer.Current.Value);
+                    }
+                    if(enumer.Current.Key == "file")
+                    {
+                        System.IO.File.Copy("../SaveFiles/" + enumer.Current.Value, "../Checkout/" + enumer.Current.Value, true);
+                    }
                 }
                 Action hint = () => hintDisplay("File checken out successful");
                 Dispatcher.Invoke(hint, new Object[] { });
@@ -787,7 +809,7 @@ namespace GUI
                 Action updateCheckInDependencyList = () =>
                 {
                     populateCheckInDependencyListView();
-                    populateBrowseListView();
+                    // populateBrowseListView();
                     populateCheckoutListView();
                 };
                 Dispatcher.Invoke(updateCheckInDependencyList, new Object[] { });
@@ -840,18 +862,18 @@ namespace GUI
             if(isDebug == true) message.show();
         }
 
-        // -----< browseDescriptionCallbackHandler: Callback handler of browseDescription >-----
-        private void browseDescriptionCallbackHandler()
+        // -----< uploadFilesCallbackHandler: Handle uploadFilesCallback event >-----
+        private void uploadFilesCallbackHandler()
         {
-            Action<CsMessage> browseDescriptionCallback = (CsMessage receiveMessage) =>
+            Action<CsMessage> uploadFileCallback = (CsMessage receiveMessage) =>
             {
                 receiveMessage.show();
             };
-            registerHandler("browseDescriptionCallback", browseDescriptionCallback);
+            registerHandler("uploadFileCallback", uploadFileCallback);
         }
 
-        // -----< browseDescription: Send message of browseDescription >-----
-        private void browseDescription(string fileName)
+        // -----< uploadFiles: Send message of uploadFiles >-----
+        private void uploadFiles(string fileName)
         {
             CsEndPoint serverEndPoint = new CsEndPoint();
             serverEndPoint.machineAddress = theServerAddress;
@@ -859,9 +881,43 @@ namespace GUI
             CsMessage message = new CsMessage();
             message.add("to", CsEndPoint.toString(serverEndPoint));
             message.add("from", CsEndPoint.toString(endPoint_));
-            message.add("command", "browseDescription");
-            message.add("fileName", fileName);
-            if (isDebug == true) { message.add("name", "Demo message of requirement 3d"); }
+            message.add("command", "uploadFile");
+            message.add("file", fileName);
+            System.IO.FileInfo sourceFileInfo = new System.IO.FileInfo("../SendFiles/" + fileName);
+            message.add("content-length", sourceFileInfo.Length.ToString());
+            if (isDebug == true) { message.add("name", "Demo message of requirement 3a"); }
+            Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+            message.show();
+        }
+
+        // -----< downloadFilesCallbackHandler: Handle downloadFilesCallback event >-----
+        private void downloadFilesCallbackHandler()
+        {
+            Action<CsMessage> downloadFileCallback = (CsMessage receiveMessage) =>
+            {
+                var enumer = receiveMessage.attributes.GetEnumerator();
+                while (enumer.MoveNext())
+                {
+                    if (enumer.Current.Key == "content-length" && enumer.Current.Value != "0") { receiveMessage.show(); break; }
+                }
+            };
+            registerHandler("downloadFileCallback", downloadFileCallback);
+        }
+
+        // -----< downloadFiles: Send message of downloadFiles >-----
+        private void downloadFiles(string fileName)
+        {
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "downloadFile");
+            message.add("requestFile", fileName);
+            if (isDebug == true) { message.add("name", "Demo message of requirement 3b"); }
             Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
@@ -1007,7 +1063,7 @@ namespace GUI
 
             loadAboutText();
             if (isDebug == true && argUser == "Administrator") testStub();
-            else Console.Write("  This client only demostrate the project implements multi-client function, no demo shown in this client, the client title \"Client Console - User: Administrator - Port: 8081\" holds all requirements demostration");
+            else Console.Write("\n\n  This client only demostrate the project implements multi-client function, no demo shown in this client, the client title \"Client Console - User: Administrator - Port: 8081\" holds all requirements demostration");
         }
 
         // -----< testStub: Run all tests >-----
@@ -1019,8 +1075,11 @@ namespace GUI
             test2a();
             test2b();
             test2c();
+            test2d();
+            Console.Write(browseList.Items.Count);
             test3a();
             test3b();
+            test3c();
             test4();
             test5();
             test6();
@@ -1049,7 +1108,8 @@ namespace GUI
             checkInDependencies.Add("DbCore::DbCore.h.1"); checkInDependencies.Add("DbCore::DbCore.cpp.1");
             checkInCategories.Add("source");
             checkinButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 2a\"\n");
+            refreshCheckinTab();
+            Console.Write("  The client will receive the reply from server with message has name \"Server replies Demo message of requirement 2a\"\n");
             Console.Write("  Which can prove that this client can send and receive checkin messages.\n\n");
             Console.Write("  PASSED -- Requirement 2a\n\n");
         }
@@ -1076,7 +1136,8 @@ namespace GUI
             translater.postMessage(message);
             Console.Write("  The message below shows the client sending a checkout message with checkout file information and requestor.\n");
             message.show();
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 2b\"\n");
+            Console.Write("  The client will receive the reply from server with message has name \"Server replies Demo message of requirement 2b\"\n");
+            Console.Write("  The file \"DbCore::DbCore.h.1\" will be checkout and renamed as \"DbCore_DbCore.h\", and finally stored in \"GUI/bin/Checkout/\", which is the default storage directory of the checkout files.\n\n");
             Console.Write("  Which can prove that this client can send and receive checkout messages.\n\n");
             Console.Write("  PASSED -- Requirement 2b\n\n");
         }
@@ -1085,6 +1146,35 @@ namespace GUI
         private void test2c()
         {
             Console.Write("Demostration of Requirement 2c.\n\n");
+            Console.Write("===============================\n\n");
+            Console.Write("  Demostrate repository server provides recursive check-out functionality\n\n");
+            CsEndPoint serverEndPoint = new CsEndPoint();
+            serverEndPoint.machineAddress = theServerAddress;
+            serverEndPoint.port = serverPort;
+            CsMessage message = new CsMessage();
+            message.add("to", CsEndPoint.toString(serverEndPoint));
+            message.add("from", CsEndPoint.toString(endPoint_));
+            message.add("command", "fileCheckout");
+            message.add("fileName", "DbCore::DbCore.cpp.1");
+            message.add("requestor", theUser.Text);
+            message.add("recursive", "true");
+            if (isDebug == true) { message.add("name", "Demo message of requirement 2c"); }
+            Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
+            Dispatcher.Invoke(debug, new Object[] { message });
+            translater.postMessage(message);
+            Console.Write("  The message below shows the client sending a checkout message with checkout file information and requestor, and also recursively checkout all file dependencies.\n");
+            message.show();
+            Console.Write("  The client will receive the reply from server with message has name \"Server replies Demo message of requirement 2c\"\n");
+            Console.Write("  And the message contains \"successFile0\" and \"successFile1\" attribute, each represents a checkout file, which means \"DbCore::DbCore.cpp\" and its dependency.\n\n");
+            Console.Write("  The file \"DbCore::DbCore.cpp.1\" and its dependency \"DbCore::DbCore.h.1\" will be checkout and renamed as \"DbCore_DbCore.cpp\" and \"DbCore_DbCore.h\", and finally stored in \"GUI/bin/Checkout/\", which is the default storage directory of the checkout files.\n\n");
+            Console.Write("  Which can prove that this client can send and receive recursive checkout messages.\n\n");
+            Console.Write("  PASSED -- Requirement 2c\n\n");
+        }
+
+        // -----< Demostration of requirement 2d >-----
+        private void test2d()
+        {
+            Console.Write("Demostration of Requirement 2d.\n\n");
             Console.Write("===============================\n\n");
             Console.Write("  Demostrate repository server provides browse packages spcified by NoSql database queries.\n\n");
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -1096,17 +1186,19 @@ namespace GUI
             message.add("command", "setFilter");
             message.add("nameSpace", "DbCore");
             message.add("source", "DbCore::DbCore.h.1$DbCore::DbCore.h.2$SWRTB::SWRepoCore.h.1$DbCore::DbCore.cpp.1$SWRTB::SWRepoCore.cpp.1$Server::RemoteRepository.cpp.1$");
-            message.add("name", "Demo message of requirement 2c");
+            message.add("name", "Demo message of requirement 2d");
             Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send");
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
+            
             Console.Write("  The message below shows the client sending a set filter message by using query, and filter the file with NameSpace \"DbCore\".\n");
             message.show();
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 2c\"\n");
-            Console.Write("  The browse tab of the client window will show only files with NameSpace \"DbCore\" as well.\n\n");
+            Console.Write("  The client will receive the reply from server with message has name \"Server replies Demo message of requirement 2d\"\n");
+            Console.Write("  The \"query\" attribute shows the actual query string passed into NoSqlDb in the server side, and \"record + N\" attribute shows the query result as the return file records, the correspond assemble process is done by server\n\n");
+            Console.Write("  The browse tab of the client window will show only files with NameSpace \"DbCore\".\n\n");
             Console.Write("  The file popup window with its source code and metadata will be demostrated seperately in demostration of requirement 3.\n\n");
             Console.Write("  Which can prove that this client can send and receive browse package message specified with queries.\n\n");
-            Console.Write("  PASSED -- Requirement 2c\n\n");
+            Console.Write("  PASSED -- Requirement 2d\n\n");
         }
 
         // -----< Demostration of requirement 3a >-----
@@ -1114,16 +1206,31 @@ namespace GUI
         {
             Console.Write("Demostration of Requirement 3a.\n\n");
             Console.Write("===============================\n\n");
-            Console.Write("  Demostrate client program can upload and download files.\n\n");
-            Console.Write("  Upload file has already demostrated as a part of checkin.\n\n");
-            Console.Write("  Download file has already demostrated as a part of checkout.\n\n");
+            Console.Write("  Demostrate client program can upload files.\n\n");
+            Console.Write("  The message below shows the client sending a upload file message, \"About.txt\" will be uploaded to the server storage folder.\n\n");
+            uploadFiles("About.txt");
+            Console.Write("  The client will receive the reply from server with message has name \"Server replies Demo message of requirement 3a\"\n");
+            Console.Write("  Which can prove that this client can upload files to server\n\n");
             Console.Write("  PASSED -- Requirement 3a\n\n");
         }
 
         // -----< Demostration of requirement 3b >-----
         private void test3b()
         {
-            Console.Write("Demostration of Requirment 3b.\n\n");
+            Console.Write("Demostration of Requirement 3b.\n\n");
+            Console.Write("===============================\n\n");
+            Console.Write("  Demostrate client program can download files.\n\n");
+            Console.Write("  The message below shows the client sending a download file message, \"Message.cpp\" will be downloaded from server to \"GUI/bin/SaveFiles\" folder.\n\n");
+            downloadFiles("Message.cpp");
+            Console.Write("  The client will receive the reply from server with message has name \"Server replies Demo message of requirement 3b\"\n");
+            Console.Write("  Which can prove that this client can download files from server\n\n");
+            Console.Write("  PASSED -- Requirement 3b\n\n");
+        }
+
+        // -----< Demostration of requirement 3c >-----
+        private void test3c()
+        {
+            Console.Write("Demostration of Requirment 3c.\n\n");
             Console.Write("==============================\n\n");
             Console.Write("  Demostrate client program can view repository contents.\n\n");
             CsEndPoint serverEndPoint = new CsEndPoint();
@@ -1134,18 +1241,18 @@ namespace GUI
             message.add("from", CsEndPoint.toString(endPoint_));
             message.add("command", "showFile");
             message.add("fileName", "DbCore::DbCore.h.1");
-            if (isDebug == true) { message.add("name", "Demo message of requirement 3b"); }
+            if (isDebug == true) { message.add("name", "Demo message of requirement 3c"); }
             Action<CsMessage> debug = (CsMessage msg) => { debugDisplay(msg, "send"); };
             Dispatcher.Invoke(debug, new Object[] { message });
             translater.postMessage(message);
             Console.Write("  The message below shows the client sending a view file and its metadata message file information.\n");
             message.show();
-            Console.Write("  The client will receive the reply from server with message has name \"Server replys Demo message of requirement 3b\"\n");
+            Console.Write("  The client will receive the reply from server with message has name \"Server replies Demo message of requirement 3c\"\n");
             Console.Write("  Meanwhile, a file window will popup, the left part of the window shows the full file text, and the right part of the file shows the file metadata.\n");
             Console.Write("  This popup window can prove that client can satisfy display categories as purpose dessribed.\n\n");
             Console.Write("  Other file as well as their metadata can be viewed by double-clicking the listview item in the browse tab. And they represents the whole repositoey contents.\n\n");
             Console.Write("  Which can prove that this client can view reporsitory contents.\n\n");
-            Console.Write("  PASSED -- Requirement 3b\n\n");
+            Console.Write("  PASSED -- Requirement 3c\n\n");
         }
 
         // -----< Demostration of requirement 4 >-----
@@ -1193,7 +1300,7 @@ namespace GUI
             Console.Write("Demostration of Requirement 6.\n\n");
             Console.Write("==============================\n\n");
             Console.Write("  Demostrate the communication system shall also support sending and receiving blocks of bytes to support file transfer\n\n");
-            Console.Write("  The \"content-length\" attribute shown in checkin, checkout message represents that file transfer are based on sending and receiving blocks of bytes of the file.\n\n");
+            Console.Write("  The \"content-length\" attribute shown in checkin, checkout, upload file, download file message represents that all file transfer operations are based on sending and receiving blocks of bytes of the file.\n\n");
             Console.Write("  Which can prove that the communication system are using block of bytes to transfer files.\n\n");
         }
 

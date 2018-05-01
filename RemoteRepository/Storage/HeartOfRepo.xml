@@ -2,41 +2,6 @@
   <Database>
     <record>
       <name>
-        Mine::MainWindow.xaml.cs.1
-      </name>
-      <description>
-        qaq
-      </description>
-      <dateTime>
-        Sun Apr 29 11:15:51 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/Mine_MainWindow.xaml.cs.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          test
-        </owner>
-        <nameSpace>
-          Mine
-        </nameSpace>
-        <categories>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
         DbCore::DbCore.h.1
       </name>
       <description>
@@ -110,45 +75,10 @@
     </record>
     <record>
       <name>
-        Mine::KeyValuePair.cs.1
-      </name>
-      <description>
-        go go
-      </description>
-      <dateTime>
-        Sun Apr 29 11:25:06 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/Mine_KeyValuePair.cs.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          Mine
-        </nameSpace>
-        <categories>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
         DbCore::DbCore.h.2
       </name>
       <description>
-        New version of DbCore.h
+        Version 2 DbCore header
       </description>
       <dateTime>
         Thu Mar 29 11:30:12 2018
@@ -169,6 +99,9 @@
           DbCore
         </nameSpace>
         <categories>
+          <category>
+            DbCore
+          </category>
           <category>
             Project 1
           </category>
@@ -224,11 +157,11 @@
         Source file of the server of project4
       </description>
       <dateTime>
-        Sun Apr  8 23:10:08 2018
+        Tue May  1 18:11:58 2018
       </dateTime>
       <children>
         <childName>
-          DbCore::DbCore.h.1
+          DbCore::DbCore.h.1$DbCore::DbCore.cpp.1
         </childName>
       </children>
       <payLoads>
@@ -286,251 +219,6 @@
           <category>
             Project2
           </category>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
-        GUI::KeyValuePair.cs.1
-      </name>
-      <description>
-        another test
-      </description>
-      <dateTime>
-        Sun Apr 29 11:22:24 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/GUI_KeyValuePair.cs.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          GUI
-        </nameSpace>
-        <categories>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
-        DbCore::DbCore_DbCore.cpp.1
-      </name>
-      <description>
-        again
-      </description>
-      <dateTime>
-        Sun Apr 29 12:54:44 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/DbCore_DbCore_DbCore.cpp.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          Administrator
-        </owner>
-        <nameSpace>
-          DbCore
-        </nameSpace>
-        <categories>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
-        Const::KeyValuePair.cs.1
-      </name>
-      <description>
-        go go go
-      </description>
-      <dateTime>
-        Sun Apr 29 11:27:11 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/Const_KeyValuePair.cs.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          Const
-        </nameSpace>
-        <categories>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
-        log::logFile.txt.1
-      </name>
-      <description>
-        new test
-      </description>
-      <dateTime>
-        Sun Apr 29 11:54:47 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/log_logFile.txt.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          
-        </owner>
-        <nameSpace>
-          log
-        </nameSpace>
-        <categories>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
-        Server::KeyValuePair.cs.1
-      </name>
-      <description>
-        Source file of the server of project4
-      </description>
-      <dateTime>
-        Sun Apr 29 12:56:30 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/Server_KeyValuePair.cs.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          Administrator
-        </owner>
-        <nameSpace>
-          Server
-        </nameSpace>
-        <categories>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
-        ::HeartOfRepo.xml.1
-      </name>
-      <description>
-        
-      </description>
-      <dateTime>
-        Sun Apr 29 13:01:40 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/_HeartOfRepo.xml.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          Administrator
-        </owner>
-        <nameSpace>
-          
-        </nameSpace>
-        <categories>
-          <category>
-            source
-          </category>
-        </categories>
-      </payLoads>
-    </record>
-    <record>
-      <name>
-        ::RemoteRepository.cpp.1
-      </name>
-      <description>
-        
-      </description>
-      <dateTime>
-        Sun Apr 29 13:02:39 2018
-      </dateTime>
-      <children>
-        <childName>
-          DbCore::DbCore.h.1
-        </childName>
-      </children>
-      <payLoads>
-        <payLoad>
-          ../Storage/_RemoteRepository.cpp.1
-        </payLoad>
-        <status>
-          open
-        </status>
-        <owner>
-          Administrator
-        </owner>
-        <nameSpace>
-          
-        </nameSpace>
-        <categories>
           <category>
             source
           </category>

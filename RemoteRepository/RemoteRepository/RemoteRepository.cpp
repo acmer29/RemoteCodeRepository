@@ -19,7 +19,7 @@ using Msg = MsgPassingCommunication::Message;
 std::string vectorToString(const std::vector<std::string>& toConvert) {
 	std::string result = "";
 	for (auto item : toConvert) {
-		result = item + "$";
+		result = result + item + "$";
 	}
 	if (result != "") result = result.substr(0, result.length() - 1);
 	return result;
@@ -177,7 +177,7 @@ Msg Server::checkInCallbackMessage(const EndPoint& from, const EndPoint& to, Msg
 		}
 	}
 	reply.attribute("errorInfo", errorInfo);
-	if (receiveMessage.containsKey("name")) reply.attribute("name", "Server replys " + receiveMessage.value("name"));
+	if (receiveMessage.containsKey("name")) reply.attribute("name", "Server replies " + receiveMessage.value("name"));
 	return reply;
 }
 
@@ -202,7 +202,7 @@ Msg Server::checkOutCallbackMessage(const EndPoint& from, const EndPoint& to, Ms
 	for (size_t i = 0; i < theFiles.size(); ++i) reply.attribute("successFile" + std::to_string(int(i)), theFiles[i]);
 	theFiles = worker.failCheckouts();
 	for (size_t i = 0; i < theFiles.size(); ++i) reply.attribute("failFile" + std::to_string(int(i)), theFiles[i]);
-	if (receiveMessage.containsKey("name")) reply.attribute("name", "Server replys " + receiveMessage.value("name"));
+	if (receiveMessage.containsKey("name")) reply.attribute("name", "Server replies " + receiveMessage.value("name"));
 	return reply;
 }
 
@@ -249,6 +249,7 @@ Msg Server::setFilterMessage(const EndPoint& from, const EndPoint& to, Msg recei
 	queryString += "payLoad: \"" + fileNameRegex + "\",";
 	if (receiveMessage.containsKey("dependencies")) queryString += "children: \"" + receiveMessage.value("dependencies") + "\",";
 	if (receiveMessage.containsKey("categories")) queryString += "category: \"" + receiveMessage.value("category") + "\",";
+	reply.attribute("query", queryString.substr(0, queryString.length() - 1));
 	result = querier.from(buildSource(receiveMessage.value("source"))).find(queryString.substr(0, queryString.length() - 1)).eval();
 	size_t count = 0;
 	for (auto item : result) {
@@ -272,6 +273,16 @@ bool shouldClose(const std::string& name) {
 	else return true;
 }
 
+// -----< speratorConverter: Convert seperator >-----
+std::string seperatorConverter(std::string toConvert, char oldOne, char newOne) {
+	size_t i = 0, len = toConvert.length();
+	while (i < len) {
+		if (toConvert[i] == oldOne) toConvert[i] = newOne;
+		i++;
+	}
+	return toConvert;
+}
+
 // -----< resumeCheckinMessage: Assamble resumeCheckinMessage >---------------------------------
 Msg Server::resumeCheckinMessage(const EndPoint& from, const EndPoint& to, Msg receiveMessage) {
 	Msg reply(to, from);
@@ -280,15 +291,14 @@ Msg Server::resumeCheckinMessage(const EndPoint& from, const EndPoint& to, Msg r
 	SWRTB::Checkin worker(repo);
 	std::string name = receiveMessage.value("fileKey");
 	std::string errorInfo = "";
-	std::cout << "----------" << receiveMessage.value("fileName") << "--------------" << std::endl;
 	try {
 		if (shouldClose(name) == true && receiveMessage.value("status") != "open") {
-			worker.checkin(receiveMessage.value("fileName"), receiveMessage.value("dependencies"), receiveMessage.value("description"),
-				receiveMessage.value("categories"), receiveMessage.value("nameSpace"), receiveMessage.value("owner"), true);
+			worker.checkin(receiveMessage.value("fileName"), seperatorConverter(receiveMessage.value("dependencies"), '$', ','), receiveMessage.value("description"),
+				seperatorConverter(receiveMessage.value("categories"), '$', ','), receiveMessage.value("nameSpace"), receiveMessage.value("owner"), true);
 		}
 		else {
-			worker.checkin(receiveMessage.value("fileName"), receiveMessage.value("dependencies"), receiveMessage.value("description"),
-				receiveMessage.value("categories"), receiveMessage.value("nameSpace"), receiveMessage.value("owner"), false);
+			worker.checkin(receiveMessage.value("fileName"), seperatorConverter(receiveMessage.value("dependencies"), '$', ','), receiveMessage.value("description"),
+				seperatorConverter(receiveMessage.value("categories"), '$', ','), receiveMessage.value("nameSpace"), receiveMessage.value("owner"), false);
 		}
 	}
 	catch (std::exception& ex) {
@@ -314,21 +324,21 @@ std::function<Msg(Msg)> echo = [](Msg msg) {
 	Msg reply = msg;
 	reply.to(msg.from());
 	reply.from(msg.to());
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
 	return reply;
 };
 
 // -----< trackAllCategories: reply trackAllCategories message >-----
 std::function<Msg(Msg)> trackAllCategories = [](Msg msg) {
 	Msg reply = Server::trackAllCategoriesMessage(msg.to(), msg.from());
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
 	return reply;
 };
 
 // -----< trackAllRecords: reply trackAllCategories message >-----
 std::function<Msg(Msg)> trackAllRecords = [](Msg msg) {
 	Msg reply = Server::trackAllRecordsMessage(msg.to(), msg.from());
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
 	return reply;
 };
 
@@ -345,7 +355,7 @@ std::function<Msg(Msg)> showFileCleanUp = [](Msg msg) {
 // -----< showFile: reply showFile message >-----
 std::function<Msg(Msg)> showFile = [](Msg msg) {
 	Msg reply = Server::showFileMessge(msg.to(), msg.from(), msg.value("fileName"));
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
 	return reply;
 };
 
@@ -364,35 +374,39 @@ std::function<Msg(Msg)> fileCheckout = [](Msg msg) {
 // -----< ping: reply ping message >-----
 std::function<Msg(Msg)> ping = [](Msg msg) {
 	Msg reply(msg.from(), msg.to());
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
 	reply.attribute("command", "ping");
 	return reply;
 };
 
-// -----< browseDescription: reply browseDescription message >-----
-std::function<Msg(Msg)> browseDescription = [](Msg msg) {
+// -----< uploadFiles: reply uploadFiles message >-----
+std::function<Msg(Msg)> uploadFiles = [](Msg msg) {
 	Msg reply(msg.from(), msg.to());
-	reply.attribute("command", "browseDescriptionCallback");
-	SWRTB::Core repo(Repository::repoHeartPath);
-	NoSqlDb::DbQuery<std::string> querier(repo.core());
-	std::vector<NoSqlDb::DbElement<std::string>> result =
-		querier.from(repo.core()).find("name", msg.value("fileName")).eval();
-	reply.attribute("description", result[0].descrip());
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	reply.attribute("command", "uploadFileCallback");
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
+	return reply;
+};
+
+// -----< downloadFiles: reply downloadFiles message >-----
+std::function<Msg(Msg)> downloadFiles = [](Msg msg) {
+	Msg reply(msg.from(), msg.to());
+	reply.attribute("command", "downloadFileCallback");
+	reply.attribute("file", msg.value("requestFile"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
 	return reply;
 };
 
 // -----< setFilter: reply setFilter message >-----
 std::function<Msg(Msg)> setFilter = [](Msg msg) {
 	Msg reply = Server::setFilterMessage(msg.to(), msg.from(), msg);
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
 	return reply;
 };
 
 // -----< resumeCheckin: reply resumeCheckin message >-----
 std::function<Msg(Msg)> resumeCheckin = [](Msg msg) {
 	Msg reply = Server::resumeCheckinMessage(msg.to(), msg.from(), msg);
-	if (msg.containsKey("name")) reply.attribute("name", "Server replys " + msg.value("name"));
+	if (msg.containsKey("name")) reply.attribute("name", "Server replies " + msg.value("name"));
 	return reply;
 };
 
@@ -415,7 +429,8 @@ int main()
 	server.addMsgProc("trackAllCategories", trackAllCategories);
 	server.addMsgProc("serverQuit", echo);
 	server.addMsgProc("ping", ping);
-	server.addMsgProc("browseDescription", browseDescription);
+	server.addMsgProc("downloadFile", downloadFiles);
+	server.addMsgProc("uploadFile", uploadFiles);
 	server.addMsgProc("setFilter", setFilter);
 	server.addMsgProc("resumeCheckin", resumeCheckin);
 	server.processMessages();

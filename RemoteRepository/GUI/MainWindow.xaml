@@ -61,7 +61,7 @@
 							<ColumnDefinition Width="1*"></ColumnDefinition>
 							<ColumnDefinition Width="1*"></ColumnDefinition>
 						</Grid.ColumnDefinitions>
-						<TextBox Grid.Column="0" Margin="5,5,66.5,5" Name="pathFileName" Grid.ColumnSpan="2" IsEnabled="False" Text="Click Browse to select the file" FontSize="14"/>
+						<TextBox Grid.Column="0" Margin="5,5,66.5,5" Name="pathFileName" Grid.ColumnSpan="2" IsEnabled="False" Text="Click Browse to select the file"/>
 						<Button  Grid.Column="1" Margin="5,5,0,5" Click="Open_FileForm" MouseEnter="Browse_MouseEnter" MouseLeave="mouseLeave">Browse</Button>
 					</Grid>
 					<Label Grid.Row="1" Grid.Column="0" Margin="5,5,5,5" HorizontalAlignment="Right">Namespace</Label>
@@ -146,12 +146,14 @@
 				</Grid>
 			</TabItem>
 			<TabItem Header="Check-Out">
-				<Grid Margin="25, 0, 25, 0">
+				<Grid Margin="5,0,5,0">
 					<Grid.RowDefinitions>
+						<RowDefinition Height="40"></RowDefinition>
 						<RowDefinition Height="*"></RowDefinition>
 						<RowDefinition Height="40"></RowDefinition>
 					</Grid.RowDefinitions>
-					<ListView Grid.Row="0" Margin="5,5,0,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="checkOutList">
+					<Label Margin="5,0,0,0" VerticalAlignment="Center">Select the item in the list below and then click "Check out" to checkout</Label>
+					<ListView Grid.Row="1" Margin="5,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="checkOutList">
 						<ListView.View>
 							<GridView>
 								<GridViewColumn Header="Namespace" Width="100" DisplayMemberBinding="{Binding Path=NameSpace}"/>
@@ -162,17 +164,20 @@
 							</GridView>
 						</ListView.View>
 					</ListView>
-					<CheckBox Grid.Row="1" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0 100,0" Name="recursiveCheckout" MouseEnter="RecursiveCheckout_MouseEnter" MouseLeave="mouseLeave">Checkout all its dependencies</CheckBox>
-					<Button Grid.Row="1" Margin="5,5,0,5" Width="80" HorizontalAlignment="Right" Click="Check_Out_Click" MouseEnter="Checkout_MouseEnter" MouseLeave="mouseLeave">Check out</Button>
+					<CheckBox Grid.Row="2" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0 100,0" Name="recursiveCheckout" MouseEnter="RecursiveCheckout_MouseEnter" MouseLeave="mouseLeave">Checkout all its dependencies</CheckBox>
+					<Button Grid.Row="2" Margin="5,5,0,5" Width="80" HorizontalAlignment="Right" Click="Check_Out_Click" MouseEnter="Checkout_MouseEnter" MouseLeave="mouseLeave">Check out</Button>
 				</Grid>
 			</TabItem>
 			<TabItem Header="Browse">
-				<Grid>
+				<Grid Margin="5,0,5,0">
 					<Grid.RowDefinitions>
+						<RowDefinition Height="40"></RowDefinition>
 						<RowDefinition Height="*"></RowDefinition>
 						<RowDefinition Height="40"></RowDefinition>
 					</Grid.RowDefinitions>
-					<ListView Grid.Row="0" Margin="5,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="browseList" MouseDoubleClick="browseList_DoubleClick">
+					<Label Margin="5,0,0,0" VerticalAlignment="Center">Double Click items in the list below to view its content and its metadata</Label>
+					<Button HorizontalAlignment="Right" VerticalAlignment="Center" Width="60" Click="browseRefresh" Content="Refresh"/>
+					<ListView Grid.Row="1" Margin="5,5,5,5" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Name="browseList" MouseDoubleClick="browseList_DoubleClick">
 						<ListView.View>
 							<GridView>
 								<GridViewColumn Header="Namespace" Width="100" DisplayMemberBinding="{Binding Path=NameSpace}"/>
@@ -183,7 +188,7 @@
 							</GridView>
 						</ListView.View>
 					</ListView>
-					<Grid Grid.Row="1" Margin="5,5,5,5">
+					<Grid Grid.Row="2" Margin="5,5,5,5">
 						<Grid.ColumnDefinitions>
 							<ColumnDefinition></ColumnDefinition>
 							<ColumnDefinition Width="80"></ColumnDefinition>

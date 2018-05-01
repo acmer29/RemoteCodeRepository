@@ -1,0 +1,18 @@
+About Project4
+===============================================================================
+Project4 implemented a remote repository with a GUI, its description are as below:
+
+The command line of GUI accept three arguments: 
+  "--u" with login username, if not set, the client will login as "Administrator"
+  "--p" with send port, if not set, the client will send message via port 8082
+  "--d" with debug flag, if not equals to "true", the client will not in debug mode
+
+Debug mode:
+  In debug mode (not command line argument "--d true"), the popup message will not 
+  be suppressed. User can get message notification from the message box.
+
+  When using it by running run.bat, the debug mode is disabled as default.
+
+  However, there are status bar below the window, user can also get operatrion 
+  result notification there.
+

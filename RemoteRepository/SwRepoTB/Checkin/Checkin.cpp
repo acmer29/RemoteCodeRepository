@@ -95,7 +95,7 @@ void Checkin::pathSolver(const std::string& pathFileName) {
 
 // -----< localPathSolver: Solve the path appears to be the working directory >-----
 void Checkin::localPathSolver(const std::string& fileName) {
-	querier.from(repo.core()).find("payLoad", workDirectory + fileName).find("status", "open");
+	querier.from(repo.core()).find("payLoad", workDirectory + fileName);
 	if (querier.eval().size() != 1) throw std::exception("Check-in: Cannot locate local file by given fileName.\n");
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
 	filesForCheckin.push_back(fileCplx.payLoad());
@@ -172,9 +172,10 @@ void Checkin::resumeCheckin(const std::string& pathFileName) {
 	NoSqlDb::DbElement<std::string> fileCplx = querier.eval()[0];
 	if (canTouch(fileCplx.owner(), owner_) == false) 
 		throw std::exception("Checkin: This file is not owned by you!\n");
-	if (dependencies_ != "$") querier.update("children", dependencies_);
-	if (description_ != "$") querier.update("description", description_);
-	if (categories_ != "$") querier.update("category", categories_);
+	if (dependencies_ != "$") querier.from(repo.core()).find("name", fileCplx.name()).update("children", dependencies_);
+	if (description_ != "$") querier.from(repo.core()).find("name", fileCplx.name()).update("description", description_);
+	if (categories_ != "$") querier.from(repo.core()).find("name", fileCplx.name()).update("category", categories_);
+	// querier.from(repo.core()).find("name", fileCplx.name()).resultDisplay();
 	return;
 }
 
