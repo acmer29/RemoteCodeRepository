@@ -336,11 +336,13 @@ namespace GUI
             {
                 closeCheckin.Content = "Undo";
                 status.Text = "close";
+                theFile.Status = "close";
             }
             else
             {
                 closeCheckin.Content = "Close";
                 status.Text = "open";
+                theFile.Status = "open";
             }
             applyChanges.IsEnabled = true;
         }

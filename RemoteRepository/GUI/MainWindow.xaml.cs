@@ -712,20 +712,20 @@ namespace GUI
         private void Change_CurrentUser(object sender, RoutedEventArgs e)
         {
             string tmp = correctUser(userName.Text);
-            if (tmp == "") { userName.Text = "Anonymous"; theUser.Text = "Anonymous"; }
+            if (tmp == "") tmp = "Anonymous";
+            if (isAlphaDigit(tmp) == false)
+            {
+                hintDisplay("User name should only consist of digits and letters");
+                userName.Text = theUser.Text;
+                return;
+            }
             else
             {
-                if (isAlphaDigit(tmp) == false)
-                {
-                    hintDisplay("User name should only consist of digits and letters");
-                    userName.Text = theUser.Text;
-                    return;
-                }
-                else
-                {
-                    theUser.Text = tmp;
-                    hintDisplay(userName.Text + " has logged in");
-                }
+                theUser.Text = tmp;
+                argUser = tmp;
+                hintDisplay(userName.Text + " has logged in");
+                Console.Title = "Client Console - User: " + argUser + " - Port: " + argPort;
+                Title = "Client Console - User: " + argUser + " - Port: " + argPort;
             }
         }
 
