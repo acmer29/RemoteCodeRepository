@@ -329,7 +329,7 @@ namespace GUI
                 while (enumer.MoveNext())
                 {
                     if (enumer.Current.Key.Contains("errorInfo") && enumer.Current.Value != "") errorInfo = enumer.Current.Value;
-                    else if (enumer.Current.Key.Contains("errorInfo") && enumer.Current.Value == "") trackFiles();
+                    else if (enumer.Current.Key.Contains("errorInfo") && enumer.Current.Value == "") { trackFiles(); trackAllCategoriesHandler(); }
                 };
                 if (isDebug == false)
                     MessageBox.Show(errorInfo, "File Information Modification", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -519,7 +519,7 @@ namespace GUI
                 while (enumer.MoveNext())
                 {
                     if (enumer.Current.Key == "errorInfo" && enumer.Current.Value != "") errorInfo = enumer.Current.Value;
-                    else if (enumer.Current.Key == "errorInfo" && enumer.Current.Value == "") trackFiles();
+                    else if (enumer.Current.Key == "errorInfo" && enumer.Current.Value == "") { trackFiles(); trackAllCategoriesHandler(); }
                 }
                 if (isDebug == false)
                     MessageBox.Show(errorInfo, "Checkin result", MessageBoxButton.OK, MessageBoxImage.Information);
@@ -556,11 +556,11 @@ namespace GUI
             if(isDebug == true) { message.add("name", "Demo message of requirement 2a"); }
             message.add("command", "fileCheckin");
             message.add("content-length", sourceFileInfo.Length.ToString());
-            message.add("description", description.Text);
-            message.add("dependencies", hashSetToString(checkInDependencies));
-            message.add("categories", hashSetToString(checkInCategories));
-            message.add("nameSpace", nameSpace.Text);
-            message.add("owner", theUser.Text);
+            message.add("description", description.Text.Trim());
+            message.add("dependencies", hashSetToString(checkInDependencies).Trim());
+            message.add("categories", hashSetToString(checkInCategories).Trim());
+            message.add("nameSpace", nameSpace.Text.Trim());
+            message.add("owner", theUser.Text.Trim());
             message.add("close", closeCheckIn.IsChecked.ToString().ToLower());
             Action<CsMessage> debug = (CsMessage msg) => debugDisplay(msg, "send"); 
             Dispatcher.Invoke(debug, new Object[] { message });
